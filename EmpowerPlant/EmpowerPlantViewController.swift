@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Sentry
 
 class EmpowerPlantViewController: UIViewController {
 
