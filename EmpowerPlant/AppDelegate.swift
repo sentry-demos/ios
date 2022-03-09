@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Sentry
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

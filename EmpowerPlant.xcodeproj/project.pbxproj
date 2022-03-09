@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
 		D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B227D8291D006650AF /* AppDelegate.swift */; };
 		D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B427D8291D006650AF /* SceneDelegate.swift */; };
 		D17C73B727D8291D006650AF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B627D8291D006650AF /* ViewController.swift */; };
@@ -19,6 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
+		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.debug.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.debug.xcconfig"; sourceTree = "<group>"; };
 		D17C73AF27D8291D006650AF /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D17C73B227D8291D006650AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D17C73B427D8291D006650AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -37,17 +41,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A2BF5384A6D041CDB3FCA8D9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D17C73A627D8291D006650AF = {
 			isa = PBXGroup;
 			children = (
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
 				D17C73B027D8291D006650AF /* Products */,
+				DBBFE14A41453664EF0F8F57 /* Pods */,
+				A2BF5384A6D041CDB3FCA8D9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -76,6 +91,16 @@
 			path = EmpowerPlant;
 			sourceTree = "<group>";
 		};
+		DBBFE14A41453664EF0F8F57 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */,
+				57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -83,9 +108,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D17C73C327D8291D006650AF /* Build configuration list for PBXNativeTarget "EmpowerPlant" */;
 			buildPhases = (
+				C23F49D22CAB6B4570AD18F4 /* [CP] Check Pods Manifest.lock */,
 				D17C73AB27D8291D006650AF /* Sources */,
 				D17C73AC27D8291D006650AF /* Frameworks */,
 				D17C73AD27D8291D006650AF /* Resources */,
+				64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -140,6 +167,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C23F49D22CAB6B4570AD18F4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-EmpowerPlant-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D17C73AB27D8291D006650AF /* Sources */ = {
@@ -295,6 +364,7 @@
 		};
 		D17C73C427D8291D006650AF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -313,6 +383,7 @@
 		};
 		D17C73C527D8291D006650AF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
