@@ -1,0 +1,356 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B227D8291D006650AF /* AppDelegate.swift */; };
+		D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B427D8291D006650AF /* SceneDelegate.swift */; };
+		D17C73B727D8291D006650AF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B627D8291D006650AF /* ViewController.swift */; };
+		D17C73BA27D8291D006650AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73B827D8291D006650AF /* Main.storyboard */; };
+		D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BB27D8291D006650AF /* Assets.xcassets */; };
+		D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */; };
+		D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */; };
+		D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CE27D82ED1006650AF /* CartViewController.swift */; };
+		D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73D127D83321006650AF /* ListAppViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D17C73AF27D8291D006650AF /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D17C73B227D8291D006650AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D17C73B427D8291D006650AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D17C73B627D8291D006650AF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D17C73B927D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D17C73BB27D8291D006650AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D17C73BE27D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D17C73C027D8291D006650AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantViewController.swift; sourceTree = "<group>"; };
+		D17C73CE27D82ED1006650AF /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
+		D17C73D127D83321006650AF /* ListAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D17C73AC27D8291D006650AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D17C73A627D8291D006650AF = {
+			isa = PBXGroup;
+			children = (
+				D17C73B127D8291D006650AF /* EmpowerPlant */,
+				D17C73B027D8291D006650AF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D17C73B027D8291D006650AF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D17C73AF27D8291D006650AF /* EmpowerPlant.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D17C73B127D8291D006650AF /* EmpowerPlant */ = {
+			isa = PBXGroup;
+			children = (
+				D17C73B227D8291D006650AF /* AppDelegate.swift */,
+				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
+				D17C73B627D8291D006650AF /* ViewController.swift */,
+				D17C73B827D8291D006650AF /* Main.storyboard */,
+				D17C73D127D83321006650AF /* ListAppViewController.swift */,
+				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
+				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
+				D17C73BB27D8291D006650AF /* Assets.xcassets */,
+				D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */,
+				D17C73C027D8291D006650AF /* Info.plist */,
+			);
+			path = EmpowerPlant;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D17C73AE27D8291D006650AF /* EmpowerPlant */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D17C73C327D8291D006650AF /* Build configuration list for PBXNativeTarget "EmpowerPlant" */;
+			buildPhases = (
+				D17C73AB27D8291D006650AF /* Sources */,
+				D17C73AC27D8291D006650AF /* Frameworks */,
+				D17C73AD27D8291D006650AF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EmpowerPlant;
+			productName = EmpowerPlant;
+			productReference = D17C73AF27D8291D006650AF /* EmpowerPlant.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D17C73A727D8291D006650AF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1240;
+				LastUpgradeCheck = 1240;
+				TargetAttributes = {
+					D17C73AE27D8291D006650AF = {
+						CreatedOnToolsVersion = 12.4;
+					};
+				};
+			};
+			buildConfigurationList = D17C73AA27D8291D006650AF /* Build configuration list for PBXProject "EmpowerPlant" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D17C73A627D8291D006650AF;
+			productRefGroup = D17C73B027D8291D006650AF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D17C73AE27D8291D006650AF /* EmpowerPlant */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D17C73AD27D8291D006650AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */,
+				D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */,
+				D17C73BA27D8291D006650AF /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D17C73AB27D8291D006650AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
+				D17C73B727D8291D006650AF /* ViewController.swift in Sources */,
+				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
+				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
+				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
+				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D17C73B827D8291D006650AF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D17C73B927D8291D006650AF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D17C73BE27D8291D006650AF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D17C73C127D8291D006650AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D17C73C227D8291D006650AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D17C73C427D8291D006650AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = EmpowerPlant/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sentrydemos.ios.EmpowerPlant;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D17C73C527D8291D006650AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = EmpowerPlant/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sentrydemos.ios.EmpowerPlant;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D17C73AA27D8291D006650AF /* Build configuration list for PBXProject "EmpowerPlant" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D17C73C127D8291D006650AF /* Debug */,
+				D17C73C227D8291D006650AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D17C73C327D8291D006650AF /* Build configuration list for PBXNativeTarget "EmpowerPlant" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D17C73C427D8291D006650AF /* Debug */,
+				D17C73C527D8291D006650AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D17C73A727D8291D006650AF /* Project object */;
+}
