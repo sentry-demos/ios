@@ -6,13 +6,27 @@
 //
 
 import UIKit
+import Sentry
 
 class ListAppViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        SentrySDK.capture(message: "Message from List App")
 
         // Do any additional setup after loading the view.
+        do {
+            try callMethodThatThrowsError()
+        } catch let error as NSError {
+            SentrySDK.capture(error: error) { (scope) in
+                scope.setLevel(.fatal)
+            }
+        }
+    }
+    
+    func callMethodThatThrowsError() throws{
+        throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Handled Exception"])
     }
     
 

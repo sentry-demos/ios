@@ -7,6 +7,8 @@
 
 import UIKit
 
+// This controller is not being used. It came with the project when the project was bootstrapped
+// We created new controllers rather than refactor/renaming ViewController.swift
 class ViewController: UIViewController {
 
     override func viewDidLoad() {

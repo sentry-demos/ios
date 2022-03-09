@@ -1,7 +1,10 @@
+## Overview
+This app uses UIKit
 
 ## Setup
 - install XCode
 - iPhone 11 tested
+- iPhone 14.4
 
 `pod install`
 
@@ -46,3 +49,5 @@ Problem - 'xcode not creating pods directory'
 XCode > File > Open > select the project's .xcoworkspace file, not the entire project directory  
 https://stackoverflow.com/questions/32906165/xcode-not-detecting-pods-directory 
 https://stackoverflow.com/questions/47343066/pod-files-not-showing-up-on-xcode
+
+TODO - need upload debug symbols.
