@@ -7,7 +7,6 @@
 
 import UIKit
 import Sentry
-//import Product
 
 class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -28,7 +27,9 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.frame = view.bounds // Show/hides on top of green background
+        
+        // Comment this out and to see the green background and no data in the rows
+        tableView.frame = view.bounds
         
         // Do any additional setup after loading the view.
         configureNavigationItems()
@@ -43,17 +44,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = products[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = model.title // "Hello Title"
-//        cell.textLabel?.text = "Placeholder"
+        cell.textLabel?.text = model.title
         return cell
     }
     
     func getAllProducts() {
         do {
-//            let products = try context.fetch(Product.fetchRequest())
             self.products = try context.fetch(Product.fetchRequest())
             DispatchQueue.main.async {
-                print("getAllProducts")
                 self.tableView.reloadData()
             }
         }
@@ -67,13 +65,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         newProduct.title = title
         newProduct.text = "thedescription"
         do {
-            print("createProduct")
             try context.save()
-            print("then...")
             getAllProducts()
         }
         catch {
-            
+            // error
         }
     }
 
@@ -104,7 +100,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             target: self,
             action: #selector(addToDb)
         )
-        // goToCart
+        // TODO - put goToCart back eventually for the above #selector
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "List App",
@@ -120,8 +116,18 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                                       message: "Enter new product title",
                                       preferredStyle: .alert)
         alert.addTextField(configurationHandler: nil)
-
-        // WORKED
+        
+        // WORKS
+        alert.addAction(UIAlertAction(title:"Submit", style: .cancel, handler: { [weak self] _ in
+            guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
+                return
+            }
+            self?.createProduct(title: text)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
+        // ALSO WORKED
 //        alert.addTextField()
 //        let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
 //            print("here")
@@ -129,18 +135,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 //        }
 //        alert.addAction(submitButton)
 //        self.present(alert, animated: true, completion: nil)
-        
-        // WORKS, handler
-        alert.addAction(UIAlertAction(title:"Submit", style: .cancel, handler: { [weak self] _ in
-            guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
-                print(".")
-                return
-            }
-            print("..")
-            self?.createProduct(title: text)
-        }))
-        
-        self.present(alert, animated: true, completion: nil)
     }
     
     @objc
