@@ -7,14 +7,59 @@
 
 import UIKit
 import Sentry
+//import Product
 
 class EmpowerPlantViewController: UIViewController {
 
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Empower Plant"
         // Do any additional setup after loading the view.
         configureNavigationItems()
+    }
+    
+    func getAllProducts() {
+        do {
+            let products = try context.fetch(Product.fetchRequest())
+//            products
+        }
+        catch {
+            // error
+        }
+    }
+    
+    func createProduct(name: String) {
+        let newProduct = Product(context: context)
+        newProduct.title = "thetitle"
+        newProduct.text = "thedescription"
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
+    }
+
+    func deleteProduct(product: Product) {
+        context.delete(product)
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
+    }
+
+    func updateProduct(product: Product, newTitle:  String) {
+        product.title = newTitle
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
     }
     
     private func configureNavigationItems() {

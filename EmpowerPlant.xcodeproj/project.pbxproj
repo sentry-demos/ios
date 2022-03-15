@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
+		D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */; };
 		D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B227D8291D006650AF /* AppDelegate.swift */; };
 		D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B427D8291D006650AF /* SceneDelegate.swift */; };
 		D17C73B727D8291D006650AF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B627D8291D006650AF /* ViewController.swift */; };
@@ -17,13 +18,15 @@
 		D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */; };
 		D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CE27D82ED1006650AF /* CartViewController.swift */; };
 		D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73D127D83321006650AF /* ListAppViewController.swift */; };
+		D191948B27E01335007845C5 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D191948A27E01335007845C5 /* Product+CoreDataProperties.swift */; };
+		D191948E27E01337007845C5 /* Product+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D191948D27E01337007845C5 /* Product+CoreDataClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.debug.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.debug.xcconfig"; sourceTree = "<group>"; };
-		D17C73AF27D8291D006650AF /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		D17C73B227D8291D006650AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D17C73B427D8291D006650AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D17C73B627D8291D006650AF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -34,6 +37,9 @@
 		D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantViewController.swift; sourceTree = "<group>"; };
 		D17C73CE27D82ED1006650AF /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		D17C73D127D83321006650AF /* ListAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppViewController.swift; sourceTree = "<group>"; };
+		D191948627E011F2007845C5 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D191948A27E01335007845C5 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Product+CoreDataProperties.swift"; path = "/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		D191948D27E01337007845C5 /* Product+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Product+CoreDataClass.swift"; path = "/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataClass.swift"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,18 +66,10 @@
 			isa = PBXGroup;
 			children = (
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
-				D17C73B027D8291D006650AF /* Products */,
 				DBBFE14A41453664EF0F8F57 /* Pods */,
 				A2BF5384A6D041CDB3FCA8D9 /* Frameworks */,
+				D191948627E011F2007845C5 /* EmpowerPlant.app */,
 			);
-			sourceTree = "<group>";
-		};
-		D17C73B027D8291D006650AF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D17C73AF27D8291D006650AF /* EmpowerPlant.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D17C73B127D8291D006650AF /* EmpowerPlant */ = {
@@ -79,9 +77,12 @@
 			children = (
 				D17C73B227D8291D006650AF /* AppDelegate.swift */,
 				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
+				D191948D27E01337007845C5 /* Product+CoreDataClass.swift */,
 				D17C73B627D8291D006650AF /* ViewController.swift */,
+				D191948A27E01335007845C5 /* Product+CoreDataProperties.swift */,
 				D17C73B827D8291D006650AF /* Main.storyboard */,
 				D17C73D127D83321006650AF /* ListAppViewController.swift */,
+				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
 				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
 				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
 				D17C73BB27D8291D006650AF /* Assets.xcassets */,
@@ -97,7 +98,6 @@
 				CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */,
 				57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -120,7 +120,7 @@
 			);
 			name = EmpowerPlant;
 			productName = EmpowerPlant;
-			productReference = D17C73AF27D8291D006650AF /* EmpowerPlant.app */;
+			productReference = D191948627E011F2007845C5 /* EmpowerPlant.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -146,7 +146,7 @@
 				Base,
 			);
 			mainGroup = D17C73A627D8291D006650AF;
-			productRefGroup = D17C73B027D8291D006650AF /* Products */;
+			productRefGroup = D17C73A627D8291D006650AF;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -218,8 +218,11 @@
 				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
 				D17C73B727D8291D006650AF /* ViewController.swift in Sources */,
 				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
+				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
+				D191948E27E01337007845C5 /* Product+CoreDataClass.swift in Sources */,
 				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
+				D191948B27E01335007845C5 /* Product+CoreDataProperties.swift in Sources */,
 				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -422,6 +425,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */,
+			);
+			currentVersion = D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = D17C73A727D8291D006650AF /* Project object */;
 }
