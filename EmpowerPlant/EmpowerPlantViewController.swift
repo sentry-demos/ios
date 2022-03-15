@@ -23,7 +23,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Empower Plant"
-        
+        print("Hiiiiii")
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
@@ -35,6 +35,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         configureNavigationItems()
 
         getAllProducts()
+        getAllProductsFromServer()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -46,6 +47,43 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = model.title
         return cell
+    }
+    
+    func getAllProductsFromServer() {
+        print("getAllProductsFromServer")
+        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        struct Product1: Decodable {
+
+            // MARK: - Properties
+            let id: Int
+            let title: String
+            let description: String
+            let descriptionfull: String
+            let img: String
+            let imgcropped: String
+            let price: Int
+            // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
+
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                if let products = try? JSONDecoder().decode([Product1].self, from: data) {
+                    // Prints the 4 products from server, successfully
+                    for product in products {
+                        print(product.title, product.description)
+                    }
+                } else {
+                    print("Invalid Response")
+                }
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+            }
+        }
+        task.resume()
     }
     
     func getAllProducts() {
@@ -94,6 +132,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     private func configureNavigationItems() {
+        print("configureNavigationItems")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Cart",
             style: .plain,

@@ -51,3 +51,5 @@ https://stackoverflow.com/questions/32906165/xcode-not-detecting-pods-directory
 https://stackoverflow.com/questions/47343066/pod-files-not-showing-up-on-xcode
 
 TODO - need upload debug symbols.
+
+https://programmingwithswift.com/add-core-data-to-existing-ios-project/
