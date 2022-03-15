@@ -13,6 +13,7 @@ import CoreData
 extension Product {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
+        print("fetchRequest")
         return NSFetchRequest<Product>(entityName: "Product")
     }
 
