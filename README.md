@@ -53,3 +53,12 @@ https://stackoverflow.com/questions/47343066/pod-files-not-showing-up-on-xcode
 TODO - need upload debug symbols.
 
 https://programmingwithswift.com/add-core-data-to-existing-ios-project/
+
+
+
+"After that, I'll show you how to conform your managed object to Decodable"
+https://www.donnywals.com/using-codable-with-core-data-and-nsmanagedobject/
+JSON into Swift objects.
+
+followed this...  
+https://cocoacasts.com/networking-fundamentals-how-to-make-an-http-request-in-swift

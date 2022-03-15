@@ -23,18 +23,18 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Empower Plant"
-        print("Hiiiiii")
+
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Comment this out and to see the green background and no data in the rows
+        // Dev Note - Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
         
-        // Do any additional setup after loading the view.
         configureNavigationItems()
 
-        getAllProducts()
+        // TODO - clear Db on startup, and insert the objects from server into the db
+        getAllProductsFromDb()
         getAllProductsFromServer()
     }
     
@@ -71,6 +71,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
+                // Can't use 'Product' here because it can't be Decoded, so testing with Product1 for now
                 if let products = try? JSONDecoder().decode([Product1].self, from: data) {
                     // Prints the 4 products from server, successfully
                     for product in products {
@@ -83,10 +84,21 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                 print("HTTP Request Failed \(error)")
             }
         }
+        // print("Dev Note - I am printed before the products info above is printed")
         task.resume()
+        
+        // Don't Reload Table, because we still have to conver the above JSON objects from the server into Swift objects
+//        do {
+//            DispatchQueue.main.async {
+//                self.tableView.reloadData()
+//            }
+//        }
+//        catch {
+//            //error
+//        }
     }
     
-    func getAllProducts() {
+    func getAllProductsFromDb() {
         do {
             self.products = try context.fetch(Product.fetchRequest())
             DispatchQueue.main.async {
@@ -104,7 +116,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         newProduct.text = "thedescription"
         do {
             try context.save()
-            getAllProducts()
+            getAllProductsFromDb()
         }
         catch {
             // error
@@ -132,14 +144,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     private func configureNavigationItems() {
-        print("configureNavigationItems")
+        
+        // TODO - put goToCart back eventually for the below #selector
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Cart",
             style: .plain,
             target: self,
             action: #selector(addToDb)
         )
-        // TODO - put goToCart back eventually for the above #selector
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "List App",
