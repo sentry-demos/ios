@@ -36,7 +36,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         /* TODO
          1 get products from server (so we get http.client span)
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
-         3 get products from DB (so we get db.query span)
+         3 get products from DB (so we get db.query span) and reload the table with this data
          */
         getAllProductsFromServer()
         getAllProductsFromDb()

@@ -11,9 +11,15 @@ import CoreData
 
 @objc(Product)
 public class Product: NSManagedObject {
-//    required convenience public init(from decoder: Decoder) throws {
     required convenience public init(from decoder: Decoder) throws {
-// TODO deprecate all the Decodable properties
+        self.init()
+    }
+}
+
+
+// TODO Deprecate this soon
+// This was all the boilerplate needed for mapping the HTTP Response directly into a Product CoreData Class,
+// in addition to changes needed in XCode settings for the Product Entity
 //        enum CodingKeys: String, CodingKey {
 //            case title
 //            case shortdescription
@@ -37,9 +43,6 @@ public class Product: NSManagedObject {
 //
 //
 //        self.init(entity: entity, insertInto: context)
-        self.init()
-    }
-}
 
 //enum ManagedObjectError: Error {
 //    case decodeContextError
