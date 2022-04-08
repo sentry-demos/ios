@@ -1,5 +1,6 @@
 #import "PrivateSentrySDKOnly.h"
 #import "SentryDebugImageProvider.h"
+#import "SentryInstallation.h"
 #import "SentrySDK+Private.h"
 #import "SentrySerialization.h"
 #import <Foundation/Foundation.h>
@@ -16,6 +17,9 @@ PrivateSentrySDKOnly ()
 
 static SentryOnAppStartMeasurementAvailable _onAppStartMeasurmentAvailable;
 static BOOL _appStartMeasurementHybridSDKMode = NO;
+#if SENTRY_HAS_UIKIT
+static BOOL _framesTrackingMeasurementHybridSDKMode = NO;
+#endif
 
 - (instancetype)init
 {
@@ -50,6 +54,11 @@ static BOOL _appStartMeasurementHybridSDKMode = NO;
     return [SentrySDK getAppStartMeasurement];
 }
 
++ (NSString *)installationID
+{
+    return [SentryInstallation id];
+}
+
 + (SentryOnAppStartMeasurementAvailable)onAppStartMeasurementAvailable
 {
     return _onAppStartMeasurmentAvailable;
@@ -72,6 +81,16 @@ static BOOL _appStartMeasurementHybridSDKMode = NO;
 }
 
 #if SENTRY_HAS_UIKIT
+
++ (BOOL)framesTrackingMeasurementHybridSDKMode
+{
+    return _framesTrackingMeasurementHybridSDKMode;
+}
+
++ (void)setFramesTrackingMeasurementHybridSDKMode:(BOOL)framesTrackingMeasurementHybridSDKMode
+{
+    _framesTrackingMeasurementHybridSDKMode = framesTrackingMeasurementHybridSDKMode;
+}
 
 + (BOOL)isFramesTrackingRunning
 {

@@ -33,9 +33,13 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         configureNavigationItems()
 
-        // TODO - clear Db on startup, and insert the objects from server into the db
-        getAllProductsFromDb()
+        /* TODO
+         1 get products from server (so we get http.client span)
+         2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
+         3 get products from DB (so we get db.query span)
+         */
         getAllProductsFromServer()
+        getAllProductsFromDb()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -55,8 +59,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        struct Product1: Decodable {
-
+        struct ProductMap: Decodable {
             // MARK: - Properties
             let id: Int
             let title: String
@@ -66,16 +69,15 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             let imgcropped: String
             let price: Int
             // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
-
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
-                // Can't use 'Product' here because it can't be Decoded, so testing with Product1 for now
-                if let products = try? JSONDecoder().decode([Product1].self, from: data) {
-                    // Prints the 4 products from server, successfully
-                    for product in products {
-                        print(product.title, product.description)
+                if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
+                    for product in productsResponse {
+                        print(product.title)
+                        // Writes to CoreData
+                        self.createProduct(title: product.title)
                     }
                 } else {
                     print("Invalid Response")
@@ -99,6 +101,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     func getAllProductsFromDb() {
+        print("> getAllProductsFromDb")
         do {
             self.products = try context.fetch(Product.fetchRequest())
             DispatchQueue.main.async {

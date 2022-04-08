@@ -2,7 +2,7 @@
 //  Product+CoreDataProperties.swift
 //  
 //
-//  Created by William Capozzoli on 3/14/22.
+//  Created by William Capozzoli on 3/28/22.
 //
 //
 

@@ -4,14 +4,22 @@
 
 @implementation SentryDefaultObjCRuntimeWrapper
 
-- (int)getClassList:(__unsafe_unretained Class *)buffer bufferCount:(int)bufferCount
++ (instancetype)sharedInstance
 {
-    return objc_getClassList(buffer, bufferCount);
+    static SentryDefaultObjCRuntimeWrapper *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{ instance = [[self alloc] init]; });
+    return instance;
 }
 
-- (void)countIterateClasses
+- (const char **)copyClassNamesForImage:(const char *)image amount:(unsigned int *)outCount
 {
-    // Do nothing
+    return objc_copyClassNamesForImage(image, outCount);
+}
+
+- (const char *)class_getImageName:(Class)cls
+{
+    return class_getImageName(cls);
 }
 
 @end
