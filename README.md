@@ -62,3 +62,9 @@ JSON into Swift objects.
 
 followed this...  
 https://cocoacasts.com/networking-fundamentals-how-to-make-an-http-request-in-swift
+
+3/28  
+
+class vs extension...
+
+https://developer.apple.com/forums/thread/50610

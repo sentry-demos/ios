@@ -99,13 +99,15 @@ NSString *const DropSessionLogMessage = @"Session has no release name. Won't sen
 
 /** Internal constructor for testing */
 - (instancetype)initWithOptions:(SentryOptions *)options
-                   andTransport:(id<SentryTransport>)transport
-                 andFileManager:(SentryFileManager *)fileManager
+                      transport:(id<SentryTransport>)transport
+                    fileManager:(SentryFileManager *)fileManager
+                threadInspector:(SentryThreadInspector *)threadInspector
 {
     self = [self initWithOptions:options];
 
     self.transport = transport;
     self.fileManager = fileManager;
+    self.threadInspector = threadInspector;
 
     return self;
 }
@@ -456,6 +458,9 @@ NSString *const DropSessionLogMessage = @"Session has no release name. Won't sen
     // User can't be nil as setUserIdIfNoUserSet sets it.
     if (self.options.sendDefaultPii && nil == event.user.ipAddress) {
         // Let Sentry infer the IP address from the connection.
+        // Due to backward compatibility concerns, Sentry servers set the IP address to {{auto}} out
+        // of the box for only Cocoa and JavaScript, which makes this toggle currently somewhat
+        // useless. Still, we keep it for future compatibility reasons.
         event.user.ipAddress = @"{{auto}}";
     }
 
