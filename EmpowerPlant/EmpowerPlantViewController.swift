@@ -172,8 +172,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     private func configureNavigationItems() {
-        
-        // TODO - put goToCart back eventually for the below #selector
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Cart",
             style: .plain,
@@ -185,7 +183,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             title: "List App",
             style: .plain,
             target: self,
-            action: #selector(goToListApp)
+            action: #selector(clearDb) // TODO restore goToListApp
         )
     }
     
@@ -235,10 +233,20 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         // Pass the selected object to the new view controller.
     }
     */
+    
+    @objc
+    func clearDb() {
+        print("> clearDb")
+//        self.products = try context.fetch(Product.fetchRequest())
+        for product in self.products {
+            deleteProduct(product: product)
+        }
+        refreshTable()
+    }
 
     @objc
     func refreshTable() {
-//        print("> refresh table") // why is this executing so much
+        // print("> refresh table") // why is this executing so many times on load
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
