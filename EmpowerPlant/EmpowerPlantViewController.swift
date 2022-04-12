@@ -110,13 +110,13 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 //                deleteProduct(product: product)
 //            }
             
-            for product in self.products {
+//            for product in self.products {
 //                print(product.productId, product.title, product.productDescriptionFull)
-            }
-//
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+//            }
+            refreshTable()
+//            DispatchQueue.main.async {
+//                self.tableView.reloadData()
+//            }
         }
         catch {
             // error
@@ -236,4 +236,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     */
 
+    @objc
+    func refreshTable() {
+//        print("> refresh table") // why is this executing so much
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
 }
