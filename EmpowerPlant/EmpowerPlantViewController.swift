@@ -77,7 +77,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                     for product in productsResponse {
                         print(product.title)
                         // Writes to CoreData
-                        self.createProduct(title: product.title)
+                        self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
                     }
                 } else {
                     print("Invalid Response")
@@ -86,7 +86,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                 print("HTTP Request Failed \(error)")
             }
         }
-        // print("Dev Note - I am printed before the products info above is printed")
+
         task.resume()
         
         // Don't Reload Table, because we still have to conver the above JSON objects from the server into Swift objects
@@ -104,6 +104,16 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         print("> getAllProductsFromDb")
         do {
             self.products = try context.fetch(Product.fetchRequest())
+            
+            // TEMPORARY - this is for testing purposes only
+//            for product in self.products {
+//                deleteProduct(product: product)
+//            }
+            
+            for product in self.products {
+                print(product.productId, product.title, product.productDescriptionFull)
+            }
+//
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -113,10 +123,25 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
     }
     
-    func createProduct(title: String) {
+    //func createProduct(id: Int, title: String, description: String, descriptionfull: String, img: String, imgcropped: String, price: price) {
+    func createProduct(productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String, imgCropped: String, price: String) {
         let newProduct = Product(context: context)
+        
+        newProduct.productId = productId // 'id' was a reserved word in swift
         newProduct.title = title
-        newProduct.text = "thedescription"
+        newProduct.productDescription = productDescription // 'description' was a reserved word in swift
+        newProduct.productDescriptionFull = productDescriptionFull
+        newProduct.img = img
+        newProduct.imgCropped = imgCropped
+        newProduct.price = price
+        
+//        let id: Int
+//        let title: String
+//        let description: String
+//        let descriptionfull: String
+//        let img: String
+//        let imgcropped: String
+//        let price: Int
         do {
             try context.save()
             getAllProductsFromDb()
@@ -176,7 +201,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
                 return
             }
-            self?.createProduct(title: text)
+            self?.createProduct(productId: "123", title: text, productDescription: "product.description", productDescriptionFull: "product.description.full", img:"img", imgCropped:"img.cropped", price:"1")
         }))
         
         self.present(alert, animated: true, completion: nil)
