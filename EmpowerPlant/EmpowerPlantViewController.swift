@@ -38,9 +38,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
-        // we always want a http request span in our Transaction
+        
         getAllProductsFromServer()
-        // we always want a CoreData span in our Transaction
         getAllProductsFromDb()
         
         print("> isEmpty", ShoppingCart.instance.isEmpty)
@@ -57,6 +56,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         return cell
     }
     
+    // Also writes them into db if db is empty
     func getAllProductsFromServer() {
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
         var request = URLRequest(url: url)
@@ -80,7 +80,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                     if (self.products.count == 0) {
                         print("> was 0")
                         for product in productsResponse {
-                            // print(product.title)
                             self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
                         }
                     } else {
@@ -95,16 +94,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
 
         task.resume()
-        
-        // Don't Reload Table, because we still have to conver the above JSON objects from the server into Swift objects
-//        do {
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
-//        }
-//        catch {
-//            //error
-//        }
     }
     
     func getAllProductsFromDb() {
@@ -120,7 +109,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
     }
     
-    //func createProduct(id: Int, title: String, description: String, descriptionfull: String, img: String, imgcropped: String, price: price) {
     func createProduct(productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String, imgCropped: String, price: String) {
         let newProduct = Product(context: context)
         
@@ -132,13 +120,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         newProduct.imgCropped = imgCropped
         newProduct.price = price
         
-//        let id: Int
-//        let title: String
-//        let description: String
-//        let descriptionfull: String
-//        let img: String
-//        let imgcropped: String
-//        let price: Int
         do {
             try context.save()
             getAllProductsFromDb()
@@ -173,14 +154,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             title: "Cart",
             style: .plain,
             target: self,
-            action: #selector(goToCart) // TESTING addToDb
+            action: #selector(goToCart) // addToDb
         )
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "List App",
             style: .plain,
             target: self,
-            action: #selector(clearDb) // TODO restore goToListApp
+            action: #selector(clearDb) // goToListApp
         )
     }
     
@@ -191,7 +172,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                                       preferredStyle: .alert)
         alert.addTextField(configurationHandler: nil)
         
-        // WORKS
         alert.addAction(UIAlertAction(title:"Submit", style: .cancel, handler: { [weak self] _ in
             guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
                 return
@@ -201,7 +181,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         self.present(alert, animated: true, completion: nil)
         
-        // ALSO WORKED
+// ALSO WORKED
 //        alert.addTextField()
 //        let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
 //            print("here")
@@ -234,7 +214,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     @objc
     func clearDb() {
         print("> clearDb")
-//        self.products = try context.fetch(Product.fetchRequest())
+        // self.products was already set by viewDidLoad()
+        // self.products = try context.fetch(Product.fetchRequest())
         for product in self.products {
             deleteProduct(product: product)
         }
@@ -243,7 +224,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 
     @objc
     func refreshTable() {
-        // print("> refresh table") // why is this executing so many times on load
+        // print("> refresh table") // TODO why is this executing so many times on load?
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }

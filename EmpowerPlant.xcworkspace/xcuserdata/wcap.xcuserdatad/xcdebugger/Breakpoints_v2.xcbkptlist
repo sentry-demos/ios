@@ -30,10 +30,10 @@
             filePath = "EmpowerPlant/EmpowerPlantViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "215"
-            endingLineNumber = "215"
-            landmarkName = "EmpowerPlantViewController"
-            landmarkType = "3">
+            startingLineNumber = "195"
+            endingLineNumber = "195"
+            landmarkName = "goToCart()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -46,8 +46,8 @@
             filePath = "EmpowerPlant/EmpowerPlantViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "252"
-            endingLineNumber = "252">
+            startingLineNumber = "233"
+            endingLineNumber = "233">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -84,3 +84,14 @@ File I/O - why not?
 CoreData - easy (already using)
 
 Segue - https://levelup.gitconnected.com/swift-xcode-sharing-data-between-view-controllers-8d270e99ca1e, going back and forth between controllers, could present problems with persistence.
+
+
+```
+let id: Int
+let title: String
+let description: String
+let descriptionfull: String
+let img: String
+let imgcropped: String
+let price: Int
+```
