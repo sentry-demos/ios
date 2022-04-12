@@ -38,7 +38,9 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
+        // we always want a http request span in our Transaction
         getAllProductsFromServer()
+        // we always want a CoreData span in our Transaction
         getAllProductsFromDb()
         
         print("> isEmpty", ShoppingCart.instance.isEmpty)
@@ -75,10 +77,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
-                    for product in productsResponse {
-//                        print(product.title)
-                        // Writes to CoreData
-                        self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                    if (self.products.count == 0) {
+                        print("> was 0")
+                        for product in productsResponse {
+                            // print(product.title)
+                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                        }
+                    } else {
+                        print("> was not 0")
                     }
                 } else {
                     print("Invalid Response")
@@ -104,19 +110,10 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func getAllProductsFromDb() {
         do {
             self.products = try context.fetch(Product.fetchRequest())
-            
-            // TEMPORARY - this is for testing purposes only
-//            for product in self.products {
-//                deleteProduct(product: product)
-//            }
-            
 //            for product in self.products {
 //                print(product.productId, product.title, product.productDescriptionFull)
 //            }
             refreshTable()
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
         }
         catch {
             // error
