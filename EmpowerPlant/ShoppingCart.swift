@@ -17,5 +17,5 @@ class ShoppingCart {
     }
     
     //creates the global variable
-    var isEmpty = false
+    var isEmpty = 0
 }

@@ -13,6 +13,9 @@ class CartViewController: UIViewController {
         super.viewDidLoad()
         title = "Cart Screen"
         // Do any additional setup after loading the view.
+        
+        print("CartViewController > ShoppingCart.instance.isEmpty", ShoppingCart.instance.isEmpty)
+        ShoppingCart.instance.isEmpty = ShoppingCart.instance.isEmpty + 1
     }
     
 
