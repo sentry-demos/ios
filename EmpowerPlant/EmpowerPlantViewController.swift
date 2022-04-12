@@ -178,7 +178,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             title: "Cart",
             style: .plain,
             target: self,
-            action: #selector(addToDb)
+            action: #selector(goToCart) // TESTING addToDb
         )
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
