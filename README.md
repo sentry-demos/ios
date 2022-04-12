@@ -68,3 +68,19 @@ https://cocoacasts.com/networking-fundamentals-how-to-make-an-http-request-in-sw
 class vs extension...
 
 https://developer.apple.com/forums/thread/50610
+
+
+
+SHOPPING CART
+
+ModelController - boilerplate...https://code.tutsplus.com/tutorials/the-right-way-to-share-state-between-swift-view-controllers--cms-28474
+
+Data Container - boilerplate...
+
+Singleton Pattern - easy, https://betterprogramming.pub/5-ways-to-pass-data-between-view-controllers-18acb467f5ec class Settings
+
+File I/O - why not?
+
+CoreData - easy (already using)
+
+Segue - https://levelup.gitconnected.com/swift-xcode-sharing-data-between-view-controllers-8d270e99ca1e, going back and forth between controllers, could present problems with persistence.

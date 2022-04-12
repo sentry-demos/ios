@@ -40,6 +40,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
          */
         getAllProductsFromServer()
         getAllProductsFromDb()
+        
+        print("> isEmpty", ShoppingCart.instance.isEmpty)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -54,7 +56,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     func getAllProductsFromServer() {
-        print("getAllProductsFromServer")
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -75,7 +76,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
                     for product in productsResponse {
-                        print(product.title)
+//                        print(product.title)
                         // Writes to CoreData
                         self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
                     }
@@ -101,7 +102,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     func getAllProductsFromDb() {
-        print("> getAllProductsFromDb")
         do {
             self.products = try context.fetch(Product.fetchRequest())
             
@@ -111,7 +111,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 //            }
             
             for product in self.products {
-                print(product.productId, product.title, product.productDescriptionFull)
+//                print(product.productId, product.title, product.productDescriptionFull)
             }
 //
             DispatchQueue.main.async {
@@ -218,13 +218,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     
     @objc
     func goToCart() {
-        print("go to Cart")
         self.performSegue(withIdentifier: "goToCart", sender: self)
     }
     
     @objc
     func goToListApp() {
-        print("go to List App")
         self.performSegue(withIdentifier: "goToListApp", sender: self)
     }
 

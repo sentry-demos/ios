@@ -20,6 +20,7 @@
 		D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73D127D83321006650AF /* ListAppViewController.swift */; };
 		D191948B27E01335007845C5 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D191948A27E01335007845C5 /* Product+CoreDataProperties.swift */; };
 		D191948E27E01337007845C5 /* Product+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D191948D27E01337007845C5 /* Product+CoreDataClass.swift */; };
+		D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19EBE6E2805ED52007022DC /* ShoppingCart.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		D191948627E011F2007845C5 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D191948A27E01335007845C5 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Product+CoreDataProperties.swift"; path = "/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
 		D191948D27E01337007845C5 /* Product+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Product+CoreDataClass.swift"; path = "/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		D19EBE6E2805ED52007022DC /* ShoppingCart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCart.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 				D17C73D127D83321006650AF /* ListAppViewController.swift */,
 				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
 				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
+				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
 				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
 				D17C73BB27D8291D006650AF /* Assets.xcassets */,
 				D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */,
@@ -220,6 +223,7 @@
 				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
 				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
+				D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */,
 				D191948E27E01337007845C5 /* Product+CoreDataClass.swift in Sources */,
 				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
 				D191948B27E01335007845C5 /* Product+CoreDataProperties.swift in Sources */,
