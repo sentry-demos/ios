@@ -20,11 +20,27 @@ class ShoppingCart {
     var isEmpty = 0
     
     // Cart.items, Cart.quantities, Cart.total
-    var cart = {}
+    // var cart = {
+    //    items: []
+    // }
     
-    // TODO replicate what's in here
+    var items = [Product]()
+    var quantities = {}
+    var price = 0
+    
     // https://github.com/sentry-demos/application-monitoring/blob/master/react/src/reducers/index.js#L23-L32
     static func addProduct(product: Product) {
         print("addProduct", product)
+        /*
+         var cart = Object.assign({}, state.cart)
+           let item = cart.items.find((x) => x.id === payload.product.id);
+           if (!item) cart.items.push(payload.product);
+           cart.quantities[payload.product.id] = cart.quantities[payload.product.id] || 0;
+           cart.quantities[payload.product.id]++;
+           cart.total = cart.items.reduce((a, item) => {
+             const itemTotal = item.price * cart.quantities[item.id];
+             return a + itemTotal;
+           }, 0);
+         */
     }
 }
