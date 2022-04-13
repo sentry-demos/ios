@@ -31,6 +31,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         // Dev Note - Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
         
+        // Configures the nav bar buttons
         configureNavigationItems()
 
         /* TODO
@@ -43,126 +44,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         getAllProductsFromDb()
         
         print("> isEmpty", ShoppingCart.instance.isEmpty)
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return products.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = products[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = model.title
-        return cell
-    }
-    
-    // Also writes them into db if db is empty
-    func getAllProductsFromServer() {
-        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        struct ProductMap: Decodable {
-            // MARK: - Properties
-            let id: Int
-            let title: String
-            let description: String
-            let descriptionfull: String
-            let img: String
-            let imgcropped: String
-            let price: Int
-            // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let data = data {
-                if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
-                    if (self.products.count == 0) {
-                        print("> was 0")
-                        for product in productsResponse {
-                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
-                        }
-                    } else {
-                        print("> was not 0")
-                    }
-                } else {
-                    print("Invalid Response")
-                }
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
-            }
-        }
-
-        task.resume()
-    }
-    
-    func getAllProductsFromDb() {
-        do {
-            self.products = try context.fetch(Product.fetchRequest())
-//            for product in self.products {
-//                print(product.productId, product.title, product.productDescriptionFull)
-//            }
-            refreshTable()
-        }
-        catch {
-            // error
-        }
-    }
-    
-    func createProduct(productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String, imgCropped: String, price: String) {
-        let newProduct = Product(context: context)
-        
-        newProduct.productId = productId // 'id' was a reserved word in swift
-        newProduct.title = title
-        newProduct.productDescription = productDescription // 'description' was a reserved word in swift
-        newProduct.productDescriptionFull = productDescriptionFull
-        newProduct.img = img
-        newProduct.imgCropped = imgCropped
-        newProduct.price = price
-        
-        do {
-            try context.save()
-            getAllProductsFromDb()
-        }
-        catch {
-            // error
-        }
-    }
-
-    func deleteProduct(product: Product) {
-        context.delete(product)
-        do {
-            try context.save()
-        }
-        catch {
-            
-        }
-    }
-
-    func updateProduct(product: Product, newTitle:  String) {
-        product.title = newTitle
-        do {
-            try context.save()
-        }
-        catch {
-            
-        }
-    }
-    
-    private func configureNavigationItems() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Cart",
-            style: .plain,
-            target: self,
-            action: #selector(goToCart) // addToDb
-        )
-        
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "List App",
-            style: .plain,
-            target: self,
-            action: #selector(clearDb) // goToListApp
-        )
     }
     
     @objc
@@ -191,26 +72,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 //        self.present(alert, animated: true, completion: nil)
     }
     
-    @objc
-    func goToCart() {
-        self.performSegue(withIdentifier: "goToCart", sender: self)
-    }
-    
-    @objc
-    func goToListApp() {
-        self.performSegue(withIdentifier: "goToListApp", sender: self)
-    }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
+    // Don't deprecate, this function is useful for development and testing
     @objc
     func clearDb() {
         print("> clearDb")
@@ -221,6 +83,118 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
         refreshTable()
     }
+    
+    private func configureNavigationItems() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Cart",
+            style: .plain,
+            target: self,
+            action: #selector(goToCart) // addToDb
+        )
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "List App",
+            style: .plain,
+            target: self,
+            action: #selector(goToListApp) // clearDb
+        )
+    }
+    
+    // Writes to CoreData database
+    func createProduct(productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String, imgCropped: String, price: String) {
+        let newProduct = Product(context: context)
+        
+        newProduct.productId = productId // 'id' was a reserved word in swift
+        newProduct.title = title
+        newProduct.productDescription = productDescription // 'description' was a reserved word in swift
+        newProduct.productDescriptionFull = productDescriptionFull
+        newProduct.img = img
+        newProduct.imgCropped = imgCropped
+        newProduct.price = price
+        
+        do {
+            try context.save()
+            getAllProductsFromDb()
+        }
+        catch {
+            // error
+        }
+    }
+    
+    // Don't deprecate this until major release of this demo
+    func deleteProduct(product: Product) {
+        context.delete(product)
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
+    }
+    
+    func getAllProductsFromDb() {
+        do {
+            self.products = try context.fetch(Product.fetchRequest())
+//            for product in self.products {
+//                print(product.productId, product.title, product.productDescriptionFull)
+//            }
+            refreshTable()
+        }
+        catch {
+            // error
+        }
+    }
+    
+    // Also writes them into database if database is empty
+    func getAllProductsFromServer() {
+        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        struct ProductMap: Decodable {
+            // MARK: - Properties
+            let id: Int
+            let title: String
+            let description: String
+            let descriptionfull: String
+            let img: String
+            let imgcropped: String
+            let price: Int
+            // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
+                    if (self.products.count == 0) {
+                        print("> products.count 0")
+                        for product in productsResponse {
+                            // Writes to CoreData database
+                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                        }
+                    } else {
+                        print("> products.count not 0")
+                    }
+                } else {
+                    print("Invalid Response")
+                }
+            } else if let error = error {
+                print("HTTP Request Failed \(error)")
+            }
+        }
+
+        task.resume()
+    }
+    
+    @objc
+    func goToCart() {
+        self.performSegue(withIdentifier: "goToCart", sender: self)
+    }
+    
+    @objc
+    func goToListApp() {
+        self.performSegue(withIdentifier: "goToListApp", sender: self)
+    }
 
     @objc
     func refreshTable() {
@@ -229,4 +203,36 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             self.tableView.reloadData()
         }
     }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return products.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = products[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = model.title
+        return cell
+    }
+    
+    // Don't deprecate this until major release of this demo
+    func updateProduct(product: Product, newTitle:  String) {
+        product.title = newTitle
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
+    }
+    
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destination.
+        // Pass the selected object to the new view controller.
+    }
+    */
 }
