@@ -10,6 +10,7 @@ import Sentry
 
 class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    // CoreData database
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     let tableView: UITableView = {
@@ -18,6 +19,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         return table
     }()
     
+    // Product Entity, gets written to CoreData
     var products = [Product]()
     
     override func viewDidLoad() {
@@ -211,9 +213,25 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = products[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        //  print("model", model) WORKS, has all attributes
         cell.textLabel?.text = model.title
         return cell
     }
+    
+    // Code that executes on Click'ing table rows
+    // https://www.simplifiedios.net/ios-tableview-tutorial-handling-clicks/
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("clicked...")
+        //getting the index path of selected row
+        let indexPath = tableView.indexPathForSelectedRow
+                
+        //getting the current cell from the index path
+        let currentCell = tableView.cellForRow(at: indexPath!)! as UITableViewCell
+                
+        //getting the text of that cell
+        let currentItem = currentCell.textLabel!.text
+    }
+
     
     // Don't deprecate this until major release of this demo
     func updateProduct(product: Product, newTitle:  String) {
