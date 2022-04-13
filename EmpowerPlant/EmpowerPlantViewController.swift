@@ -45,7 +45,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         getAllProductsFromServer()
         getAllProductsFromDb()
         
-        print("> isEmpty", ShoppingCart.instance.isEmpty)
+        // WORKS
+        // print("> isEmpty", ShoppingCart.instance.isEmpty)
     }
     
     @objc
