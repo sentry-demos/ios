@@ -19,15 +19,12 @@ class ShoppingCart {
     //creates the global variable
     var isEmpty = 0
     
-    // TODO for checkout, will need put these on a 'cart' property on req body, may need a Class there for that
     var items = [Product]()
-    var price = 0
+    var total = 0
     var quantities = Quantities()
     
-    // https://github.com/sentry-demos/application-monitoring/blob/master/react/src/reducers/index.js#L23-L32
+    // This updates the items, total, and quantities
     static func addProduct(product: Product) {
-        // WORKS
-        // print("isEmpty", self.instance.isEmpty)
         
         if self.instance.items.contains(product) {
             //print("has it", product.productId!)
@@ -36,73 +33,55 @@ class ShoppingCart {
             self.instance.items.append(product)
         }
         
-        // WORKS
-        // self.instance.quantities.name = self.instance.quantities.name + 1
-        // print("quantities.name", self.instance.quantities.name)
-        
         let productId = product.productId!
         let id = Int(productId)
         
-        // Cannot dynamically set KeyId's like in javascript
         // These are the values as used in the backend database in CloudSQL
-        switch id {
-        case 3:
-            // print("id | 3")
-            self.instance.quantities.plantMood += 1
-            print(">> quantities plantMood", self.instance.quantities.plantMood)
-            break
-        case 4:
-            // print("id | 4")
-            self.instance.quantities.botanaVoice += 1
-            print(">> quantities botanaVoice", self.instance.quantities.botanaVoice)
-            break
-        case 5:
-            // print("id | 5")
-            self.instance.quantities.plantStroller += 1
-            print(">> quantities plantStroller", self.instance.quantities.plantStroller)
-            break
-        case 6:
-            // print("id | 6")
-            self.instance.quantities.plantNodes += 1
-            print(">> quantities plantNodes", self.instance.quantities.plantNodes)
-            break
-        default:
-            print("product id not found in ShoppingCart switch statement")
-        }
-        
         /*
          Plant Mood 3
          Botana Voice 4
          Plant Stroller 5
          Plant Nodes 6
         */
-
+        switch id {
+        case 3:
+            self.instance.quantities.plantMood += 1
+            let price = Int(product.price!)
+            self.instance.total = self.instance.total + price!
+            print("> quantities plantMood", self.instance.quantities.plantMood)
+            break
+        case 4:
+            self.instance.quantities.botanaVoice += 1
+            let price = Int(product.price!)
+            self.instance.total = self.instance.total + price!
+            print("> quantities botanaVoice", self.instance.quantities.botanaVoice)
+            break
+        case 5:
+            self.instance.quantities.plantStroller += 1
+            let price = Int(product.price!)
+            self.instance.total = self.instance.total + price!
+            print("> quantities plantStroller", self.instance.quantities.plantStroller)
+            break
+        case 6:
+            self.instance.quantities.plantNodes += 1
+            let price = Int(product.price!)
+            self.instance.total = self.instance.total + price!
+            print("> quantities plantNodes", self.instance.quantities.plantNodes)
+            break
+        default:
+            print("product id not found in ShoppingCart switch statement")
+        }
         
-        /*
-         DONE
-           let item = cart.items.find((x) => x.id === payload.product.id);
-           if (!item) cart.items.push(payload.product);
-         NEXT
-           cart.quantities[payload.product.id] = cart.quantities[payload.product.id] || 0;
-           cart.quantities[payload.product.id]++;
-         
-           cart.total = cart.items.reduce((a, item) => {
-             const itemTotal = item.price * cart.quantities[item.id];
-             return a + itemTotal;
-           }, 0);
-         */
+        print("> TOTAL", self.instance.total)
     }
 }
 
 /*
- Cannot dynamically set KeyId's like in javascript
+ Cannot dynamically set KeyId's like in javascript, so coding the product names into the Quantities class
  
  The following code fails:
  self.instance.quantities.setValue(1, forKey: "someProperty")
  self.instance.quantities.value(forKey: "someProperty"))
- 
- Reference:
- https://stackoverflow.com/questions/26667380/in-swift-for-anyobject-how-do-i-setvalue-then-call-valueforkey
  */
 class Quantities: NSObject {
 
