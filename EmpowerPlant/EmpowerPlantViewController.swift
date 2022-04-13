@@ -219,17 +219,27 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     // Code that executes on Click'ing table rows
-    // https://www.simplifiedios.net/ios-tableview-tutorial-handling-clicks/
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("clicked...")
-        //getting the index path of selected row
-        let indexPath = tableView.indexPathForSelectedRow
-                
-        //getting the current cell from the index path
-        let currentCell = tableView.cellForRow(at: indexPath!)! as UITableViewCell
-                
-        //getting the text of that cell
-        let currentItem = currentCell.textLabel!.text
+        let model = products[indexPath.row]
+        
+        // WORKS
+        print("product", model)
+        
+        // PROB don't need
+        // getting the index path of selected row
+        // let indexPath = tableView.indexPathForSelectedRow
+        
+        // PROB don't need
+        // getting the current cell from the index path
+        // let currentCell = tableView.cellForRow(at: indexPath!)! as UITableViewCell
+        
+        // WAS NOT HELPFUL
+        // getting the text of that cell, but we need more than just the text
+        // let currentItem = currentCell.textLabel!.text
+        // print("stuff", indexPath, currentCell)
+        
+        // self.products, products
+//        print("product", products[indexPath.row])
     }
 
     
