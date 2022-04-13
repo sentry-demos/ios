@@ -44,9 +44,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         getAllProductsFromServer()
         getAllProductsFromDb()
-        
-        // WORKS
-        // print("> isEmpty", ShoppingCart.instance.isEmpty)
     }
     
     @objc
@@ -201,7 +198,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
 
     @objc
     func refreshTable() {
-        // print("> refresh table") // TODO why is this executing so many times on load?
+        // TODO why is this executing so many times on load?
+        // print("> refresh table") 
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
@@ -219,41 +217,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         return cell
     }
     
-    // Code that executes on Click'ing table rows
+    // Code that executes on Click'ing table row, adds the product item to shopping cart
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let product = products[indexPath.row]
         
-        // WORKS
-        // print("product", model)
-        
-        // TODO - can call a method on ShoppingCart.swift for updating the cart?
-        // 1. try it with isEmpty counter incrementing
-        // 2. if works, then do for shopping cart. keeps this function cleaner.
         ShoppingCart.addProduct(product: product)
-        
-        // PROB don't need
-        // getting the index path of selected row
-        // let indexPath = tableView.indexPathForSelectedRow
-        
-        // PROB don't need
-        // getting the current cell from the index path
-        // let currentCell = tableView.cellForRow(at: indexPath!)! as UITableViewCell
-        
-        // WAS NOT HELPFUL
-        // getting the text of that cell, but we need more than just the text
-        // let currentItem = currentCell.textLabel!.text
-        // print("stuff", indexPath, currentCell)
-        
-        // self.products, products
-        // print("product", products[indexPath.row])
-        
-        /*
-         TODO put whole cart as property on request body
-         body: JSON.stringify({
-             cart: cart,
-             form: this.state
-         })
-         */
     }
 
     

@@ -12,10 +12,9 @@ class CartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Cart Screen"
-        // Do any additional setup after loading the view.
         
-        print("CartViewController > ShoppingCart.instance.isEmpty", ShoppingCart.instance.isEmpty)
-        ShoppingCart.instance.isEmpty = ShoppingCart.instance.isEmpty + 1
+        // TODO make this 'total' appear in a UI element
+        print("CartViewController | TOTAL", ShoppingCart.instance.total)
     }
     
 

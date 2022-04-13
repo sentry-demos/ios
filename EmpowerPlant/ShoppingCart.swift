@@ -16,9 +16,6 @@ class ShoppingCart {
     private init() {
     }
     
-    //creates the global variable
-    var isEmpty = 0
-    
     var items = [Product]()
     var total = 0
     var quantities = Quantities()
@@ -26,10 +23,7 @@ class ShoppingCart {
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
         
-        if self.instance.items.contains(product) {
-            //print("has it", product.productId!)
-        } else {
-            //print("doesn't have it", product.productId!, product.title!)
+        if !self.instance.items.contains(product) {
             self.instance.items.append(product)
         }
         
@@ -79,9 +73,9 @@ class ShoppingCart {
 /*
  Cannot dynamically set KeyId's like in javascript, so coding the product names into the Quantities class
  
- The following code fails:
- self.instance.quantities.setValue(1, forKey: "someProperty")
- self.instance.quantities.value(forKey: "someProperty"))
+ The following code fails because you can't add key names on the go
+    self.instance.quantities.setValue(1, forKey: "someProperty")
+    self.instance.quantities.value(forKey: "someProperty"))
  */
 class Quantities: NSObject {
 
