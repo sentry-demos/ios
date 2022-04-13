@@ -18,4 +18,13 @@ class ShoppingCart {
     
     //creates the global variable
     var isEmpty = 0
+    
+    // Cart.items, Cart.quantities, Cart.total
+    var cart = {}
+    
+    // TODO replicate what's in here
+    // https://github.com/sentry-demos/application-monitoring/blob/master/react/src/reducers/index.js#L23-L32
+    static func addProduct(product: Product) {
+        print("addProduct", product)
+    }
 }

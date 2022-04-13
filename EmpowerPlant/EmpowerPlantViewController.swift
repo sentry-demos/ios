@@ -213,17 +213,22 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = products[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        //  print("model", model) WORKS, has all attributes
+        //  'model' has all available attributes here, if needed in the future (e.g. UI development)
         cell.textLabel?.text = model.title
         return cell
     }
     
     // Code that executes on Click'ing table rows
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let model = products[indexPath.row]
+        let product = products[indexPath.row]
         
         // WORKS
-        print("product", model)
+        // print("product", model)
+        
+        // TODO - can call a method on ShoppingCart.swift for updating the cart?
+        // 1. try it with isEmpty counter incrementing
+        // 2. if works, then do for shopping cart. keeps this function cleaner.
+        ShoppingCart.addProduct(product: product)
         
         // PROB don't need
         // getting the index path of selected row
@@ -239,7 +244,15 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         // print("stuff", indexPath, currentCell)
         
         // self.products, products
-//        print("product", products[indexPath.row])
+        // print("product", products[indexPath.row])
+        
+        /*
+         TODO put whole cart as property on request body
+         body: JSON.stringify({
+             cart: cart,
+             form: this.state
+         })
+         */
     }
 
     
