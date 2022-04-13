@@ -62,14 +62,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         self.present(alert, animated: true, completion: nil)
         
-// ALSO WORKED
-//        alert.addTextField()
-//        let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
-//            print("here")
-//            let textfield = alert.textFields![0]
-//        }
-//        alert.addAction(submitButton)
-//        self.present(alert, animated: true, completion: nil)
+        // ALSO WORKED
+        // alert.addTextField()
+        // let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
+        //     print("here")
+        //     let textfield = alert.textFields![0]
+        // }
+        // alert.addAction(submitButton)
+        // self.present(alert, animated: true, completion: nil)
     }
     
     // Don't deprecate, this function is useful for development and testing
@@ -135,9 +135,9 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func getAllProductsFromDb() {
         do {
             self.products = try context.fetch(Product.fetchRequest())
-//            for product in self.products {
-//                print(product.productId, product.title, product.productDescriptionFull)
-//            }
+        // for product in self.products {
+        //     print(product.productId, product.title, product.productDescriptionFull)
+        // }
             refreshTable()
         }
         catch {
