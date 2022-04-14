@@ -152,7 +152,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         struct ProductMap: Decodable {
-            // MARK: - Properties
             let id: Int
             let title: String
             let description: String
@@ -167,13 +166,10 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
                     if (self.products.count == 0) {
-                        print("> products.count 0")
                         for product in productsResponse {
                             // Writes to CoreData database
                             self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
                         }
-                    } else {
-                        print("> products.count not 0")
                     }
                 } else {
                     print("Invalid Response")
