@@ -10,6 +10,7 @@ import Sentry
 
 class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    // CoreData database
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     let tableView: UITableView = {
@@ -18,6 +19,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         return table
     }()
     
+    // Product Entity, gets written to CoreData
     var products = [Product]()
     
     override func viewDidLoad() {
@@ -31,6 +33,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         // Dev Note - Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
         
+        // Configures the nav bar buttons
         configureNavigationItems()
 
         /* TODO
@@ -38,29 +41,117 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
+        
         getAllProductsFromServer()
         getAllProductsFromDb()
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return products.count
+    @objc
+    func addToDb() {
+        let alert = UIAlertController(title: "New Product",
+                                      message: "Enter new product title",
+                                      preferredStyle: .alert)
+        alert.addTextField(configurationHandler: nil)
+        
+        alert.addAction(UIAlertAction(title:"Submit", style: .cancel, handler: { [weak self] _ in
+            guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
+                return
+            }
+            self?.createProduct(productId: "123", title: text, productDescription: "product.description", productDescriptionFull: "product.description.full", img:"img", imgCropped:"img.cropped", price:"1")
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
+        // ALSO WORKED
+        // alert.addTextField()
+        // let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
+        //     print("here")
+        //     let textfield = alert.textFields![0]
+        // }
+        // alert.addAction(submitButton)
+        // self.present(alert, animated: true, completion: nil)
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = products[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = model.title
-        return cell
+    // Don't deprecate, this function is useful for development and testing
+    @objc
+    func clearDb() {
+        print("> clearDb")
+        // self.products was already set by viewDidLoad()
+        // self.products = try context.fetch(Product.fetchRequest())
+        for product in self.products {
+            deleteProduct(product: product)
+        }
+        refreshTable()
     }
     
+    private func configureNavigationItems() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Cart",
+            style: .plain,
+            target: self,
+            action: #selector(goToCart) // addToDb
+        )
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "List App",
+            style: .plain,
+            target: self,
+            action: #selector(goToListApp) // clearDb
+        )
+    }
+    
+    // Writes to CoreData database
+    func createProduct(productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String, imgCropped: String, price: String) {
+        let newProduct = Product(context: context)
+        
+        newProduct.productId = productId // 'id' was a reserved word in swift
+        newProduct.title = title
+        newProduct.productDescription = productDescription // 'description' was a reserved word in swift
+        newProduct.productDescriptionFull = productDescriptionFull
+        newProduct.img = img
+        newProduct.imgCropped = imgCropped
+        newProduct.price = price
+        
+        do {
+            try context.save()
+            getAllProductsFromDb()
+        }
+        catch {
+            // error
+        }
+    }
+    
+    // Don't deprecate this until major release of this demo
+    func deleteProduct(product: Product) {
+        context.delete(product)
+        do {
+            try context.save()
+        }
+        catch {
+            
+        }
+    }
+    
+    func getAllProductsFromDb() {
+        do {
+            self.products = try context.fetch(Product.fetchRequest())
+        // for product in self.products {
+        //     print(product.productId, product.title, product.productDescriptionFull)
+        // }
+            refreshTable()
+        }
+        catch {
+            // error
+        }
+    }
+    
+    // Also writes them into database if database is empty
     func getAllProductsFromServer() {
-        print("getAllProductsFromServer")
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         struct ProductMap: Decodable {
-            // MARK: - Properties
             let id: Int
             let title: String
             let description: String
@@ -74,10 +165,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
-                    for product in productsResponse {
-                        print(product.title)
-                        // Writes to CoreData
-                        self.createProduct(title: product.title)
+                    if (self.products.count == 0) {
+                        for product in productsResponse {
+                            // Writes to CoreData database
+                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                        }
                     }
                 } else {
                     print("Invalid Response")
@@ -86,56 +178,50 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                 print("HTTP Request Failed \(error)")
             }
         }
-        // print("Dev Note - I am printed before the products info above is printed")
+
         task.resume()
+    }
+    
+    @objc
+    func goToCart() {
+        self.performSegue(withIdentifier: "goToCart", sender: self)
+    }
+    
+    @objc
+    func goToListApp() {
+        self.performSegue(withIdentifier: "goToListApp", sender: self)
+    }
+
+    @objc
+    func refreshTable() {
+        // TODO why is this executing so many times on load?
+        // print("> refresh table") 
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return products.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = products[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        //  'model' has all available attributes here, if needed in the future (e.g. UI development)
+        cell.textLabel?.text = model.title
+        return cell
+    }
+    
+    // Code that executes on Click'ing table row, adds the product item to shopping cart
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let product = products[indexPath.row]
         
-        // Don't Reload Table, because we still have to conver the above JSON objects from the server into Swift objects
-//        do {
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
-//        }
-//        catch {
-//            //error
-//        }
-    }
-    
-    func getAllProductsFromDb() {
-        print("> getAllProductsFromDb")
-        do {
-            self.products = try context.fetch(Product.fetchRequest())
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        }
-        catch {
-            // error
-        }
-    }
-    
-    func createProduct(title: String) {
-        let newProduct = Product(context: context)
-        newProduct.title = title
-        newProduct.text = "thedescription"
-        do {
-            try context.save()
-            getAllProductsFromDb()
-        }
-        catch {
-            // error
-        }
+        ShoppingCart.addProduct(product: product)
     }
 
-    func deleteProduct(product: Product) {
-        context.delete(product)
-        do {
-            try context.save()
-        }
-        catch {
-            
-        }
-    }
-
+    
+    // Don't deprecate this until major release of this demo
     func updateProduct(product: Product, newTitle:  String) {
         product.title = newTitle
         do {
@@ -146,63 +232,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
     }
     
-    private func configureNavigationItems() {
-        
-        // TODO - put goToCart back eventually for the below #selector
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Cart",
-            style: .plain,
-            target: self,
-            action: #selector(addToDb)
-        )
-        
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "List App",
-            style: .plain,
-            target: self,
-            action: #selector(goToListApp)
-        )
-    }
-    
-    @objc
-    func addToDb() {
-        let alert = UIAlertController(title: "New Product",
-                                      message: "Enter new product title",
-                                      preferredStyle: .alert)
-        alert.addTextField(configurationHandler: nil)
-        
-        // WORKS
-        alert.addAction(UIAlertAction(title:"Submit", style: .cancel, handler: { [weak self] _ in
-            guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
-                return
-            }
-            self?.createProduct(title: text)
-        }))
-        
-        self.present(alert, animated: true, completion: nil)
-        
-        // ALSO WORKED
-//        alert.addTextField()
-//        let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
-//            print("here")
-//            let textfield = alert.textFields![0]
-//        }
-//        alert.addAction(submitButton)
-//        self.present(alert, animated: true, completion: nil)
-    }
-    
-    @objc
-    func goToCart() {
-        print("go to Cart")
-        self.performSegue(withIdentifier: "goToCart", sender: self)
-    }
-    
-    @objc
-    func goToListApp() {
-        print("go to List App")
-        self.performSegue(withIdentifier: "goToListApp", sender: self)
-    }
-
     /*
     // MARK: - Navigation
 
@@ -212,5 +241,4 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         // Pass the selected object to the new view controller.
     }
     */
-
 }
