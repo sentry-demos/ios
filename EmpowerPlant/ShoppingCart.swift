@@ -30,43 +30,41 @@ class ShoppingCart {
         let productId = product.productId!
         let id = Int(productId)
         
-        // These are the values as used in the backend database in CloudSQL
+        // These are the product Id values as used in the backend database in CloudSQL
         /*
          Plant Mood 3
          Botana Voice 4
          Plant Stroller 5
          Plant Nodes 6
         */
+        // Updates the Quantities for each product as well as the sum Total of all
         switch id {
         case 3:
             self.instance.quantities.plantMood += 1
-            let price = Int(product.price!)
-            self.instance.total = self.instance.total + price!
-            print("> quantities plantMood", self.instance.quantities.plantMood)
+            updateTotal(product:product)
             break
         case 4:
             self.instance.quantities.botanaVoice += 1
-            let price = Int(product.price!)
-            self.instance.total = self.instance.total + price!
-            print("> quantities botanaVoice", self.instance.quantities.botanaVoice)
+            updateTotal(product: product)
             break
         case 5:
             self.instance.quantities.plantStroller += 1
-            let price = Int(product.price!)
-            self.instance.total = self.instance.total + price!
-            print("> quantities plantStroller", self.instance.quantities.plantStroller)
+            updateTotal(product: product)
             break
         case 6:
             self.instance.quantities.plantNodes += 1
-            let price = Int(product.price!)
-            self.instance.total = self.instance.total + price!
-            print("> quantities plantNodes", self.instance.quantities.plantNodes)
+            updateTotal(product: product)
             break
         default:
             print("product id not found in ShoppingCart switch statement")
         }
         
         print("> TOTAL", self.instance.total)
+    }
+    
+    static func updateTotal(product: Product) {
+        let price = Int(product.price!)
+        self.instance.total = self.instance.total + price!
     }
 }
 
