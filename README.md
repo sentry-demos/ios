@@ -104,3 +104,13 @@ and not
 ```
 "localhost:8080/success"
 ```
+
+
+GET requests must be
+```
+let task = URLSession.shared.dataTask(with: url) { data, response, error in
+```
+POST requests must be
+```
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+```
