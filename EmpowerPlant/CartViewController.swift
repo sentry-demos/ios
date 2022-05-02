@@ -23,14 +23,40 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Dev Note - Comment this out and to see the green background and no data in the rows
-        tableView.frame = view.bounds
+        // Comment this out and to see the green background and no data in the rows
+        // tableView.frame = view.bounds
+        
+        configureNavigationItems()
         
         // TODO make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
     }
     
+    private func configureNavigationItems() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Purchase",
+            style: .plain,
+            target: self,
+            action: #selector(purchase)
+        )
+        
+//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+//            title: "Cart",
+//            style: .plain,
+//            target: self,
+//            action: #selector(goToCart) // clearDb
+//        )
+    }
     
+//    @objc
+//    func goToCart() {
+//        self.performSegue(withIdentifier: "goToCart", sender: self)
+//    }
+    
+    @objc
+    func purchase() {
+        print("> purchase!")
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
