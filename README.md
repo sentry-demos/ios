@@ -95,3 +95,12 @@ let img: String
 let imgcropped: String
 let price: Int
 ```
+
+If developing locally, must use
+```
+"http://127.0.0.1:8080/success"
+```
+and not
+```
+"localhost:8080/success"
+```

@@ -48,15 +48,27 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         //print("> purchase!", ShoppingCart.instance.quantities.botanaVoice)
         //print("> purchase!", ShoppingCart.instance.quantities.plantStroller)
         //print("> purchase!", ShoppingCart.instance.quantities.plantNodes)
-        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
         
-        let url = URL(string: "http://localhost:8080/checkout")!
+        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
+        //let url = URL(string: "http://127.0.0.1:8080/success")!
+        let url = URL(string: "http://127.0.0.1:8080/checkout")!
         
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         
+        //struct Form : Codable {
+        //    let email : String
+        //}
+        //let bodyTest = [Form(email: "will@chat.com")]
+        /*
+         cart.items
+         cart.quantities
+         cart.total
+         form.email...
+         */
         let body = ["user_id": "12"]
+        //let body = ["form": { "email": "will@chat.com" }]
         let bodyData = try? JSONSerialization.data(
             withJSONObject: body,
             options: []
@@ -64,8 +76,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.httpBody = bodyData
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            print("URLSession...")
+            print("1 URLSession...")
             if let data = data {
+                print("2 data", data)
 //                if let response = try? JSONDecoder().decode([ProductMap].self, from: data) {
 //                    
 //                } else {
