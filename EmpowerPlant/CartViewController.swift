@@ -47,7 +47,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         //print("> purchase!", ShoppingCart.instance.quantities.plantMood) botanaVoice plantStroller plantNodes
         
         //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
-        //let url = URL(string: "http://127.0.0.1:8080/success")!
         let url = URL(string: "http://127.0.0.1:8080/checkout")!
         
         var request = URLRequest(url: url)
@@ -72,23 +71,30 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         )
         request.httpBody = bodyData
         
+        enum PurchaseError: Error {
+            case insufficientInventory
+        }
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            print("...URLSession response", response)
+            print("> URLSession response", response)
             if let httpResponse = response as? HTTPURLResponse {
-            print("> httpResponse.statusCode", httpResponse.statusCode)
+                if (httpResponse.statusCode) == 500 {
+                    print("> 500 response")
+                    var err = PurchaseError.insufficientInventory
+                    SentrySDK.capture(error: err)
+                }
             }
             
             // not getting met
-            if let error = error {
-                print("> error, capture exception")
-                print("> HTTP Request Failed \(error)")
-                SentrySDK.capture(error: error)
-            }
+            //if let error = error {
+            //    print("> HTTP Request Failed \(error)")
+            //    SentrySDK.capture(error: error)
+            //}
             
             // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            if let data = data {
-                print("> no error, do nothing", data)
-            }
+            //if let data = data {
+            //    print("> no error, do nothing", data)
+            //}
         }
         task.resume()
     }
