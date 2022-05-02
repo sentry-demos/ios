@@ -24,7 +24,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         
         // Comment this out and to see the green background and no data in the rows
-        // tableView.frame = view.bounds
+        tableView.frame = view.bounds
         
         configureNavigationItems()
         
@@ -43,11 +43,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @objc
     func purchase() {
-        print("purchase...")
-        //print("> purchase!", ShoppingCart.instance.quantities.plantMood)
-        //print("> purchase!", ShoppingCart.instance.quantities.botanaVoice)
-        //print("> purchase!", ShoppingCart.instance.quantities.plantStroller)
-        //print("> purchase!", ShoppingCart.instance.quantities.plantNodes)
+        //print("> purchase!", ShoppingCart.instance.quantities.plantMood) botanaVoice plantStroller plantNodes
         
         //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
         //let url = URL(string: "http://127.0.0.1:8080/success")!
@@ -57,23 +53,46 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         
-        //struct Form : Codable {
-        //    let email : String
-        //}
-        //let bodyTest = [Form(email: "will@chat.com")]
-        /*
-         cart.items
-         cart.quantities
-         cart.total
-         form.email...
-         */
-        let body = ["user_id": "12"]
-        //let body = ["form": { "email": "will@chat.com" }]
+        // cart.items .quantities .total
+        // form.email
+         
+        //let body = ["user_id": "12"]
+        
+        let json: [String: Any] = [
+            "form": ["email":"will@chat.io"],
+            "cart": [
+                "total": 100,
+                "quantities": ["4": "3"],
+                "items": [
+                    ["id":"4", "title":"Plant Nodes"],
+                    ["id":"5", "title":"Plant Stroller"]
+                ]
+            ],
+        ]
+
+        var jsonStringAsArray = "[\n" +
+               "{\n" +
+               "\"id\":72,\n" +
+               "\"name\":\"Batata Cremosa\",\n" +
+               "},\n" +
+               "{\n" +
+               "\"id\":183,\n" +
+               "\"name\":\"Caldeirada de Peixes\",\n" +
+               "},\n" +
+               "{\n" +
+               "\"id\":76,\n" +
+               "\"name\":\"Batata com Cebola e Ervas\",\n" +
+               "},\n" +
+               "{\n" +
+               "\"id\":56,\n" +
+               "\"name\":\"Arroz de forma\",\n" +
+           "}]"
+        
         let bodyData = try? JSONSerialization.data(
-            withJSONObject: body,
+            withJSONObject: json,
             options: []
         )
-        request.httpBody = bodyData
+         request.httpBody = bodyData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             print("1 URLSession...")
