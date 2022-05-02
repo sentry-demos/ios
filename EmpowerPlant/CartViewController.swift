@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Sentry
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -53,63 +54,40 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         
-        // cart.items .quantities .total
-        // form.email
-         
-        //let body = ["user_id": "12"]
-        
         let json: [String: Any] = [
             "form": ["email":"will@chat.io"],
             "cart": [
                 "total": 100,
-                "quantities": ["4": "3"],
+                "quantities": ["4": 3],
                 "items": [
-                    ["id":"4", "title":"Plant Nodes"],
-                    ["id":"5", "title":"Plant Stroller"]
+                    ["id":"4", "title":"Plant Nodes"]
+                    // ["id":"5", "title":"Plant Stroller"]
                 ]
             ],
         ]
-
-        var jsonStringAsArray = "[\n" +
-               "{\n" +
-               "\"id\":72,\n" +
-               "\"name\":\"Batata Cremosa\",\n" +
-               "},\n" +
-               "{\n" +
-               "\"id\":183,\n" +
-               "\"name\":\"Caldeirada de Peixes\",\n" +
-               "},\n" +
-               "{\n" +
-               "\"id\":76,\n" +
-               "\"name\":\"Batata com Cebola e Ervas\",\n" +
-               "},\n" +
-               "{\n" +
-               "\"id\":56,\n" +
-               "\"name\":\"Arroz de forma\",\n" +
-           "}]"
         
         let bodyData = try? JSONSerialization.data(
             withJSONObject: json,
             options: []
         )
-         request.httpBody = bodyData
+        request.httpBody = bodyData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            print("1 URLSession...")
+            print("...URLSession response", response)
+            
+            // not getting met
+            if let error = error {
+                print("> error, capture exception")
+                print("> HTTP Request Failed \(error)")
+                SentrySDK.capture(error: error)
+            }
+            
+            // getting met whether it's a 200 or 500 - there's always a 'data' object here
             if let data = data {
-                print("2 data", data)
-//                if let response = try? JSONDecoder().decode([ProductMap].self, from: data) {
-//                    
-//                } else {
-//                    print("Invalid Response")
-//                }
-            } else if let error = error {
-                print("XXXXXX HTTP Request Failed \(error)")
+                print("> no error, do nothing", data)
             }
         }
         task.resume()
-//        print("all over")
-
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
