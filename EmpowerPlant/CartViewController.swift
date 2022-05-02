@@ -74,6 +74,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             print("...URLSession response", response)
+            if let httpResponse = response as? HTTPURLResponse {
+            print("> httpResponse.statusCode", httpResponse.statusCode)
+            }
             
             // not getting met
             if let error = error {
