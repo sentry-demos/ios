@@ -39,23 +39,45 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             target: self,
             action: #selector(purchase)
         )
-        
-//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-//            title: "Cart",
-//            style: .plain,
-//            target: self,
-//            action: #selector(goToCart) // clearDb
-//        )
     }
-    
-//    @objc
-//    func goToCart() {
-//        self.performSegue(withIdentifier: "goToCart", sender: self)
-//    }
     
     @objc
     func purchase() {
-        print("> purchase!")
+        print("purchase...")
+        //print("> purchase!", ShoppingCart.instance.quantities.plantMood)
+        //print("> purchase!", ShoppingCart.instance.quantities.botanaVoice)
+        //print("> purchase!", ShoppingCart.instance.quantities.plantStroller)
+        //print("> purchase!", ShoppingCart.instance.quantities.plantNodes)
+        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
+        
+        let url = URL(string: "http://localhost:8080/checkout")!
+        
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        
+        let body = ["user_id": "12"]
+        let bodyData = try? JSONSerialization.data(
+            withJSONObject: body,
+            options: []
+        )
+        request.httpBody = bodyData
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            print("URLSession...")
+            if let data = data {
+//                if let response = try? JSONDecoder().decode([ProductMap].self, from: data) {
+//                    
+//                } else {
+//                    print("Invalid Response")
+//                }
+            } else if let error = error {
+                print("XXXXXX HTTP Request Failed \(error)")
+            }
+        }
+        task.resume()
+//        print("all over")
+
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
