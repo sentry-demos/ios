@@ -44,7 +44,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @objc
     func purchase() {
-        //print("> purchase!", ShoppingCart.instance.quantities.plantMood) botanaVoice plantStroller plantNodes
+        let transaction = SentrySDK.startTransaction(
+          name: "purchase",
+          operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
+        )
         
         //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
         let url = URL(string: "http://127.0.0.1:8080/checkout")!
@@ -52,9 +55,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
-        
-        
-        //let json1: [String: Any] = setJson()
         
         let json: [String: Any] = [
             "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
@@ -83,7 +83,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
-                    var let = PurchaseError.insufficientInventory
+                    let err = PurchaseError.insufficientInventory
                     SentrySDK.capture(error: err)
                 }
             }
@@ -99,16 +99,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             //     print("> no error, do nothing", data)
             //}
         }
+        
+        
         task.resume()
+        
+        transaction.finish()
     }
     
     // total, quantities, items
     func setJson() -> [String: Any] {
-        print("\nsetJson")
         
         // total DONE
-        print("> PURCHASE total", ShoppingCart.instance.total)
-        
         // quantities DONE below
         // items TODO
         
