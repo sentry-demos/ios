@@ -53,8 +53,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         
+        
+        //let json1: [String: Any] = setJson()
+        
         let json: [String: Any] = [
-            "form": ["email":"will@chat.io"],
+            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
             "cart": [
                 "total": 100,
                 "quantities": ["4": 3],
@@ -66,7 +69,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ]
         
         let bodyData = try? JSONSerialization.data(
-            withJSONObject: json,
+            withJSONObject: setJson(),
             options: []
         )
         request.httpBody = bodyData
@@ -76,27 +79,57 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            print("> URLSession response", response)
+            // print("> URLSession response", response)
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
-                    var err = PurchaseError.insufficientInventory
+                    var let = PurchaseError.insufficientInventory
                     SentrySDK.capture(error: err)
                 }
             }
             
             // not getting met
-            //if let error = error {
+            // if let error = error {
             //    print("> HTTP Request Failed \(error)")
             //    SentrySDK.capture(error: error)
             //}
             
             // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            //if let data = data {
-            //    print("> no error, do nothing", data)
+            // if let data = data {
+            //     print("> no error, do nothing", data)
             //}
         }
         task.resume()
+    }
+    
+    // total, quantities, items
+    func setJson() -> [String: Any] {
+        print("\nsetJson")
+        
+        // total DONE
+        print("> PURCHASE total", ShoppingCart.instance.total)
+        
+        // quantities DONE below
+        // items TODO
+        
+        let json: [String: Any] = [
+            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "cart": [
+                "total": ShoppingCart.instance.total,
+                "quantities": [
+                    "3": ShoppingCart.instance.quantities.plantMood,
+                    "4": ShoppingCart.instance.quantities.botanaVoice,
+                    "5": ShoppingCart.instance.quantities.plantStroller,
+                    "6": ShoppingCart.instance.quantities.plantNodes,
+                ],
+                "items": [
+                    ["id":"4", "title":"Plant Nodes"]
+                    // ["id":"5", "title":"Plant Stroller"]
+                ]
+            ],
+        ]
+        
+        return json
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
