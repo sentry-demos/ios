@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Sentry
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -23,14 +24,114 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Dev Note - Comment this out and to see the green background and no data in the rows
+        // Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
+        
+        configureNavigationItems()
         
         // TODO make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
     }
     
+    private func configureNavigationItems() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Purchase",
+            style: .plain,
+            target: self,
+            action: #selector(purchase)
+        )
+    }
     
+    @objc
+    func purchase() {
+        let transaction = SentrySDK.startTransaction(
+          name: "purchase",
+          operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
+        )
+        
+        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
+        let url = URL(string: "http://127.0.0.1:8080/checkout")!
+        
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        
+        let json: [String: Any] = [
+            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "cart": [
+                "total": 100,
+                "quantities": ["4": 3],
+                "items": [
+                    ["id":"4", "title":"Plant Nodes"]
+                    // ["id":"5", "title":"Plant Stroller"]
+                ]
+            ],
+        ]
+        
+        let bodyData = try? JSONSerialization.data(
+            withJSONObject: setJson(),
+            options: []
+        )
+        request.httpBody = bodyData
+        
+        enum PurchaseError: Error {
+            case insufficientInventory
+        }
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // print("> URLSession response", response)
+            if let httpResponse = response as? HTTPURLResponse {
+                if (httpResponse.statusCode) == 500 {
+                    print("> 500 response")
+                    let err = PurchaseError.insufficientInventory
+                    SentrySDK.capture(error: err)
+                }
+            }
+            
+            // not getting met
+            // if let error = error {
+            //    print("> HTTP Request Failed \(error)")
+            //    SentrySDK.capture(error: error)
+            //}
+            
+            // getting met whether it's a 200 or 500 - there's always a 'data' object here
+            // if let data = data {
+            //     print("> no error, do nothing", data)
+            //}
+        }
+        
+        
+        task.resume()
+        
+        transaction.finish()
+    }
+    
+    // total, quantities, items
+    func setJson() -> [String: Any] {
+        
+        // total DONE
+        // quantities DONE below
+        // items TODO
+        
+        let json: [String: Any] = [
+            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "cart": [
+                "total": ShoppingCart.instance.total,
+                "quantities": [
+                    "3": ShoppingCart.instance.quantities.plantMood,
+                    "4": ShoppingCart.instance.quantities.botanaVoice,
+                    "5": ShoppingCart.instance.quantities.plantStroller,
+                    "6": ShoppingCart.instance.quantities.plantNodes,
+                ],
+                "items": [
+                    ["id":"4", "title":"Plant Nodes"]
+                    // ["id":"5", "title":"Plant Stroller"]
+                ]
+            ],
+        ]
+        
+        return json
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.

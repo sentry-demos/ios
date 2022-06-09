@@ -95,3 +95,25 @@ let img: String
 let imgcropped: String
 let price: Int
 ```
+
+If developing locally, must use
+```
+"http://127.0.0.1:8080/success"
+```
+and not
+```
+"localhost:8080/success"
+```
+
+
+GET requests must be
+```
+let task = URLSession.shared.dataTask(with: url) { data, response, error in
+```
+POST requests must be
+```
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+```
+
+
+Swift Version: X

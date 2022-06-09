@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataProperties.swift">
-   </FileRef>
-   <FileRef
-      location = "absolute:/Users/wcap/thinkocapo/EmpowerPlant/EmpowerPlant/Product+CoreDataClass.swift">
-   </FileRef>
-   <FileRef
       location = "group:EmpowerPlant.xcodeproj">
    </FileRef>
    <FileRef

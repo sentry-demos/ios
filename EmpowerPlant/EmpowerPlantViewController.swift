@@ -30,7 +30,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Dev Note - Comment this out and to see the green background and no data in the rows
+        // Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
         
         // Configures the nav bar buttons
