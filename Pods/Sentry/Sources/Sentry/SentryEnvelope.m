@@ -1,6 +1,7 @@
 #import "SentryEnvelope.h"
 #import "SentryAttachment.h"
 #import "SentryBreadcrumb.h"
+#import "SentryClientReport.h"
 #import "SentryEnvelopeItemType.h"
 #import "SentryEvent.h"
 #import "SentryLog.h"
@@ -28,29 +29,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithId:(SentryId *_Nullable)eventId andSdkInfo:(SentrySdkInfo *_Nullable)sdkInfo
 {
-    return [self initWithId:eventId sdkInfo:sdkInfo traceState:nil];
+    return [self initWithId:eventId sdkInfo:sdkInfo traceContext:nil];
 }
 
 - (instancetype)initWithId:(nullable SentryId *)eventId
-                traceState:(nullable SentryTraceState *)traceState
+              traceContext:(nullable SentryTraceContext *)traceContext
 {
     SentrySdkInfo *sdkInfo = [[SentrySdkInfo alloc] initWithName:SentryMeta.sdkName
                                                       andVersion:SentryMeta.versionString];
 
-    self = [self initWithId:eventId sdkInfo:sdkInfo traceState:traceState];
+    self = [self initWithId:eventId sdkInfo:sdkInfo traceContext:traceContext];
 
     return self;
 }
 
 - (instancetype)initWithId:(nullable SentryId *)eventId
                    sdkInfo:(nullable SentrySdkInfo *)sdkInfo
-                traceState:(nullable SentryTraceState *)traceState
+              traceContext:(nullable SentryTraceContext *)traceContext
 {
 
     if (self = [super init]) {
         _eventId = eventId;
         _sdkInfo = sdkInfo;
-        _traceState = traceState;
+        _traceContext = traceContext;
     }
 
     return self;
@@ -182,6 +183,24 @@ NS_ASSUME_NONNULL_BEGIN
 
     return [self initWithHeader:[[SentryEnvelopeItemHeader alloc]
                                     initWithType:SentryEnvelopeItemTypeUserFeedback
+                                          length:json.length]
+                           data:json];
+}
+
+- (instancetype)initWithClientReport:(SentryClientReport *)clientReport
+{
+    NSError *error = nil;
+    NSData *json = [NSJSONSerialization dataWithJSONObject:[clientReport serialize]
+                                                   options:0
+                                                     error:&error];
+
+    if (nil != error) {
+        [SentryLog logWithMessage:@"Couldn't serialize client report." andLevel:kSentryLevelError];
+        json = [NSData new];
+    }
+
+    return [self initWithHeader:[[SentryEnvelopeItemHeader alloc]
+                                    initWithType:SentryEnvelopeItemTypeClientReport
                                           length:json.length]
                            data:json];
 }

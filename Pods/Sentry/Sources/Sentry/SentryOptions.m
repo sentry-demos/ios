@@ -1,6 +1,5 @@
 #import "SentryOptions.h"
 #import "SentryDsn.h"
-#import "SentryError.h"
 #import "SentryLog.h"
 #import "SentryMeta.h"
 #import "SentrySDK.h"
@@ -22,7 +21,8 @@ SentryOptions ()
     return @[
         @"SentryCrashIntegration",
 #if SENTRY_HAS_UIKIT
-        @"SentryANRTrackingIntegration",
+        @"SentryANRTrackingIntegration", @"SentryScreenshotIntegration",
+        @"SentryUIEventTrackingIntegration",
 #endif
         @"SentryFramesTrackingIntegration", @"SentryAutoBreadcrumbTrackingIntegration",
         @"SentryAutoSessionTrackingIntegration", @"SentryAppStartTrackingIntegration",
@@ -52,6 +52,12 @@ SentryOptions ()
         self.maxAttachmentSize = 20 * 1024 * 1024;
         self.sendDefaultPii = NO;
         self.enableAutoPerformanceTracking = YES;
+#if SENTRY_HAS_UIKIT
+        self.enableUIViewControllerTracking = YES;
+        self.attachScreenshot = NO;
+        self.enableUserInteractionTracing = NO;
+        self.idleTimeout = 3.0;
+#endif
         self.enableNetworkTracking = YES;
         self.enableFileIOTracking = NO;
         self.enableNetworkBreadcrumbs = YES;
@@ -60,6 +66,10 @@ SentryOptions ()
         self.enableCoreDataTracking = NO;
         _experimentalEnableTraceSampling = NO;
         _enableSwizzling = YES;
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+        self.enableProfiling = NO;
+#endif
+        self.sendClientReports = YES;
 
         // Use the name of the bundle’s executable file as inAppInclude, so SentryInAppLogic
         // marks frames coming from there as inApp. With this approach, the SDK marks public
@@ -220,6 +230,21 @@ SentryOptions ()
     [self setBool:options[@"enableAutoPerformanceTracking"]
             block:^(BOOL value) { self->_enableAutoPerformanceTracking = value; }];
 
+#if SENTRY_HAS_UIKIT
+    [self setBool:options[@"enableUIViewControllerTracking"]
+            block:^(BOOL value) { self->_enableUIViewControllerTracking = value; }];
+
+    [self setBool:options[@"attachScreenshot"]
+            block:^(BOOL value) { self->_attachScreenshot = value; }];
+
+    [self setBool:options[@"enableUserInteractionTracing"]
+            block:^(BOOL value) { self->_enableUserInteractionTracing = value; }];
+
+    if ([options[@"idleTimeout"] isKindOfClass:[NSNumber class]]) {
+        self.idleTimeout = [options[@"idleTimeout"] doubleValue];
+    }
+#endif
+
     [self setBool:options[@"enableNetworkTracking"]
             block:^(BOOL value) { self->_enableNetworkTracking = value; }];
 
@@ -256,6 +281,20 @@ SentryOptions ()
 
     [self setBool:options[@"enableCoreDataTracking"]
             block:^(BOOL value) { self->_enableCoreDataTracking = value; }];
+
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+    [self setBool:options[@"enableProfiling"]
+            block:^(BOOL value) { self->_enableProfiling = value; }];
+#endif
+
+    [self setBool:options[@"sendClientReports"]
+            block:^(BOOL value) { self->_sendClientReports = value; }];
+
+    // SentrySdkInfo already expects a dictionary with {"sdk": {"name": ..., "value": ...}}
+    // so we're passing the whole options object.
+    if ([options[@"sdk"] isKindOfClass:[NSDictionary class]]) {
+        _sdkInfo = [[SentrySdkInfo alloc] initWithDict:options orDefaults:_sdkInfo];
+    }
 
     if (nil != error && nil != *error) {
         return NO;

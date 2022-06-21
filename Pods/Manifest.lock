@@ -1,24 +1,24 @@
 PODS:
-  - Sentry (7.11.0):
-    - Sentry/Core (= 7.11.0)
-  - Sentry/Core (7.11.0)
+  - Sentry (7.18.0):
+    - Sentry/Core (= 7.18.0)
+  - Sentry/Core (7.18.0)
 
 DEPENDENCIES:
-  - Sentry (from `https://github.com/getsentry/sentry-cocoa.git`, tag `7.11.0`)
+  - Sentry (from `https://github.com/getsentry/sentry-cocoa.git`, tag `7.18.0`)
 
 EXTERNAL SOURCES:
   Sentry:
     :git: https://github.com/getsentry/sentry-cocoa.git
-    :tag: 7.11.0
+    :tag: 7.18.0
 
 CHECKOUT OPTIONS:
   Sentry:
     :git: https://github.com/getsentry/sentry-cocoa.git
-    :tag: 7.11.0
+    :tag: 7.18.0
 
 SPEC CHECKSUMS:
-  Sentry: 0c5cd63d714187b4a39c331c1f0eb04ba7868341
+  Sentry: aff6fb3785973436f0bf25748f6b3bcb3e825e09
 
-PODFILE CHECKSUM: 3d1549747691d0d3b43bfaeb2b975b411cc1b305
+PODFILE CHECKSUM: da70c75a894828efa04924d025a0a791b0162e89
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.3

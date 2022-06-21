@@ -1,4 +1,5 @@
 #import "SentryDefines.h"
+#import "SentryProfilingConditionals.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -109,9 +110,9 @@ NS_SWIFT_NAME(Options)
 + (NSArray<NSString *> *)defaultIntegrations;
 
 /**
- * Indicates the percentage of events being sent to Sentry. Setting this to 0 or NIL discards all
- * events, 1.0 sends all events, 0.01 collects 1% of all events. The default is 1. The value needs
- * to be >= 0.0 and <= 1.0. When setting a value out of range  the SDK sets it to the default
+ * Indicates the percentage of events being sent to Sentry. Setting this to 0 discards all
+ * events, 1.0 or NIL sends all events, 0.01 collects 1% of all events. The default is 1. The value
+ * needs to be >= 0.0 and <= 1.0. When setting a value out of range  the SDK sets it to the default
  * of 1.0.
  */
 @property (nullable, nonatomic, copy) NSNumber *sampleRate;
@@ -183,6 +184,36 @@ NS_SWIFT_NAME(Options)
  * https://docs.sentry.io/platforms/apple/performance/
  */
 @property (nonatomic, assign) BOOL enableAutoPerformanceTracking;
+
+#if SENTRY_HAS_UIKIT
+/**
+ * When enabled, the SDK tracks performance for UIViewController subclasses. The default is
+ * <code>YES</code>.
+ */
+@property (nonatomic, assign) BOOL enableUIViewControllerTracking;
+
+/**
+ * Automatically attaches a screenshot when capturing an error or exception.
+ *
+ * Default value is <code>NO</code>
+ */
+@property (nonatomic, assign) BOOL attachScreenshot;
+
+/**
+ * This feature is EXPERIMENTAL.
+ *
+ * When enabled, the SDK creates transactions for UI events like buttons clicks, switch toggles,
+ * and other ui elements that uses UIControl `sendAction:to:forEvent:`.
+ */
+@property (nonatomic, assign) BOOL enableUserInteractionTracing;
+
+/**
+ * How long an idle transaction waits for new children after all its child spans finished. Only UI
+ * event transactions are idle transactions. The default is 3 seconds.
+ */
+@property (nonatomic, assign) NSTimeInterval idleTimeout;
+
+#endif
 
 /**
  * When enabled, the SDK adds breadcrumbs for HTTP requests and tracks performance for HTTP
@@ -279,6 +310,23 @@ NS_SWIFT_NAME(Options)
  * @see <https://docs.sentry.io/platforms/apple/performance/>
  */
 @property (nonatomic, assign) BOOL enableCoreDataTracking;
+
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+/**
+ * Whether to enable the sampling profiler. Default is NO.
+ * @note This is a beta feature that is currently not available to all Sentry customers. This
+ * feature is not supported on watchOS or tvOS.
+ */
+@property (nonatomic, assign) BOOL enableProfiling;
+#endif
+
+/**
+ * Whether to send client reports, which contain statistics about discarded events. The default is
+ * <code>YES</code>.
+ *
+ * @see <https://develop.sentry.dev/sdk/client-reports/>
+ */
+@property (nonatomic, assign) BOOL sendClientReports;
 
 @end
 

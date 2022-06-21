@@ -35,6 +35,7 @@
 #import "SentryMessage.h"
 #import "SentryNSError.h"
 #import "SentryOptions.h"
+#import "SentryProfilingConditionals.h"
 #import "SentrySampleDecision.h"
 #import "SentrySamplingContext.h"
 #import "SentryScope.h"

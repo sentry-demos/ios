@@ -6,5 +6,5 @@ target 'EmpowerPlant' do
   use_frameworks!
 
   # Pods for EmpowerPlant
-  pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.11.0'
+  pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.18.0'
 end
