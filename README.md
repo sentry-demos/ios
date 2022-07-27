@@ -8,6 +8,8 @@ This app uses UIKit
 
 `pod install`
 
+The `se` tag is set in AppDelegate, not build configuration files.
+
 ## Run
 Click Play button
 
@@ -117,3 +119,10 @@ let task = URLSession.shared.dataTask(with: request) { data, response, error in
 
 
 Swift Version: X
+
+## Upgrading Sentry SDK
+Check out a new branch so you can open a PR.
+
+1. Xcode -> Podfile, increment the sdk version.
+2. pod update, or pod install if pod updating is hanging.
+3. Click 'Play' button

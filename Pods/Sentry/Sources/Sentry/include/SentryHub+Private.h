@@ -8,7 +8,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface
 SentryHub (Private)
 
+- (SentryClient *_Nullable)client;
+
 - (void)captureCrashEvent:(SentryEvent *)event;
+
+- (void)captureCrashEvent:(SentryEvent *)event withScope:(SentryScope *)scope;
 
 - (void)setSampleRandomValue:(NSNumber *)value;
 

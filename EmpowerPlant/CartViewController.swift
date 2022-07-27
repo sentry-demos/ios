@@ -49,10 +49,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
           operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
         )
         
-        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
-        let url = URL(string: "http://127.0.0.1:8080/checkout")!
-        
+        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
         var request = URLRequest(url: url)
+        request.setValue("willc", forHTTPHeaderField: "se")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         

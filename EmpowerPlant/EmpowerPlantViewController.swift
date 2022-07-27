@@ -150,6 +150,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("willc", forHTTPHeaderField: "se")
         
         struct ProductMap: Decodable {
             let id: Int

@@ -26,6 +26,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
                 options.enableCoreDataTracking = true
             }
+        
+        SentrySDK.configureScope { scope in
+            scope.setTag(value: "willc", key: "se")
+        }
 
         return true
     }

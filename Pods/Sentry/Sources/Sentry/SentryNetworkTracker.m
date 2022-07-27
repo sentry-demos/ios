@@ -5,6 +5,7 @@
 #import "SentryLog.h"
 #import "SentrySDK+Private.h"
 #import "SentryScope+Private.h"
+#import "SentrySerialization.h"
 #import "SentryTraceContext.h"
 #import "SentryTraceHeader.h"
 #import "SentryTracer.h"
@@ -274,6 +275,17 @@ SentryNetworkTracker ()
     return kSentrySpanStatusUndefined;
 }
 
+- (NSString *)removeSentryKeysFromBaggage:(NSString *)baggage
+{
+    NSMutableDictionary *original = [SentrySerialization decodeBaggage:baggage].mutableCopy;
+    NSDictionary *filtered =
+        [original dictionaryWithValuesForKeys:
+                      [original.allKeys
+                          filteredArrayUsingPredicate:
+                              [NSPredicate predicateWithFormat:@"NOT SELF BEGINSWITH 'sentry-'"]]];
+    return [SentrySerialization baggageEncodedDictionary:filtered];
+}
+
 - (nullable NSDictionary *)addTraceHeader:(nullable NSDictionary *)headers
 {
     @synchronized(self) {
@@ -284,7 +296,19 @@ SentryNetworkTracker ()
 
     id<SentrySpan> span = SentrySDK.currentHub.scope.span;
     if (span == nil) {
-        return headers;
+        // Remove the Sentry keys from the cached headers (cached by NSURLSession itself),
+        // because it could contain a completely unrelated trace id from a previous request.
+        NSMutableDictionary *existingHeaders = headers.mutableCopy;
+        [existingHeaders removeObjectForKey:SENTRY_TRACE_HEADER];
+
+        NSString *newBaggageHeader =
+            [self removeSentryKeysFromBaggage:headers[SENTRY_BAGGAGE_HEADER]];
+        if (newBaggageHeader.length > 0) {
+            existingHeaders[SENTRY_BAGGAGE_HEADER] = newBaggageHeader;
+        } else {
+            [existingHeaders removeObjectForKey:SENTRY_BAGGAGE_HEADER];
+        }
+        return [existingHeaders copy];
     }
 
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:headers];
@@ -292,7 +316,9 @@ SentryNetworkTracker ()
 
     SentryTracer *tracer = [SentryTracer getTracer:span];
     if (tracer != nil) {
-        result[SENTRY_BAGGAGE_HEADER] = [[tracer.traceContext toBaggage] toHTTPHeader];
+        result[SENTRY_BAGGAGE_HEADER] = [[tracer.traceContext toBaggage]
+            toHTTPHeaderWithOriginalBaggage:[SentrySerialization
+                                                decodeBaggage:headers[SENTRY_BAGGAGE_HEADER]]];
     }
 
     return [[NSDictionary alloc] initWithDictionary:result];
