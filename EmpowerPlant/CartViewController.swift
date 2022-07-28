@@ -35,18 +35,18 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Purchase",
+            title: "Checkout",
             style: .plain,
             target: self,
-            action: #selector(purchase)
+            action: #selector(checkout)
         )
     }
     
     @objc
-    func purchase() {
+    func checkout() {
         let transaction = SentrySDK.startTransaction(
-          name: "purchase",
-          operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
+          name: "checkout",
+          operation: "http.client"
         )
         
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
@@ -73,7 +73,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         )
         request.httpBody = bodyData
         
-        enum PurchaseError: Error {
+        enum CheckoutError: Error {
             case insufficientInventory
         }
         
@@ -82,21 +82,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
-                    let err = PurchaseError.insufficientInventory
+                    let err = CheckoutError.insufficientInventory
                     SentrySDK.capture(error: err)
                 }
             }
             
-            // not getting met
-            // if let error = error {
-            //    print("> HTTP Request Failed \(error)")
-            //    SentrySDK.capture(error: error)
-            //}
-            
-            // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            // if let data = data {
-            //     print("> no error, do nothing", data)
-            //}
         }
         
         
