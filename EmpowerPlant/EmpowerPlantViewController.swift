@@ -148,14 +148,12 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
-        //let url = URL(string: "http://127.0.0.1:8080/products-join")!
         
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("will1", forHTTPHeaderField: "se")
-        request.setValue("will1@abc.com", forHTTPHeaderField: "email")
+        request.setValue("will@abc.com", forHTTPHeaderField: "email")
         request.httpMethod = "GET"
-        print("> SET HEADERS")
         
         struct ProductMap: Decodable {
             let id: Int
@@ -168,7 +166,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
         }
         
-        // with url vs request
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
