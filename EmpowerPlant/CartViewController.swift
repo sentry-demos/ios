@@ -15,24 +15,24 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         return table
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Cart Screen"
-        
+
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        
+
         // Comment this out and to see the green background and no data in the rows
         tableView.frame = view.bounds
-        
+
         configureNavigationItems()
-        
+
         // TODO make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
     }
-    
+
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Purchase",
@@ -41,21 +41,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             action: #selector(purchase)
         )
     }
-    
+
     @objc
     func purchase() {
         let transaction = SentrySDK.startTransaction(
           name: "purchase",
           operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
         )
-        
-        //let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
-        let url = URL(string: "http://127.0.0.1:8080/checkout")!
-        
+
+        // use localhost for development against dev-backend
+        // let url = URL(string: "http://127.0.0.1:8080/checkout")!
+        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
+
+
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
-        
+
         let json: [String: Any] = [
             "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
             "cart": [
@@ -67,17 +69,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 ]
             ],
         ]
-        
+
         let bodyData = try? JSONSerialization.data(
             withJSONObject: setJson(),
             options: []
         )
         request.httpBody = bodyData
-        
+
         enum PurchaseError: Error {
             case insufficientInventory
         }
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             // print("> URLSession response", response)
             if let httpResponse = response as? HTTPURLResponse {
@@ -87,32 +89,32 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     SentrySDK.capture(error: err)
                 }
             }
-            
+
             // not getting met
             // if let error = error {
             //    print("> HTTP Request Failed \(error)")
             //    SentrySDK.capture(error: error)
             //}
-            
+
             // getting met whether it's a 200 or 500 - there's always a 'data' object here
             // if let data = data {
             //     print("> no error, do nothing", data)
             //}
         }
-        
-        
+
+
         task.resume()
-        
+
         transaction.finish()
     }
-    
+
     // total, quantities, items
     func setJson() -> [String: Any] {
-        
+
         // total DONE
         // quantities DONE below
         // items TODO
-        
+
         let json: [String: Any] = [
             "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
             "cart": [
@@ -129,28 +131,28 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 ]
             ],
         ]
-        
+
         return json
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
         // or continue showing all products, even if quantity is 0. the screen looks more full this way
         return 4 // products.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //  'product' here has all available attributes here, if needed in the future (e.g. UI development)
         // let product = products[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        
+
         var items: [Int] = [
             ShoppingCart.instance.quantities.plantMood,
             ShoppingCart.instance.quantities.botanaVoice,
             ShoppingCart.instance.quantities.plantStroller,
             ShoppingCart.instance.quantities.plantNodes,
         ]
-        
+
         var text = ""
         var quantity = items[indexPath.row]
 
@@ -170,12 +172,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         default:
             print("indexPath.row was not 0,1,2,3")
         }
-        
+
         cell.textLabel?.text = text
-        
+
         return cell
     }
-    
+
 
     /*
     // MARK: - Navigation
