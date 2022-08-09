@@ -46,17 +46,19 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func checkout() {
         let transaction = SentrySDK.startTransaction(
           name: "checkout",
-          operation: "http.client"
+          operation: "http.client",
+          bindToScope: true
         )
         
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
         var request = URLRequest(url: url)
-        request.setValue("willc", forHTTPHeaderField: "se")
+        request.setValue("will", forHTTPHeaderField: "se")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("will@def.com", forHTTPHeaderField: "email")
         request.httpMethod = "POST"
         
         let json: [String: Any] = [
-            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "form": ["email":"will@chat.io"],
             "cart": [
                 "total": 100,
                 "quantities": ["4": 3],
@@ -78,7 +80,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // print("> URLSession response", response)
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
@@ -86,13 +87,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     SentrySDK.capture(error: err)
                 }
             }
-            
+            transaction.finish()
         }
         
-        
         task.resume()
-        
-        transaction.finish()
     }
     
     // total, quantities, items
