@@ -23,8 +23,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         SentrySDK.configureScope { scope in
-            scope.setTag(value: "will", key: "se")
+            scope.setTag(value: "will1", key: "se")
         }
+        
+        let user = User()
+        user.email = "will@abc.com"
+        SentrySDK.setUser(user)
 
         return true
     }
