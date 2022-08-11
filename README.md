@@ -29,7 +29,7 @@ Dragged 'Checkout' button to bottom but it displays in middle in the virtual dev
 
 
 `pod init` created Podfile but not Pods folder in XCode, like /cocoa demo has.
-`pod install`  
+`pod install`
 ```
  ~/thinkocapo/EmpowerPlant   master ±   pod install
 Analyzing dependencies
@@ -45,11 +45,11 @@ Pod installation complete! There is 1 dependency from the Podfile and 1 total po
 [!] Your project does not explicitly specify the CocoaPods master specs repo. Since CDN is now used as the default, you may safely remove it from your repos directory via `pod repo remove master`. To suppress this warning please add `warn_for_unused_master_specs_repo => false` to your Podfile.
 ```
 
-Problem - 'xcode not creating pods directory'  
-"Closing current project then re-open with new .xcworskpace will solve the issue."  
-"You should open .xcworkspace, not .xcodeproj."  
-XCode > File > Open > select the project's .xcoworkspace file, not the entire project directory  
-https://stackoverflow.com/questions/32906165/xcode-not-detecting-pods-directory 
+Problem - 'xcode not creating pods directory'
+"Closing current project then re-open with new .xcworskpace will solve the issue."
+"You should open .xcworkspace, not .xcodeproj."
+XCode > File > Open > select the project's .xcoworkspace file, not the entire project directory
+https://stackoverflow.com/questions/32906165/xcode-not-detecting-pods-directory
 https://stackoverflow.com/questions/47343066/pod-files-not-showing-up-on-xcode
 
 TODO - need upload debug symbols.
@@ -62,10 +62,10 @@ https://programmingwithswift.com/add-core-data-to-existing-ios-project/
 https://www.donnywals.com/using-codable-with-core-data-and-nsmanagedobject/
 JSON into Swift objects.
 
-followed this...  
+followed this...
 https://cocoacasts.com/networking-fundamentals-how-to-make-an-http-request-in-swift
 
-3/28  
+3/28
 
 class vs extension...
 
@@ -117,7 +117,18 @@ POST requests must be
 let task = URLSession.shared.dataTask(with: request) { data, response, error in
 ```
 
+Swift Version: X
 
+## Creating release and uploading app
+
+- Create debug and release builds + locate them on your disk + zip up accordingly (`EmpowerPlant_debug.zip` + `EmpowerPlant_release.zip`)
+- Create release manually using UI (https://github.com/sentry-demos/ios/releases/new)
+    - Increment version accordingly (release-title)
+    - Upload `EmpowerPlant_debug.zip` + `EmpowerPlant_release.zip`
+
+See https://github.com/sentry-demos/ios/releases/tag/0.0.1 for a sample release
+
+<<<<<<< HEAD
 Swift Version: X
 
 ## Upgrading Sentry SDK
@@ -126,3 +137,6 @@ Check out a new branch so you can open a PR.
 1. Xcode -> Podfile, increment the sdk version.
 2. pod update, or pod install if pod updating is hanging.
 3. Click 'Play' button
+=======
+Note: TDA must be restarted for it to pick up new version
+>>>>>>> master

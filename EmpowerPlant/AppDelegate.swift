@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.dsn = "https://c88045e430864a8e864af6233e7c18ea@o87286.ingest.sentry.io/6249899"
                 options.tracesSampleRate = 1.0
                 options.enableCoreDataTracking = true
+                options.environment = "production"
         }
         
         SentrySDK.configureScope { scope in
@@ -27,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         let user = User()
+        // TODO
         user.email = "will@abc.com"
         SentrySDK.setUser(user)
 

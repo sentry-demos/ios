@@ -30,7 +30,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Comment this out and to see the green background and no data in the rows
+        // Comment this out to see the green background and no data in the rows
         tableView.frame = view.bounds
         
         // Configures the nav bar buttons
@@ -135,9 +135,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func getAllProductsFromDb() {
         do {
             self.products = try context.fetch(Product.fetchRequest())
-        // for product in self.products {
-        //     print(product.productId, product.title, product.productDescriptionFull)
-        // }
             refreshTable()
         }
         catch {
