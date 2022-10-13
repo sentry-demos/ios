@@ -8,4 +8,3 @@ target 'EmpowerPlant' do
   # Pods for EmpowerPlant
   pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.26.0'
 end
-

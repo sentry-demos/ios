@@ -26,7 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.profilesSampleRate = 1.0
                 options.enableCoreDataTracking = true
             }
-    
         return true
     }
 
