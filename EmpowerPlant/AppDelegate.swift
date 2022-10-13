@@ -17,16 +17,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         SentrySDK.start { options in
-                options.dsn = "https://c88045e430864a8e864af6233e7c18ea@o87286.ingest.sentry.io/6249899"
+                options.dsn = "https://6d18723839b440c598ebbfa6c5e88e64@o87286.ingest.sentry.io/4503919866937344"
 //                options.debug = true // Enabled debug when first installing is always helpful
 
                 // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
                 // We recommend adjusting this value in production.
                 options.tracesSampleRate = 1.0
-            
+                options.profilesSampleRate = 1.0
                 options.enableCoreDataTracking = true
+                options.enableFileIOTracking = true
+                options.enableUserInteractionTracing = true
             }
-
+    
         return true
     }
 
