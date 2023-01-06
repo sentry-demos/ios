@@ -46,7 +46,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func purchase() {
         let transaction = SentrySDK.startTransaction(
           name: "purchase",
-          operation: "http.client" // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
+          operation: "http.client", // 'http.client' appears automatically in our js app, don't have to set 'operation' // this param is mandatory
+          bindToScope: true // needed for distributed tracing - It binds a transaction to the scope making it accessible to every method running
         )
 
         // use localhost for development against dev-backend
