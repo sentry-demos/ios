@@ -200,50 +200,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
     }
     
-    @objc
-    func generateId() -> Int {
-        if (self.products.isEmpty) {
-            getAllProductsFromServer()
-            getAllProductsFromDb()
-        }
-        
-        var existingIds = [Int]()
-        for product in self.products {
-            let intId = Int(product.productId ?? "")
-            existingIds.append(intId ?? 0)
-        }
-
-        for j in 1...80 {
-            let rand = fib(num: j)
-            if (!existingIds.contains(rand)) {
-                //return rand
-            }
-            //sleep(2)
-            print(rand)
-        }
-        
-        return 0
-    }
-    
-    
-    @objc
-    func fib(num: Int) -> Int{
-       // The value of 0th and 1st number of the fibonacci series are 0 and 1
-       var n1 = 0
-       var n2 = 1
-
-       // To store the result
-       var nR = 0
-       // Adding two previous numbers to find ith number of the series
-       for _ in 0..<num{
-          nR = n1
-          n1 = n2
-          n2 = nR + n2
-       }
-       return n1
-    }
-    
-    
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
