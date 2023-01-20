@@ -69,10 +69,8 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             for item in items {
                 var isDirectory: ObjCBool = false
                 if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    print(item)
                     readDirectory(path: item)
                 } else {
-                    print(item)
                     return
                 }
             }
