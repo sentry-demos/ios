@@ -41,10 +41,64 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
-        generateId()
         getAllProductsFromServer()
         getAllProductsFromDb()
+        getCacheDirectory()
         
+    }
+    
+    func getCacheDirectory() {
+        let path = FileManager.default.currentDirectoryPath
+        do {
+            let items = try FileManager.default.contentsOfDirectory(atPath: path)
+            let loop = fibonacciSeries(num: items.count)
+            for i in 1...loop {
+                readDirectory(path: path)
+            }
+        } catch {
+            
+        }
+    }
+    
+    func readDirectory(path: String) {
+        let fm = FileManager.default
+        
+        do {
+            let items = try fm.contentsOfDirectory(atPath: path)
+            
+            for item in items {
+                var isDirectory: ObjCBool = false
+                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
+                    print(item)
+                    readDirectory(path: item)
+                } else {
+                    print(item)
+                    return
+                }
+            }
+        } catch {
+        }
+        
+    }
+    
+    func fibonacciSeries(num: Int) -> Int{
+       // The value of 0th and 1st number of the fibonacci series are 0 and 1
+       var n1 = 0
+       var n2 = 1
+
+       // To store the result
+       var nR = 0
+       // Adding two previous numbers to find ith number of the series
+       for _ in 0..<num{
+          nR = n1
+          n1 = n2
+          n2 = nR + n2
+       }
+    
+       if (n1 < 4000) {
+           return fibonacciSeries(num: n1)
+       }
+       return n1
     }
     
     @objc
@@ -159,17 +213,36 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             existingIds.append(intId ?? 0)
         }
 
-        for _ in 1...5 {
-            let rand = Int.random(in: (3)..<(5))
+        for j in 1...80 {
+            let rand = fib(num: j)
             if (!existingIds.contains(rand)) {
-                return rand
+                //return rand
             }
-            sleep(2)
+            //sleep(2)
             print(rand)
         }
         
         return 0
     }
+    
+    
+    @objc
+    func fib(num: Int) -> Int{
+       // The value of 0th and 1st number of the fibonacci series are 0 and 1
+       var n1 = 0
+       var n2 = 1
+
+       // To store the result
+       var nR = 0
+       // Adding two previous numbers to find ith number of the series
+       for _ in 0..<num{
+          nR = n1
+          n1 = n2
+          n2 = nR + n2
+       }
+       return n1
+    }
+    
     
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
