@@ -44,11 +44,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         getAllProductsFromServer()
         getAllProductsFromDb()
-        getCacheDirectory()
+        readCurrentDirectory()
         
     }
     
-    func getCacheDirectory() {
+    func readCurrentDirectory() {
         let path = FileManager.default.currentDirectoryPath
         do {
             let items = try FileManager.default.contentsOfDirectory(atPath: path)
