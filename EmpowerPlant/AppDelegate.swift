@@ -25,6 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.tracesSampleRate = 1.0
                 options.profilesSampleRate = 1.0
                 options.enableCoreDataTracking = true
+                options.enableFileIOTracking = true
             }
         return true
     }
