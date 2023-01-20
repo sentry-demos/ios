@@ -9,7 +9,7 @@ import UIKit
 import Sentry
 
 class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+
     // CoreData database
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
@@ -25,7 +25,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Empower Plant"
-        
+
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
@@ -35,12 +35,13 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         
         // Configures the nav bar buttons
         configureNavigationItems()
-        
+
         /* TODO
          1 get products from server (so we get http.client span)
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
+        
         getAllProductsFromServer()
         getAllProductsFromDb()
         getCacheDirectory()
