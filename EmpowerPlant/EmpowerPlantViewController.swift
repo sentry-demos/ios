@@ -158,15 +158,10 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             let intId = Int(product.productId ?? "")
             existingIds.append(intId ?? 0)
         }
-        
-        return createId(ids:existingIds)
-    }
-    
-    @objc
-    func createId(ids: [Int]) -> Int {
+
         for _ in 1...5 {
             let rand = Int.random(in: (3)..<(5))
-            if (!ids.contains(rand)) {
+            if (!existingIds.contains(rand)) {
                 return rand
             }
             sleep(2)
