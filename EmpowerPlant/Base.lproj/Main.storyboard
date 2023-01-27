@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zLm-2U-p5i">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zLm-2U-p5i">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Empower Plant View Controller-->
+        <!--Title-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="EmpowerPlantViewController" customModule="EmpowerPlant" customModuleProvider="target" sceneMemberID="viewController">
@@ -26,7 +26,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemGreenColor"/>
                     </view>
-                    <navigationItem key="navigationItem" id="Zxx-KE-qjy"/>
+                    <navigationItem key="navigationItem" title="Title" id="FBl-d0-nMA"/>
                     <connections>
                         <segue destination="a38-3e-3Io" kind="show" identifier="goToCart" id="wPz-jB-LrC"/>
                         <segue destination="VXN-aD-u60" kind="show" identifier="goToListApp" id="ooB-np-j7X"/>
@@ -36,41 +36,23 @@
             </objects>
             <point key="canvasLocation" x="1050.7246376811595" y="126.5625"/>
         </scene>
-        <!--Cart View Controller-->
+        <!--Cart Screen-->
         <scene sceneID="Auo-DH-J5X">
             <objects>
                 <viewController id="a38-3e-3Io" customClass="CartViewController" customModule="EmpowerPlant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="08s-ul-IVG">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MZU-nG-SBt">
-                                <rect key="frame" x="107" y="790" width="200" height="50"/>
-                                <color key="backgroundColor" systemColor="systemGreenColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="RJv-g7-aRK"/>
-                                    <constraint firstAttribute="height" constant="50" id="kYC-br-3le"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
-                                <state key="normal" title="Checkout">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                            </button>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="M2P-we-1IG"/>
                         <color key="backgroundColor" systemColor="systemYellowColor"/>
-                        <constraints>
-                            <constraint firstItem="MZU-nG-SBt" firstAttribute="centerX" secondItem="08s-ul-IVG" secondAttribute="centerX" id="Hcz-kk-C1G"/>
-                            <constraint firstItem="MZU-nG-SBt" firstAttribute="centerY" secondItem="08s-ul-IVG" secondAttribute="centerY" id="W2a-j9-TKl"/>
-                        </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="HBc-3M-t3f"/>
+                    <navigationItem key="navigationItem" title="Cart Screen" id="HBc-3M-t3f"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lXk-wB-WcC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2000" y="127"/>
         </scene>
-        <!--List App View Controller-->
+        <!--List App-->
         <scene sceneID="NJ4-dB-pzJ">
             <objects>
                 <viewController id="VXN-aD-u60" customClass="ListAppViewController" customModule="EmpowerPlant" sceneMemberID="viewController">
@@ -80,7 +62,7 @@
                         <viewLayoutGuide key="safeArea" id="CaI-jg-IPv"/>
                         <color key="backgroundColor" systemColor="systemIndigoColor"/>
                     </view>
-                    <navigationItem key="navigationItem" id="r5d-gZ-zyX"/>
+                    <navigationItem key="navigationItem" title="List App" id="r5d-gZ-zyX"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bgO-GR-jh9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -92,7 +74,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="zLm-2U-p5i" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="ZRT-xt-jev">
-                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <textAttributes key="largeTitleTextAttributes">
@@ -109,6 +91,7 @@
             <point key="canvasLocation" x="154" y="126"/>
         </scene>
     </scenes>
+    <color key="tintColor" systemColor="systemGreenColor"/>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

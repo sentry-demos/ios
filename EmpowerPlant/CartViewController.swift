@@ -18,7 +18,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Cart Screen"
+        title = "My Cart"
 
         self.view.addSubview(tableView)
         tableView.delegate = self
@@ -40,8 +40,20 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             target: self,
             action: #selector(purchase)
         )
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+        
+        /*
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Catalog",
+            style: .plain,
+            target: self,
+            action: #selector(goToEmpowerPlant())
+        )
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+         */
     }
 
+    
     @objc
     func purchase() {
         let transaction = SentrySDK.startTransaction(

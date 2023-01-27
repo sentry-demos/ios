@@ -25,6 +25,20 @@ class ListAppViewController: UIViewController {
         }
     }
     
+
+    private func configureNavigationItems() {
+        /*
+     self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+         title: "Empower Plant",
+         style: .plain,
+         target: self,
+         action: #selector(goToEmpowerPlant())
+     )
+     self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blue
+         */
+    }
+
+    
     func callMethodThatThrowsError() throws{
         throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Handled Exception"])
     }

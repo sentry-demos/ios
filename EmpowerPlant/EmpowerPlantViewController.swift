@@ -83,21 +83,25 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         }
         refreshTable()
     }
-    
+        
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Cart",
+            image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
             action: #selector(goToCart) // addToDb
         )
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+        
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "List App",
+            image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
-            action: #selector(goToListApp) // clearDb
+            action: #selector(goToListApp)
         )
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blue
+        
     }
     
     // Writes to CoreData database
@@ -131,6 +135,11 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             
         }
     }
+    
+    /*
+    @IBAction func checkout(_ sender: UIBarButtonItem) {
+        
+    } */
     
     func getAllProductsFromDb() {
         do {
@@ -187,9 +196,16 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         self.performSegue(withIdentifier: "goToCart", sender: self)
     }
     
+    
     @objc
     func goToListApp() {
         self.performSegue(withIdentifier: "goToListApp", sender: self)
+    }
+
+    
+    @objc
+    func goToEmpowerPlant() {
+        self.performSegue(withIdentifier: "goToEmpowerPlant", sender: self)
     }
 
     @objc
