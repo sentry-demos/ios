@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
+		BF80A50F29BF9839003F3A3D /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF80A50E29BF9839003F3A3D /* RandomErrors.swift */; };
 		D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */; };
 		D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */; };
 		D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */; };
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF80A50E29BF9839003F3A3D /* RandomErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomErrors.swift; sourceTree = "<group>"; };
 		CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.debug.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.debug.xcconfig"; sourceTree = "<group>"; };
 		D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				D17C73BB27D8291D006650AF /* Assets.xcassets */,
 				D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */,
 				D17C73C027D8291D006650AF /* Info.plist */,
+				BF80A50E29BF9839003F3A3D /* RandomErrors.swift */,
 			);
 			path = EmpowerPlant;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */,
 				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
+				BF80A50F29BF9839003F3A3D /* RandomErrors.swift in Sources */,
 				D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */,
 				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
 				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,

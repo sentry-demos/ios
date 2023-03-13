@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Sentry in Pods, no dependencies
+Pods-EmpowerPlant in Pods, depends on:
+Sentry in Pods (explicit)
