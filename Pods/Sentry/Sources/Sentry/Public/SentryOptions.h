@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SentryDsn, SentrySdkInfo;
+@class SentryDsn, SentrySdkInfo, SentryMeasurementValue, SentryHttpStatusCodeRange;
 
 NS_SWIFT_NAME(Options)
 @interface SentryOptions : NSObject
@@ -44,7 +44,11 @@ NS_SWIFT_NAME(Options)
 @property (nullable, nonatomic, copy) NSString *releaseName;
 
 /**
- * This property will be filled before the event is sent.
+ * The distribution of the application.
+ *
+ * @discussion Distributions are used to disambiguate build or deployment variants of the same
+ * release of an application. For example, the dist can be the build number of an Xcode build.
+ *
  */
 @property (nullable, nonatomic, copy) NSString *dist;
 
@@ -60,14 +64,23 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enabled;
 
 /**
+ * When enabled, the SDK sends crashes to Sentry. Default value is YES.
+ */
+@property (nonatomic, assign) BOOL enableCrashHandler;
+
+/**
  * How many breadcrumbs do you want to keep in memory?
  * Default is 100.
  */
 @property (nonatomic, assign) NSUInteger maxBreadcrumbs;
 
 /**
- * When enabled, the SDK adds breadcrumbs for each network request. Default value is YES.
- * As this feature uses swizzling, disabling enableSwizzling also disables this feature.
+ * When enabled, the SDK adds breadcrumbs for each network request. Default value is
+ * <code>YES</code>. As this feature uses swizzling, disabling <code>enableSwizzling</code> also
+ * disables this feature.
+ *
+ * @discussion If you want to enable or disable network tracking for performance monitoring, please
+ * use <code>enableNetworkTracking</code> instead.
  */
 @property (nonatomic, assign) BOOL enableNetworkBreadcrumbs;
 
@@ -153,8 +166,10 @@ NS_SWIFT_NAME(Options)
 
 /**
  * Describes the Sentry SDK and its configuration used to capture and transmit an event.
+ * This is reserved for internal use, and will be removed in a future version of the SDK.
  */
-@property (nonatomic, readonly, strong) SentrySdkInfo *sdkInfo;
+@property (nonatomic, readonly, strong) SentrySdkInfo *sdkInfo DEPRECATED_MSG_ATTRIBUTE(
+    "This property will be removed in a future version of the SDK");
 
 /**
  * The maximum size for each attachment in bytes. Default is 20 MiB / 20 * 1024 * 1024 bytes.
@@ -193,11 +208,23 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enableUIViewControllerTracking;
 
 /**
+ * This feature is EXPERIMENTAL.
+ *
  * Automatically attaches a screenshot when capturing an error or exception.
  *
  * Default value is <code>NO</code>
  */
 @property (nonatomic, assign) BOOL attachScreenshot;
+
+/**
+ * This feature is EXPERIMENTAL.
+ *
+ * Automatically attaches a textual representation of the view hierarchy when capturing an error
+ * event.
+ *
+ * Default value is <code>NO</code>
+ */
+@property (nonatomic, assign) BOOL attachViewHierarchy;
 
 /**
  * This feature is EXPERIMENTAL.
@@ -213,18 +240,32 @@ NS_SWIFT_NAME(Options)
  */
 @property (nonatomic, assign) NSTimeInterval idleTimeout;
 
+/**
+ * This feature is EXPERIMENTAL.
+ *
+ * Report pre-warmed app starts by dropping the first app start spans if pre-warming paused during
+ * these steps. This approach will shorten the app start duration, but it represents the duration a
+ * user has to wait after clicking the app icon until the app is responsive.
+ *
+ * You can filter for different app start types in Discover with app_start_type:cold.prewarmed,
+ * app_start_type:warm.prewarmed, app_start_type:cold, and app_start_type:warm.
+ *
+ * Default value is <code>NO</code>
+ */
+@property (nonatomic, assign) BOOL enablePreWarmedAppStartTracking;
+
 #endif
 
 /**
- * When enabled, the SDK adds breadcrumbs for HTTP requests and tracks performance for HTTP
- * requests if auto performance tracking and enableSwizzling are enabled. The default is
- * <code>YES</code>.
+ * When enabled, the SDK tracks performance for HTTP requests if auto performance tracking and
+ * enableSwizzling are enabled. The default is <code>YES</code>.
+ *
+ * @discussion If you want to enable or disable network breadcrumbs, please use
+ * <code>enableNetworkBreadcrumbs</code> instead.
  */
 @property (nonatomic, assign) BOOL enableNetworkTracking;
 
 /**
- * This feature is EXPERIMENTAL.
- *
  * When enabled, the SDK tracks performance for file IO reads and writes with NSData if auto
  * performance tracking and enableSwizzling are enabled. The default is <code>NO</code>.
  */
@@ -286,13 +327,6 @@ NS_SWIFT_NAME(Options)
 @property (nullable, nonatomic, weak) id<NSURLSessionDelegate> urlSessionDelegate;
 
 /**
- * Controls if the `tracestate` header is attached to envelopes and HTTP client integrations.
- *
- * Note: this is an experimental API and will be removed without notice.
- */
-@property (nonatomic) BOOL experimentalEnableTraceSampling;
-
-/**
  * Wether the SDK should use swizzling or not. Default is YES.
  *
  * @discussion When turned off the following features are disabled: breadcrumbs for touch events and
@@ -303,8 +337,6 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enableSwizzling;
 
 /**
- * This feature is experimental.
- *
  * When enabled, the SDK tracks the performance of Core Data operations. It requires enabling
  * performance monitoring. The default is <code>NO</code>.
  * @see <https://docs.sentry.io/platforms/apple/performance/>
@@ -313,11 +345,46 @@ NS_SWIFT_NAME(Options)
 
 #if SENTRY_TARGET_PROFILING_SUPPORTED
 /**
+ * This feature is experimental. Profiling is not supported on watchOS or tvOS.
+ *
+ * Indicates the percentage profiles being sampled out of the sampled transactions.
+ *
+ * The default is 0. The value needs to be >= 0.0 and <= 1.0. When setting a value out of range
+ * the SDK sets it to the default of 0.
+ *
+ * This property is dependent on `tracesSampleRate` -- if `tracesSampleRate` is 0 (default),
+ * no profiles will be collected no matter what this property is set to. This property is
+ * used to undersample profiles *relative to* `tracesSampleRate`.
+ */
+@property (nullable, nonatomic, strong) NSNumber *profilesSampleRate;
+
+/**
+ * This feature is experimental. Profiling is not supported on watchOS or tvOS.
+ *
+ * A callback to a user defined profiles sampler function. This is similar to setting
+ * `profilesSampleRate`, but instead of a static value, the callback function will be called to
+ * determine the sample rate.
+ */
+@property (nullable, nonatomic) SentryTracesSamplerCallback profilesSampler;
+
+/**
+ * If profiling should be enabled or not. Returns YES if either a profilesSampleRate > 0 and
+ * <=1 or a profilesSampler is set otherwise NO.
+ */
+@property (nonatomic, assign, readonly) BOOL isProfilingEnabled;
+
+/**
+ * DEPRECATED: Use `profilesSampleRate` instead. Setting `enableProfiling` to YES is the equivalent
+ * of setting `profilesSampleRate` to `1.0`. If `profilesSampleRate` is set, it will take precedence
+ * over this setting.
+ *
  * Whether to enable the sampling profiler. Default is NO.
  * @note This is a beta feature that is currently not available to all Sentry customers. This
  * feature is not supported on watchOS or tvOS.
  */
-@property (nonatomic, assign) BOOL enableProfiling;
+@property (nonatomic, assign) BOOL enableProfiling DEPRECATED_MSG_ATTRIBUTE(
+    "Use profilesSampleRate or profilesSampler instead. This property will be removed in a future "
+    "version of the SDK");
 #endif
 
 /**
@@ -327,6 +394,64 @@ NS_SWIFT_NAME(Options)
  * @see <https://develop.sentry.dev/sdk/client-reports/>
  */
 @property (nonatomic, assign) BOOL sendClientReports;
+
+/**
+ * When enabled, the SDK tracks when the application stops responding for a specific amount of
+ * time defined by the `appHangsTimeoutInterval` option. The default is
+ * <code>NO</code>
+ */
+@property (nonatomic, assign) BOOL enableAppHangTracking;
+
+/**
+ * The minimum amount of time an app should be unresponsive to be classified as an App Hanging.
+ * The actual amount may be a little longer.
+ * Avoid using values lower than 100ms, which may cause a lot of app hangs events being transmitted.
+ * The default value is 2 seconds.
+ */
+@property (nonatomic, assign) NSTimeInterval appHangTimeoutInterval;
+
+/**
+ * When enabled, the SDK adds breadcrumbs for various system events. Default value is YES.
+ */
+@property (nonatomic, assign) BOOL enableAutoBreadcrumbTracking;
+
+/**
+ * An array of hosts or regexes that determines if outgoing HTTP requests will get
+ * extra `trace_id` and `baggage` headers added.
+ *
+ * This array can contain instances of NSString which should match the URL (using `contains`),
+ * and instances of NSRegularExpression, which will be used to check the whole URL.
+ *
+ * The default value adds the header to all outgoing requests.
+ *
+ * @see https://docs.sentry.io/platforms/apple/configuration/options/#trace-propagation-targets
+ */
+@property (nonatomic, retain) NSArray *tracePropagationTargets;
+
+/**
+ * When enabled, the SDK captures HTTP Client errors. Default value is NO.
+ * This feature requires enableSwizzling enabled as well, Default value is YES.
+ */
+@property (nonatomic, assign) BOOL enableCaptureFailedRequests;
+
+/**
+ * The SDK will only capture HTTP Client errors if the HTTP Response status code is within the
+ * defined range.
+ *
+ * Defaults to 500 - 599.
+ */
+@property (nonatomic, strong) NSArray<SentryHttpStatusCodeRange *> *failedRequestStatusCodes;
+
+/**
+ * An array of hosts or regexes that determines if HTTP Client errors will be automatically
+ * captured.
+ *
+ * This array can contain instances of NSString which should match the URL (using `contains`),
+ * and instances of NSRegularExpression, which will be used to check the whole URL.
+ *
+ * The default value automatically captures HTTP Client errors of all outgoing requests.
+ */
+@property (nonatomic, strong) NSArray *failedRequestTargets;
 
 @end
 

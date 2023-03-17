@@ -40,11 +40,15 @@ SentryOutOfMemoryLogic ()
     }
 
 #if SENTRY_HAS_UIKIT
-    SentryAppState *previousAppState = [self.appStateManager loadCurrentAppState];
+    SentryAppState *previousAppState = [self.appStateManager loadPreviousAppState];
     SentryAppState *currentAppState = [self.appStateManager buildCurrentAppState];
 
     // If there is no previous app state, we can't do anything.
     if (nil == previousAppState) {
+        return NO;
+    }
+
+    if (self.crashAdapter.isSimulatorBuild) {
         return NO;
     }
 

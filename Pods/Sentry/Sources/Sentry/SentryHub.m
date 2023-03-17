@@ -10,6 +10,7 @@
 #import "SentryFileManager.h"
 #import "SentryId.h"
 #import "SentryLog.h"
+#import "SentryProfilesSampler.h"
 #import "SentrySDK+Private.h"
 #import "SentrySamplingContext.h"
 #import "SentryScope.h"
@@ -17,7 +18,7 @@
 #import "SentryTracer.h"
 #import "SentryTracesSampler.h"
 #import "SentryTransaction.h"
-#import "SentryTransactionContext.h"
+#import "SentryTransactionContext+Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,13 +28,17 @@ SentryHub ()
 @property (nullable, nonatomic, strong) SentryClient *client;
 @property (nullable, nonatomic, strong) SentryScope *scope;
 @property (nonatomic, strong) SentryCrashWrapper *crashWrapper;
-@property (nonatomic, strong) SentryTracesSampler *sampler;
+@property (nonatomic, strong) SentryTracesSampler *tracesSampler;
+@property (nonatomic, strong) SentryProfilesSampler *profilesSampler;
 @property (nonatomic, strong) id<SentryCurrentDateProvider> currentDateProvider;
+@property (nonatomic, strong) NSMutableArray<id<SentryIntegrationProtocol>> *installedIntegrations;
+@property (nonatomic, strong) NSMutableSet<NSString *> *installedIntegrationNames;
 
 @end
 
 @implementation SentryHub {
     NSObject *_sessionLock;
+    NSObject *_integrationsLock;
 }
 
 - (instancetype)initWithClient:(nullable SentryClient *)client
@@ -43,9 +48,16 @@ SentryHub ()
         _client = client;
         _scope = scope;
         _sessionLock = [[NSObject alloc] init];
+        _integrationsLock = [[NSObject alloc] init];
         _installedIntegrations = [[NSMutableArray alloc] init];
+        _installedIntegrationNames = [[NSMutableSet alloc] init];
         _crashWrapper = [SentryCrashWrapper sharedInstance];
-        _sampler = [[SentryTracesSampler alloc] initWithOptions:client.options];
+        _tracesSampler = [[SentryTracesSampler alloc] initWithOptions:client.options];
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+        if (client.options.isProfilingEnabled) {
+            _profilesSampler = [[SentryProfilesSampler alloc] initWithOptions:client.options];
+        }
+#endif
         _currentDateProvider = [SentryDefaultCurrentDateProvider sharedInstance];
     }
     return self;
@@ -111,8 +123,7 @@ SentryHub ()
     }
 
     if (nil == currentSession) {
-        [SentryLog logWithMessage:[NSString stringWithFormat:@"No session to end with timestamp."]
-                         andLevel:kSentryLevelDebug];
+        SENTRY_LOG_DEBUG(@"No session to end with timestamp.");
         return;
     }
 
@@ -135,15 +146,15 @@ SentryHub ()
     SentryFileManager *fileManager = [_client fileManager];
     SentrySession *session = [fileManager readCurrentSession];
     if (nil == session) {
-        [SentryLog logWithMessage:@"No cached session to close." andLevel:kSentryLevelDebug];
+        SENTRY_LOG_DEBUG(@"No cached session to close.");
         return;
     }
-    [SentryLog logWithMessage:@"A cached session was found." andLevel:kSentryLevelDebug];
+    SENTRY_LOG_DEBUG(@"A cached session was found.");
 
     // Make sure there's a client bound.
     SentryClient *client = _client;
     if (nil == client) {
-        [SentryLog logWithMessage:@"No client bound." andLevel:kSentryLevelDebug];
+        SENTRY_LOG_DEBUG(@"No client bound.");
         return;
     }
 
@@ -151,17 +162,13 @@ SentryHub ()
     // out more.
     if (!self.crashWrapper.crashedLastLaunch) {
         if (nil == timestamp) {
-            [SentryLog
-                logWithMessage:[NSString stringWithFormat:@"No timestamp to close session "
-                                                          @"was provided. Closing as abnormal. "
-                                                           "Using session's start time %@",
-                                         session.started]
-                      andLevel:kSentryLevelDebug];
+            SENTRY_LOG_DEBUG(@"No timestamp to close session was provided. Closing as abnormal. "
+                             @"Using session's start time %@",
+                session.started);
             timestamp = session.started;
             [session endSessionAbnormalWithTimestamp:timestamp];
         } else {
-            [SentryLog logWithMessage:@"Closing cached session as exited."
-                             andLevel:kSentryLevelDebug];
+            SENTRY_LOG_DEBUG(@"Closing cached session as exited.");
             [session endSessionExitedWithTimestamp:timestamp];
         }
         [self deleteCurrentSession];
@@ -203,13 +210,18 @@ SentryHub ()
     return sessionCopy;
 }
 
+- (void)captureCrashEvent:(SentryEvent *)event
+{
+    [self captureCrashEvent:event withScope:self.scope];
+}
+
 /**
  * If autoSessionTracking is enabled we want to send the crash and the event together to get proper
  * numbers for release health statistics. If there are multiple crash events to be sent on the start
  * of the SDK there is currently no way to know which one belongs to the crashed session so we just
  * send the session with the first crashed event we receive.
  */
-- (void)captureCrashEvent:(SentryEvent *)event
+- (void)captureCrashEvent:(SentryEvent *)event withScope:(SentryScope *)scope
 {
     event.isCrashEvent = YES;
 
@@ -226,13 +238,13 @@ SentryHub ()
         // It can be that there is no session yet, because autoSessionTracking was just enabled and
         // there is a previous crash on disk. In this case we just send the crash event.
         if (nil != crashedSession) {
-            [client captureCrashEvent:event withSession:crashedSession withScope:self.scope];
+            [client captureCrashEvent:event withSession:crashedSession withScope:scope];
             [fileManager deleteCrashedSession];
             return;
         }
     }
 
-    [client captureCrashEvent:event withScope:self.scope];
+    [client captureCrashEvent:event withScope:scope];
 }
 
 - (SentryId *)captureTransaction:(SentryTransaction *)transaction withScope:(SentryScope *)scope
@@ -281,8 +293,19 @@ SentryHub ()
 
 - (id<SentrySpan>)startTransactionWithName:(NSString *)name operation:(NSString *)operation
 {
+    return [self startTransactionWithContext:[[SentryTransactionContext alloc]
+                                                 initWithName:name
+                                                   nameSource:kSentryTransactionNameSourceCustom
+                                                    operation:operation]];
+}
+
+- (id<SentrySpan>)startTransactionWithName:(NSString *)name
+                                nameSource:(SentryTransactionNameSource)source
+                                 operation:(NSString *)operation
+{
     return [self
         startTransactionWithContext:[[SentryTransactionContext alloc] initWithName:name
+                                                                        nameSource:source
                                                                          operation:operation]];
 }
 
@@ -290,8 +313,21 @@ SentryHub ()
                                  operation:(NSString *)operation
                                bindToScope:(BOOL)bindToScope
 {
+    return [self startTransactionWithContext:[[SentryTransactionContext alloc]
+                                                 initWithName:name
+                                                   nameSource:kSentryTransactionNameSourceCustom
+                                                    operation:operation]
+                                 bindToScope:bindToScope];
+}
+
+- (id<SentrySpan>)startTransactionWithName:(NSString *)name
+                                nameSource:(SentryTransactionNameSource)source
+                                 operation:(NSString *)operation
+                               bindToScope:(BOOL)bindToScope
+{
     return
         [self startTransactionWithContext:[[SentryTransactionContext alloc] initWithName:name
+                                                                              nameSource:source
                                                                                operation:operation]
                               bindToScope:bindToScope];
 }
@@ -336,10 +372,16 @@ SentryHub ()
         [[SentrySamplingContext alloc] initWithTransactionContext:transactionContext
                                             customSamplingContext:customSamplingContext];
 
-    transactionContext.sampled = [_sampler sample:samplingContext];
+    SentryTracesSamplerDecision *samplerDecision = [_tracesSampler sample:samplingContext];
+    transactionContext.sampled = samplerDecision.decision;
+    transactionContext.sampleRate = samplerDecision.sampleRate;
+
+    SentryProfilesSamplerDecision *profilesSamplerDecision =
+        [_profilesSampler sample:samplingContext tracesSamplerDecision:samplerDecision];
 
     id<SentrySpan> tracer = [[SentryTracer alloc] initWithTransactionContext:transactionContext
                                                                          hub:self
+                                                     profilesSamplerDecision:profilesSamplerDecision
                                                              waitForChildren:waitForChildren];
 
     if (bindToScope)
@@ -358,10 +400,16 @@ SentryHub ()
         [[SentrySamplingContext alloc] initWithTransactionContext:transactionContext
                                             customSamplingContext:customSamplingContext];
 
-    transactionContext.sampled = [_sampler sample:samplingContext];
+    SentryTracesSamplerDecision *samplerDecision = [_tracesSampler sample:samplingContext];
+    transactionContext.sampled = samplerDecision.decision;
+    transactionContext.sampleRate = samplerDecision.sampleRate;
+
+    SentryProfilesSamplerDecision *profilesSamplerDecision =
+        [_profilesSampler sample:samplingContext tracesSamplerDecision:samplerDecision];
 
     SentryTracer *tracer = [[SentryTracer alloc] initWithTransactionContext:transactionContext
                                                                         hub:self
+                                                    profilesSamplerDecision:profilesSamplerDecision
                                                                 idleTimeout:idleTimeout
                                                        dispatchQueueWrapper:dispatchQueueWrapper];
     if (bindToScope)
@@ -391,11 +439,13 @@ SentryHub ()
 
 - (SentryId *)captureError:(NSError *)error withScope:(SentryScope *)scope
 {
-    SentrySession *currentSession = [self incrementSessionErrors];
+    SentrySession *currentSession = _session;
     SentryClient *client = _client;
     if (nil != client) {
         if (nil != currentSession) {
-            return [client captureError:error withSession:currentSession withScope:scope];
+            return [client captureError:error
+                              withScope:scope
+                 incrementSessionErrors:^(void) { return [self incrementSessionErrors]; }];
         } else {
             return [client captureError:error withScope:scope];
         }
@@ -410,12 +460,13 @@ SentryHub ()
 
 - (SentryId *)captureException:(NSException *)exception withScope:(SentryScope *)scope
 {
-    SentrySession *currentSession = [self incrementSessionErrors];
-
+    SentrySession *currentSession = _session;
     SentryClient *client = _client;
     if (nil != client) {
         if (nil != currentSession) {
-            return [client captureException:exception withSession:currentSession withScope:scope];
+            return [client captureException:exception
+                                  withScope:scope
+                     incrementSessionErrors:^(void) { return [self incrementSessionErrors]; }];
         } else {
             return [client captureException:exception withScope:scope];
         }
@@ -442,9 +493,7 @@ SentryHub ()
         crumb = callback(crumb);
     }
     if (nil == crumb) {
-        [SentryLog logWithMessage:[NSString stringWithFormat:@"Discarded Breadcrumb "
-                                                             @"in `beforeBreadcrumb`"]
-                         andLevel:kSentryLevelDebug];
+        SENTRY_LOG_DEBUG(@"Discarded Breadcrumb in `beforeBreadcrumb`");
         return;
     }
     [self.scope addBreadcrumb:crumb];
@@ -491,21 +540,53 @@ SentryHub ()
  */
 - (BOOL)isIntegrationInstalled:(Class)integrationClass
 {
-    for (id<SentryIntegrationProtocol> item in SentrySDK.currentHub.installedIntegrations) {
-        if ([item isKindOfClass:integrationClass]) {
-            return YES;
+    @synchronized(_integrationsLock) {
+        for (id<SentryIntegrationProtocol> item in _installedIntegrations) {
+            if ([item isKindOfClass:integrationClass]) {
+                return YES;
+            }
         }
+        return NO;
     }
-    return NO;
 }
 
-- (nullable id)getIntegration:(NSString *)integrationName
+- (BOOL)hasIntegration:(NSString *)integrationName
 {
-    NSArray *integrations = _client.options.integrations;
-    if (![integrations containsObject:integrationName]) {
-        return nil;
+    // installedIntegrations and installedIntegrationNames share the same lock.
+    // Instead of creating an extra lock object, we use _installedIntegrations.
+    @synchronized(_integrationsLock) {
+        return [_installedIntegrationNames containsObject:integrationName];
     }
-    return [integrations objectAtIndex:[integrations indexOfObject:integrationName]];
+}
+
+- (void)addInstalledIntegration:(id<SentryIntegrationProtocol>)integration name:(NSString *)name
+{
+    @synchronized(_integrationsLock) {
+        [_installedIntegrations addObject:integration];
+        [_installedIntegrationNames addObject:name];
+    }
+}
+
+- (void)removeAllIntegrations
+{
+    @synchronized(_integrationsLock) {
+        [_installedIntegrations removeAllObjects];
+        [_installedIntegrationNames removeAllObjects];
+    }
+}
+
+- (NSArray<id<SentryIntegrationProtocol>> *)installedIntegrations
+{
+    @synchronized(_integrationsLock) {
+        return _installedIntegrations.copy;
+    }
+}
+
+- (NSSet<NSString *> *)installedIntegrationNames
+{
+    @synchronized(_integrationsLock) {
+        return _installedIntegrationNames.copy;
+    }
 }
 
 - (void)setUser:(nullable SentryUser *)user
@@ -557,6 +638,14 @@ SentryHub ()
     }
 
     return NO;
+}
+
+- (void)flush:(NSTimeInterval)timeout
+{
+    SentryClient *client = _client;
+    if (nil != client) {
+        [client flush:timeout];
+    }
 }
 
 @end

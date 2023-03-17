@@ -24,8 +24,6 @@
 // THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
-
 #import "SentryCrashMonitorType.h"
 #import "SentryCrashReportFilter.h"
 #import "SentryCrashReportWriter.h"
@@ -42,6 +40,10 @@ typedef enum {
     SentryCrashCDeleteOnSucess,
     SentryCrashCDeleteAlways
 } SentryCrashCDeleteBehavior;
+
+static NSString *const SENTRYCRASH_REPORT_ATTACHMENTS_ITEM = @"attachments";
+
+@class SentryNSNotificationCenterWrapper;
 
 /**
  * Reports any crashes that occur in the application.
@@ -82,29 +84,6 @@ typedef enum {
  * Default: SentryCrashMonitorTypeProductionSafeMinimal
  */
 @property (nonatomic, readwrite, assign) SentryCrashMonitorType monitoring;
-
-/** Maximum time to allow the main thread to run without returning.
- * If a task occupies the main thread for longer than this interval, the
- * watchdog will consider the queue deadlocked and shut down the app and write a
- * crash report.
- *
- * Note: You must have added SentryCrashMonitorTypeMainThreadDeadlock to the
- * monitoring property in order for this to have any effect.
- *
- * Warning: Make SURE that nothing in your app that runs on the main thread
- * takes longer to complete than this value or it WILL get shut down! This
- * includes your app startup process, so you may need to push app initialization
- * to another thread, or perhaps set this to a higher value until your
- * application has been fully initialized.
- *
- * WARNING: This is still causing false positives in some cases. Use at own
- * risk!
- *
- * 0 = Disabled.
- *
- * Default: 0
- */
-@property (nonatomic, readwrite, assign) double deadlockWatchdogInterval;
 
 // We removed searchQueueNames in 4.0.0 see:
 // https://github.com/getsentry/sentry-cocoa/commit/b728c74e898e6ed3b1cab0b1cf5b6c8892b29b70,
@@ -161,10 +140,6 @@ typedef enum {
  *       Do not modify it in such a case.
  */
 @property (nonatomic, readwrite, assign) SentryCrashReportWriteCallback onCrash;
-
-/** Add a copy of SentryCrash's console log messages to the crash report.
- */
-@property (nonatomic, readwrite, assign) BOOL addConsoleLogToReport;
 
 /** Print the previous app run log to the console when installing SentryCrash.
  *  This is primarily for debugging purposes.
@@ -230,6 +205,15 @@ typedef enum {
  */
 - (BOOL)install;
 
+/**
+ * It's not really possible to completely uninstall SentryCrash. The best we can do is to deactivate
+ * all the monitors, keep track of the already installed monitors to install them again if someone
+ * calls install, clear the `onCrash` callback, and stop the SentryCrashCachedData. For the
+ * ``SentryCrashMonitorTypeMachException`` we let the exception threads running, but they don't
+ * report anything.
+ */
+- (void)uninstall;
+
 /** Send all outstanding crash reports to the current sink.
  * It will only attempt to send the most recent 5 reports. All others will be
  * deleted. Once the reports are successfully sent to the server, they may be
@@ -266,6 +250,12 @@ typedef enum {
  * @param reportID An ID of report to delete.
  */
 - (void)deleteReportWithID:(NSNumber *)reportID;
+
+/**
+ * Only needed for testing.
+ */
+- (void)setSentryNSNotificationCenterWrapper:
+    (SentryNSNotificationCenterWrapper *)notificationCenter;
 
 @end
 

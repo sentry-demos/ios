@@ -1,4 +1,5 @@
 #import "SentryTracer.h"
+#import "NSDictionary+SentrySanitize.h"
 #import "PrivateSentrySDKOnly.h"
 #import "SentryAppStartMeasurement.h"
 #import "SentryClient.h"
@@ -6,19 +7,23 @@
 #import "SentryFramesTracker.h"
 #import "SentryHub+Private.h"
 #import "SentryLog.h"
+#import "SentryNoOpSpan.h"
 #import "SentryProfiler.h"
+#import "SentryProfilesSampler.h"
 #import "SentryProfilingConditionals.h"
 #import "SentrySDK+Private.h"
 #import "SentryScope.h"
 #import "SentrySpan.h"
 #import "SentrySpanContext.h"
 #import "SentrySpanId.h"
+#import "SentryTime.h"
 #import "SentryTraceContext.h"
-#import "SentryTransaction+Private.h"
 #import "SentryTransaction.h"
 #import "SentryTransactionContext.h"
 #import "SentryUIViewControllerPerformanceTracker.h"
+#import <NSMutableDictionary+Sentry.h>
 #import <SentryDispatchQueueWrapper.h>
+#import <SentryMeasurementValue.h>
 #import <SentryScreenFrames.h>
 #import <SentrySpanOperations.h>
 
@@ -37,21 +42,28 @@ static const NSTimeInterval SENTRY_AUTO_TRANSACTION_MAX_DURATION = 500.0;
 SentryTracer ()
 
 @property (nonatomic, strong) SentrySpan *rootSpan;
-@property (nonatomic, strong) NSMutableArray<id<SentrySpan>> *children;
 @property (nonatomic, strong) SentryHub *hub;
 @property (nonatomic) SentrySpanStatus finishStatus;
-@property (nonatomic) BOOL isWaitingForChildren;
+/** This property is different from isFinished. While isFinished states if the tracer is actually
+ * finished, this property tells you if finish was called on the tracer. Calling finish doesn't
+ * necessarily lead to finishing the tracer, because it could still wait for child spans to finish
+ * if waitForChildren is <code>YES</code>. */
+@property (nonatomic) BOOL wasFinishCalled;
 @property (nonatomic) NSTimeInterval idleTimeout;
 @property (nonatomic, nullable, strong) SentryDispatchQueueWrapper *dispatchQueueWrapper;
 
 @end
 
 @implementation SentryTracer {
+    /** Wether the tracer should wait for child spans to finish before finishing itself. */
     BOOL _waitForChildren;
     SentryTraceContext *_traceContext;
+    SentryAppStartMeasurement *appStartMeasurement;
     NSMutableDictionary<NSString *, id> *_tags;
     NSMutableDictionary<NSString *, id> *_data;
+    NSMutableDictionary<NSString *, SentryMeasurementValue *> *_measurements;
     dispatch_block_t _idleTimeoutBlock;
+    NSMutableArray<id<SentrySpan>> *_children;
 
 #if SENTRY_HAS_UIKIT
     BOOL _startTimeChanged;
@@ -65,26 +77,21 @@ SentryTracer ()
 static NSObject *appStartMeasurementLock;
 static BOOL appStartMeasurementRead;
 
-#if SENTRY_TARGET_PROFILING_SUPPORTED
-static SentryProfiler *_Nullable profiler;
-static NSLock *profilerLock;
-#endif
-
 + (void)initialize
 {
     if (self == [SentryTracer class]) {
         appStartMeasurementLock = [[NSObject alloc] init];
         appStartMeasurementRead = NO;
-#if SENTRY_TARGET_PROFILING_SUPPORTED
-        profilerLock = [[NSLock alloc] init];
-#endif
     }
 }
 
 - (instancetype)initWithTransactionContext:(SentryTransactionContext *)transactionContext
                                        hub:(nullable SentryHub *)hub
 {
-    return [self initWithTransactionContext:transactionContext hub:hub waitForChildren:NO];
+    return [self initWithTransactionContext:transactionContext
+                                        hub:hub
+                    profilesSamplerDecision:nil
+                            waitForChildren:NO];
 }
 
 - (instancetype)initWithTransactionContext:(SentryTransactionContext *)transactionContext
@@ -93,6 +100,7 @@ static NSLock *profilerLock;
 {
     return [self initWithTransactionContext:transactionContext
                                         hub:hub
+                    profilesSamplerDecision:nil
                             waitForChildren:waitForChildren
                                 idleTimeout:0.0
                        dispatchQueueWrapper:nil];
@@ -100,35 +108,57 @@ static NSLock *profilerLock;
 
 - (instancetype)initWithTransactionContext:(SentryTransactionContext *)transactionContext
                                        hub:(nullable SentryHub *)hub
+                   profilesSamplerDecision:
+                       (nullable SentryProfilesSamplerDecision *)profilesSamplerDecision
+                           waitForChildren:(BOOL)waitForChildren
+{
+    return [self initWithTransactionContext:transactionContext
+                                        hub:hub
+                    profilesSamplerDecision:profilesSamplerDecision
+                            waitForChildren:waitForChildren
+                                idleTimeout:0.0
+                       dispatchQueueWrapper:nil];
+}
+
+- (instancetype)initWithTransactionContext:(SentryTransactionContext *)transactionContext
+                                       hub:(nullable SentryHub *)hub
+                   profilesSamplerDecision:
+                       (nullable SentryProfilesSamplerDecision *)profilesSamplerDecision
                                idleTimeout:(NSTimeInterval)idleTimeout
                       dispatchQueueWrapper:(SentryDispatchQueueWrapper *)dispatchQueueWrapper
 {
     return [self initWithTransactionContext:transactionContext
                                         hub:hub
+                    profilesSamplerDecision:profilesSamplerDecision
                             waitForChildren:YES
                                 idleTimeout:idleTimeout
                        dispatchQueueWrapper:dispatchQueueWrapper];
 }
 
-- (instancetype)initWithTransactionContext:(SentryTransactionContext *)transactionContext
-                                       hub:(nullable SentryHub *)hub
-                           waitForChildren:(BOOL)waitForChildren
-                               idleTimeout:(NSTimeInterval)idleTimeout
-                      dispatchQueueWrapper:
-                          (nullable SentryDispatchQueueWrapper *)dispatchQueueWrapper
+- (instancetype)
+    initWithTransactionContext:(SentryTransactionContext *)transactionContext
+                           hub:(nullable SentryHub *)hub
+       profilesSamplerDecision:(nullable SentryProfilesSamplerDecision *)profilesSamplerDecision
+               waitForChildren:(BOOL)waitForChildren
+                   idleTimeout:(NSTimeInterval)idleTimeout
+          dispatchQueueWrapper:(nullable SentryDispatchQueueWrapper *)dispatchQueueWrapper
 {
     if (self = [super init]) {
-        self.rootSpan = [[SentrySpan alloc] initWithTransaction:self context:transactionContext];
-        self.name = transactionContext.name;
-        self.children = [[NSMutableArray alloc] init];
+        SENTRY_LOG_DEBUG(
+            @"Starting transaction at system time %llu", (unsigned long long)getAbsoluteTime());
+        self.rootSpan = [[SentrySpan alloc] initWithTracer:self context:transactionContext];
+        self.transactionContext = transactionContext;
+        _children = [[NSMutableArray alloc] init];
         self.hub = hub;
-        self.isWaitingForChildren = NO;
+        self.wasFinishCalled = NO;
         _waitForChildren = waitForChildren;
         _tags = [[NSMutableDictionary alloc] init];
         _data = [[NSMutableDictionary alloc] init];
+        _measurements = [[NSMutableDictionary alloc] init];
         self.finishStatus = kSentrySpanStatusUndefined;
         self.idleTimeout = idleTimeout;
         self.dispatchQueueWrapper = dispatchQueueWrapper;
+        appStartMeasurement = [self getAppStartMeasurement];
 
         if ([self hasIdleTimeout]) {
             [self dispatchIdleTimeout];
@@ -146,18 +176,13 @@ static NSLock *profilerLock;
             initSlowFrames = currentFrames.slow;
             initFrozenFrames = currentFrames.frozen;
         }
-#endif
+#endif // SENTRY_HAS_UIKIT
+
 #if SENTRY_TARGET_PROFILING_SUPPORTED
-        if ([_hub getClient].options.enableProfiling) {
-            [profilerLock lock];
-            if (profiler == nil) {
-                profiler = [[SentryProfiler alloc] init];
-                [SentryLog logWithMessage:@"Starting profiler." andLevel:kSentryLevelDebug];
-                [profiler start];
-            }
-            [profilerLock unlock];
+        if (profilesSamplerDecision.decision == kSentrySampleDecisionYes) {
+            [SentryProfiler startForSpanID:transactionContext.spanId hub:hub];
         }
-#endif
+#endif // SENTRY_TARGET_PROFILING_SUPPORTED
     }
 
     return self;
@@ -165,16 +190,12 @@ static NSLock *profilerLock;
 
 - (void)dispatchIdleTimeout
 {
-    dispatch_time_t now = [SentryCurrentDate dispatchTimeNow];
-    dispatch_time_t delta = (int64_t)(self.idleTimeout * NSEC_PER_SEC);
-    dispatch_time_t when = dispatch_time(now, delta);
-
     if (_idleTimeoutBlock != nil) {
         [self.dispatchQueueWrapper dispatchCancel:_idleTimeoutBlock];
     }
     __block SentryTracer *_self = self;
     _idleTimeoutBlock = dispatch_block_create(0, ^{ [_self finishInternal]; });
-    [self.dispatchQueueWrapper dispatchAfter:when block:_idleTimeoutBlock];
+    [self.dispatchQueueWrapper dispatchAfter:self.idleTimeout block:_idleTimeoutBlock];
 }
 
 - (BOOL)hasIdleTimeout
@@ -194,15 +215,33 @@ static NSLock *profilerLock;
     }
 }
 
+- (id<SentrySpan>)getActiveSpan
+{
+    id<SentrySpan> span;
+
+    if (self.delegate) {
+        @synchronized(_children) {
+            span = [self.delegate activeSpanForTracer:self];
+            if (span == nil || span == self || ![_children containsObject:span]) {
+                span = _rootSpan;
+            }
+        }
+    } else {
+        span = _rootSpan;
+    }
+
+    return span;
+}
+
 - (id<SentrySpan>)startChildWithOperation:(NSString *)operation
 {
-    return [_rootSpan startChildWithOperation:operation];
+    return [[self getActiveSpan] startChildWithOperation:operation];
 }
 
 - (id<SentrySpan>)startChildWithOperation:(NSString *)operation
                               description:(nullable NSString *)description
 {
-    return [_rootSpan startChildWithOperation:operation description:description];
+    return [[self getActiveSpan] startChildWithOperation:operation description:description];
 }
 
 - (id<SentrySpan>)startChildWithParentId:(SentrySpanId *)parentId
@@ -210,6 +249,12 @@ static NSLock *profilerLock;
                              description:(nullable NSString *)description
 {
     [self cancelIdleTimeout];
+
+    if (self.isFinished) {
+        SENTRY_LOG_WARN(
+            @"Starting a child on a finished span is not supported; it won't be sent to Sentry.");
+        return [SentryNoOpSpan shared];
+    }
 
     SentrySpanContext *context =
         [[SentrySpanContext alloc] initWithTraceId:_rootSpan.context.traceId
@@ -219,8 +264,9 @@ static NSLock *profilerLock;
                                            sampled:_rootSpan.context.sampled];
     context.spanDescription = description;
 
-    SentrySpan *child = [[SentrySpan alloc] initWithTransaction:self context:context];
-    @synchronized(self.children) {
+    SENTRY_LOG_DEBUG(@"Starting child span under %@", parentId.sentrySpanIdString);
+    SentrySpan *child = [[SentrySpan alloc] initWithTracer:self context:context];
+    @synchronized(_children) {
         [_children addObject:child];
     }
 
@@ -298,6 +344,11 @@ static NSLock *profilerLock;
     return self.rootSpan.isFinished;
 }
 
+- (NSArray<id<SentrySpan>> *)children
+{
+    return [_children copy];
+}
+
 - (void)setDataValue:(nullable id)value forKey:(NSString *)key
 {
     @synchronized(_data) {
@@ -331,6 +382,19 @@ static NSLock *profilerLock;
     }
 }
 
+- (void)setMeasurement:(NSString *)name value:(NSNumber *)value
+{
+    SentryMeasurementValue *measurement = [[SentryMeasurementValue alloc] initWithValue:value];
+    _measurements[name] = measurement;
+}
+
+- (void)setMeasurement:(NSString *)name value:(NSNumber *)value unit:(SentryMeasurementUnit *)unit
+{
+    SentryMeasurementValue *measurement = [[SentryMeasurementValue alloc] initWithValue:value
+                                                                                   unit:unit];
+    _measurements[name] = measurement;
+}
+
 - (SentryTraceHeader *)toTraceHeader
 {
     return [self.rootSpan toTraceHeader];
@@ -338,12 +402,14 @@ static NSLock *profilerLock;
 
 - (void)finish
 {
+    SENTRY_LOG_DEBUG(
+        @"-[SentryTracer finish] for trace ID %@", _traceContext.traceId.sentryIdString);
     [self finishWithStatus:kSentrySpanStatusOk];
 }
 
 - (void)finishWithStatus:(SentrySpanStatus)status
 {
-    self.isWaitingForChildren = YES;
+    self.wasFinishCalled = YES;
     _finishStatus = status;
 
     [self cancelIdleTimeout];
@@ -358,19 +424,19 @@ static NSLock *profilerLock;
     if (self.rootSpan.isFinished)
         return;
 
-    BOOL hasChildrenToWaitFor = [self hasChildrenToWaitFor];
-    if (self.isWaitingForChildren == NO && !hasChildrenToWaitFor && [self hasIdleTimeout]) {
+    BOOL hasUnfinishedChildSpansToWaitFor = [self hasUnfinishedChildSpansToWaitFor];
+    if (!self.wasFinishCalled && !hasUnfinishedChildSpansToWaitFor && [self hasIdleTimeout]) {
         [self dispatchIdleTimeout];
         return;
     }
 
-    if (!self.isWaitingForChildren || hasChildrenToWaitFor)
+    if (!self.wasFinishCalled || hasUnfinishedChildSpansToWaitFor)
         return;
 
     [self finishInternal];
 }
 
-- (BOOL)hasChildrenToWaitFor
+- (BOOL)hasUnfinishedChildSpansToWaitFor
 {
     if (!_waitForChildren) {
         return NO;
@@ -397,17 +463,9 @@ static NSLock *profilerLock;
         self.finishCallback = nil;
     }
 
-#if SENTRY_TARGET_PROFILING_SUPPORTED
-    if ([_hub getClient].options.enableProfiling) {
-        [SentryLog logWithMessage:@"Stopping profiler." andLevel:kSentryLevelDebug];
-        [profilerLock lock];
-        [profiler stop];
-        [profilerLock unlock];
-    }
-#endif
-
-    if (_hub == nil)
+    if (_hub == nil) {
         return;
+    }
 
     [_hub.scope useSpan:^(id<SentrySpan> _Nullable span) {
         if (span == self) {
@@ -435,6 +493,10 @@ static NSLock *profilerLock;
         }
     }
 
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+    [SentryProfiler stopProfilingSpan:self.rootSpan];
+#endif // SENTRY_TARGET_PROFILING_SUPPORTED
+
     SentryTransaction *transaction = [self toTransaction];
 
     // Prewarming can execute code up to viewDidLoad of a UIViewController, and keep the app in the
@@ -443,32 +505,20 @@ static NSLock *profilerLock;
     NSTimeInterval transactionDuration = [self.timestamp timeIntervalSinceDate:self.startTimestamp];
     if ([self isAutoGeneratedTransaction]
         && transactionDuration >= SENTRY_AUTO_TRANSACTION_MAX_DURATION) {
-        NSString *message =
-            [NSString stringWithFormat:@"Auto generated transaction exceeded the max duration of "
-                                       @"%f seconds. Not capturing transaction.",
-                      SENTRY_AUTO_TRANSACTION_MAX_DURATION];
-        [SentryLog logWithMessage:message andLevel:kSentryLevelInfo];
+        SENTRY_LOG_INFO(@"Auto generated transaction exceeded the max duration of %f seconds. Not "
+                        @"capturing transaction.",
+            SENTRY_AUTO_TRANSACTION_MAX_DURATION);
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+        [SentryProfiler dropTransaction:transaction];
+#endif // SENTRY_TARGET_PROFILING_SUPPORTED
         return;
     }
 
-    NSMutableArray<SentryEnvelopeItem *> *additionalEnvelopeItems = [NSMutableArray array];
-#if SENTRY_TARGET_PROFILING_SUPPORTED
-    if ([_hub getClient].options.enableProfiling) {
-        [profilerLock lock];
-        if (profiler != nil) {
-            SentryEnvelopeItem *profile = [profiler buildEnvelopeItemForTransaction:transaction];
-            if (profile != nil) {
-                [additionalEnvelopeItems addObject:profile];
-            }
-            profiler = nil;
-        }
-        [profilerLock unlock];
-    }
-#endif
+    [_hub captureTransaction:transaction withScope:_hub.scope];
 
-    [_hub captureTransaction:transaction
-                      withScope:_hub.scope
-        additionalEnvelopeItems:additionalEnvelopeItems];
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+    [SentryProfiler linkTransaction:transaction];
+#endif // SENTRY_TARGET_PROFILING_SUPPORTED
 }
 
 - (void)trimEndTimestamp
@@ -488,9 +538,7 @@ static NSLock *profilerLock;
 
 - (SentryTransaction *)toTransaction
 {
-    SentryAppStartMeasurement *appStartMeasurement = [self getAppStartMeasurement];
-
-    NSArray<id<SentrySpan>> *appStartSpans = [self buildAppStartSpans:appStartMeasurement];
+    NSArray<id<SentrySpan>> *appStartSpans = [self buildAppStartSpans];
 
     NSArray<id<SentrySpan>> *spans;
     @synchronized(_children) {
@@ -503,8 +551,8 @@ static NSLock *profilerLock;
     }
 
     SentryTransaction *transaction = [[SentryTransaction alloc] initWithTrace:self children:spans];
-    transaction.transaction = self.name;
-    [self addMeasurements:transaction appStartMeasurement:appStartMeasurement];
+    transaction.transaction = self.transactionContext.name;
+    [self addMeasurements:transaction];
     return transaction;
 }
 
@@ -557,8 +605,7 @@ static NSLock *profilerLock;
     return measurement;
 }
 
-- (NSArray<SentrySpan *> *)buildAppStartSpans:
-    (nullable SentryAppStartMeasurement *)appStartMeasurement
+- (NSArray<SentrySpan *> *)buildAppStartSpans
 {
     if (appStartMeasurement == nil) {
         return @[];
@@ -580,6 +627,8 @@ static NSLock *profilerLock;
         return @[];
     }
 
+    NSMutableArray<SentrySpan *> *appStartSpans = [NSMutableArray array];
+
     NSDate *appStartEndTimestamp = [appStartMeasurement.appStartTimestamp
         dateByAddingTimeInterval:appStartMeasurement.duration];
 
@@ -587,46 +636,67 @@ static NSLock *profilerLock;
                                      operation:operation
                                    description:type];
     [appStartSpan setStartTimestamp:appStartMeasurement.appStartTimestamp];
+    [appStartSpan setTimestamp:appStartEndTimestamp];
 
-    SentrySpan *runtimeInitSpan = [self buildSpan:appStartSpan.context.spanId
+    [appStartSpans addObject:appStartSpan];
+
+    if (!appStartMeasurement.isPreWarmed) {
+        SentrySpan *premainSpan = [self buildSpan:appStartSpan.context.spanId
                                         operation:operation
-                                      description:@"Pre main"];
-    [runtimeInitSpan setStartTimestamp:appStartMeasurement.appStartTimestamp];
-    [runtimeInitSpan setTimestamp:appStartMeasurement.runtimeInitTimestamp];
+                                      description:@"Pre Runtime Init"];
+        [premainSpan setStartTimestamp:appStartMeasurement.appStartTimestamp];
+        [premainSpan setTimestamp:appStartMeasurement.runtimeInitTimestamp];
+        [appStartSpans addObject:premainSpan];
+
+        SentrySpan *runtimeInitSpan = [self buildSpan:appStartSpan.context.spanId
+                                            operation:operation
+                                          description:@"Runtime Init to Pre Main Initializers"];
+        [runtimeInitSpan setStartTimestamp:appStartMeasurement.runtimeInitTimestamp];
+        [runtimeInitSpan setTimestamp:appStartMeasurement.moduleInitializationTimestamp];
+        [appStartSpans addObject:runtimeInitSpan];
+    }
 
     SentrySpan *appInitSpan = [self buildSpan:appStartSpan.context.spanId
                                     operation:operation
                                   description:@"UIKit and Application Init"];
-    [appInitSpan setStartTimestamp:appStartMeasurement.runtimeInitTimestamp];
+    [appInitSpan setStartTimestamp:appStartMeasurement.moduleInitializationTimestamp];
     [appInitSpan setTimestamp:appStartMeasurement.didFinishLaunchingTimestamp];
+    [appStartSpans addObject:appInitSpan];
 
     SentrySpan *frameRenderSpan = [self buildSpan:appStartSpan.context.spanId
                                         operation:operation
                                       description:@"Initial Frame Render"];
     [frameRenderSpan setStartTimestamp:appStartMeasurement.didFinishLaunchingTimestamp];
     [frameRenderSpan setTimestamp:appStartEndTimestamp];
+    [appStartSpans addObject:frameRenderSpan];
 
-    [appStartSpan setTimestamp:appStartEndTimestamp];
-
-    return @[ appStartSpan, runtimeInitSpan, appInitSpan, frameRenderSpan ];
+    return appStartSpans;
 }
 
 - (void)addMeasurements:(SentryTransaction *)transaction
-    appStartMeasurement:(nullable SentryAppStartMeasurement *)appStartMeasurement
 {
-    NSString *valueKey = @"value";
-
     if (appStartMeasurement != nil && appStartMeasurement.type != SentryAppStartTypeUnknown) {
         NSString *type = nil;
+        NSString *appContextType = nil;
         if (appStartMeasurement.type == SentryAppStartTypeCold) {
             type = @"app_start_cold";
+            appContextType = @"cold";
         } else if (appStartMeasurement.type == SentryAppStartTypeWarm) {
             type = @"app_start_warm";
+            appContextType = @"warm";
         }
 
-        if (type != nil) {
-            [transaction setMeasurementValue:@{ valueKey : @(appStartMeasurement.duration * 1000) }
-                                      forKey:type];
+        if (type != nil && appContextType != nil) {
+            [self setMeasurement:type value:@(appStartMeasurement.duration * 1000)];
+
+            NSString *appStartType = appStartMeasurement.isPreWarmed
+                ? [NSString stringWithFormat:@"%@.prewarmed", appContextType]
+                : appContextType;
+            NSMutableDictionary *context =
+                [[NSMutableDictionary alloc] initWithDictionary:[transaction context]];
+            NSDictionary *appContext = @{ @"app" : @ { @"start_type" : appStartType } };
+            [context mergeEntriesFromDictionary:appContext];
+            [transaction setContext:context];
         }
     }
 
@@ -644,15 +714,12 @@ static NSLock *profilerLock;
         BOOL oneBiggerThanZero = totalFrames > 0 || slowFrames > 0 || frozenFrames > 0;
 
         if (allBiggerThanZero && oneBiggerThanZero) {
-            [transaction setMeasurementValue:@{ valueKey : @(totalFrames) } forKey:@"frames_total"];
-            [transaction setMeasurementValue:@{ valueKey : @(slowFrames) } forKey:@"frames_slow"];
-            [transaction setMeasurementValue:@{ valueKey : @(frozenFrames) }
-                                      forKey:@"frames_frozen"];
+            [self setMeasurement:@"frames_total" value:@(totalFrames)];
+            [self setMeasurement:@"frames_slow" value:@(slowFrames)];
+            [self setMeasurement:@"frames_frozen" value:@(frozenFrames)];
 
-            NSString *message = [NSString
-                stringWithFormat:@"Frames for transaction \"%@\" Total:%ld Slow:%ld Frozen:%ld",
-                self.context.operation, (long)totalFrames, (long)slowFrames, (long)frozenFrames];
-            [SentryLog logWithMessage:message andLevel:kSentryLevelDebug];
+            SENTRY_LOG_DEBUG(@"Frames for transaction \"%@\" Total:%ld Slow:%ld Frozen:%ld",
+                self.context.operation, (long)totalFrames, (long)slowFrames, (long)frozenFrames);
         }
     }
 #endif
@@ -670,7 +737,7 @@ static NSLock *profilerLock;
                                            sampled:_rootSpan.context.sampled];
     context.spanDescription = description;
 
-    return [[SentrySpan alloc] initWithTransaction:self context:context];
+    return [[SentrySpan alloc] initWithTracer:self context:context];
 }
 
 - (NSDictionary *)serialize
@@ -685,7 +752,7 @@ static NSLock *profilerLock;
                 [mutableDictionary[@"data"] isKindOfClass:NSDictionary.class]) {
                 [data addEntriesFromDictionary:mutableDictionary[@"data"]];
             }
-            mutableDictionary[@"data"] = data;
+            mutableDictionary[@"data"] = [data sentry_sanitize];
         }
     }
 
@@ -706,7 +773,7 @@ static NSLock *profilerLock;
 /**
  * Internal. Only needed for testing.
  */
-+ (void)resetAppStartMeasurmentRead
++ (void)resetAppStartMeasurementRead
 {
     @synchronized(appStartMeasurementLock) {
         appStartMeasurementRead = NO;
@@ -722,7 +789,7 @@ static NSLock *profilerLock;
     if ([span isKindOfClass:[SentryTracer class]]) {
         return span;
     } else if ([span isKindOfClass:[SentrySpan class]]) {
-        return [(SentrySpan *)span transaction];
+        return [(SentrySpan *)span tracer];
     }
     return nil;
 }

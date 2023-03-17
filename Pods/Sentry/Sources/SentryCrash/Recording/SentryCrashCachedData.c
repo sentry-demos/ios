@@ -24,7 +24,7 @@
 
 #include "SentryCrashCachedData.h"
 
-//#define SentryCrashLogger_LocalLevel TRACE
+// #define SentryCrashLogger_LocalLevel TRACE
 #include "SentryCrashLogger.h"
 
 #include <errno.h>
@@ -172,6 +172,12 @@ sentrycrashccd_close()
         g_hasThreadStarted = false;
         pthread_cancel(g_cacheThread);
     }
+}
+
+bool
+sentrycrashccd_hasThreadStarted(void)
+{
+    return g_hasThreadStarted;
 }
 
 void

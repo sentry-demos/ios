@@ -30,7 +30,6 @@
 #include "SentryCrashFileUtils.h"
 #include "SentryCrashMonitorContext.h"
 #include "SentryCrashMonitor_AppState.h"
-#include "SentryCrashMonitor_Deadlock.h"
 #include "SentryCrashMonitor_System.h"
 #include "SentryCrashMonitor_User.h"
 #include "SentryCrashMonitor_Zombie.h"
@@ -41,7 +40,7 @@
 #include "SentryCrashString.h"
 #include "SentryCrashSystemCapabilities.h"
 
-//#define SentryCrashLogger_LocalLevel TRACE
+// #define SentryCrashLogger_LocalLevel TRACE
 #include "SentryCrashLogger.h"
 
 #include <inttypes.h>
@@ -56,30 +55,14 @@
 /** True if SentryCrash has been installed. */
 static volatile bool g_installed = 0;
 
-static bool g_shouldAddConsoleLogToReport = false;
-static bool g_shouldPrintPreviousLog = false;
-static char g_consoleLogPath[SentryCrashFU_MAX_PATH_LENGTH];
 static SentryCrashMonitorType g_monitoring = SentryCrashMonitorTypeProductionSafeMinimal;
 static char g_lastCrashReportFilePath[SentryCrashFU_MAX_PATH_LENGTH];
+static void (*g_saveScreenShot)(const char *) = 0;
+static void (*g_saveViewHierarchy)(const char *) = 0;
 
 // ============================================================================
 #pragma mark - Utility -
 // ============================================================================
-
-static void
-printPreviousLog(const char *filePath)
-{
-    char *data;
-    int length;
-    if (sentrycrashfu_readEntireFile(filePath, &data, &length, 0)) {
-        printf("\nvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Previous Log "
-               "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n\n");
-        printf("%s\n", data);
-        printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-               "^^^^^^^^^^^^^^^^^^^^^\n\n");
-        fflush(stdout);
-    }
-}
 
 // ============================================================================
 #pragma mark - Callbacks -
@@ -96,7 +79,6 @@ onCrash(struct SentryCrash_MonitorContext *monitorContext)
         SentryCrashLOG_DEBUG("Updating application state to note crash.");
         sentrycrashstate_notifyAppCrash();
     }
-    monitorContext->consoleLogPath = g_shouldAddConsoleLogToReport ? g_consoleLogPath : NULL;
 
     if (monitorContext->crashedDuringCrashHandling) {
         sentrycrashreport_writeRecrashReport(monitorContext, g_lastCrashReportFilePath);
@@ -105,6 +87,28 @@ onCrash(struct SentryCrash_MonitorContext *monitorContext)
         sentrycrashcrs_getNextCrashReportPath(crashReportFilePath);
         strncpy(g_lastCrashReportFilePath, crashReportFilePath, sizeof(g_lastCrashReportFilePath));
         sentrycrashreport_writeStandardReport(monitorContext, crashReportFilePath);
+    }
+
+    // Report is saved to disk, now we try to take screenshots
+    // and view hierarchies.
+    // Depending on the state of the crash this may not work
+    // because we gonna call into non async-signal safe code
+    // but since the app is already in a crash state we don't
+    // mind if this approach crashes.
+    if (g_saveScreenShot || g_saveViewHierarchy) {
+        char crashAttachmentsPath[SentryCrashCRS_MAX_PATH_LENGTH];
+        sentrycrashcrs_getAttachmentsPath_forReport(
+            g_lastCrashReportFilePath, crashAttachmentsPath);
+
+        if (sentrycrashfu_makePath(crashAttachmentsPath)) {
+            if (g_saveScreenShot) {
+                g_saveScreenShot(crashAttachmentsPath);
+            }
+
+            if (g_saveViewHierarchy) {
+                g_saveViewHierarchy(crashAttachmentsPath);
+            }
+        }
     }
 }
 
@@ -133,12 +137,6 @@ sentrycrash_install(const char *appName, const char *const installPath)
     snprintf(path, sizeof(path), "%s/Data/CrashState.json", installPath);
     sentrycrashstate_initialize(path);
 
-    snprintf(g_consoleLogPath, sizeof(g_consoleLogPath), "%s/Data/ConsoleLog.txt", installPath);
-    if (g_shouldPrintPreviousLog) {
-        printPreviousLog(g_consoleLogPath);
-    }
-    sentrycrashlog_setLogFilename(g_consoleLogPath, true);
-
     sentrycrashccd_init(60);
 
     sentrycrashcm_setEventCallback(onCrash);
@@ -146,6 +144,14 @@ sentrycrash_install(const char *appName, const char *const installPath)
 
     SentryCrashLOG_DEBUG("Installation complete.");
     return monitors;
+}
+
+void
+sentrycrash_uninstall(void)
+{
+    sentrycrashcm_setEventCallback(NULL);
+    g_installed = 0;
+    sentrycrashccd_close();
 }
 
 SentryCrashMonitorType
@@ -168,14 +174,6 @@ sentrycrash_setUserInfoJSON(const char *const userInfoJSON)
 }
 
 void
-sentrycrash_setDeadlockWatchdogInterval(double deadlockWatchdogInterval)
-{
-#if SentryCrashCRASH_HAS_OBJC
-    sentrycrashcm_setDeadlockHandlerWatchdogInterval(deadlockWatchdogInterval);
-#endif
-}
-
-void
 sentrycrash_setIntrospectMemory(bool introspectMemory)
 {
     sentrycrashreport_setIntrospectMemory(introspectMemory);
@@ -194,21 +192,21 @@ sentrycrash_setCrashNotifyCallback(const SentryCrashReportWriteCallback onCrashN
 }
 
 void
-sentrycrash_setAddConsoleLogToReport(bool shouldAddConsoleLogToReport)
-{
-    g_shouldAddConsoleLogToReport = shouldAddConsoleLogToReport;
-}
-
-void
-sentrycrash_setPrintPreviousLog(bool shouldPrintPreviousLog)
-{
-    g_shouldPrintPreviousLog = shouldPrintPreviousLog;
-}
-
-void
 sentrycrash_setMaxReportCount(int maxReportCount)
 {
     sentrycrashcrs_setMaxReportCount(maxReportCount);
+}
+
+void
+sentrycrash_setSaveScreenshots(void (*callback)(const char *))
+{
+    g_saveScreenShot = callback;
+}
+
+void
+sentrycrash_setSaveViewHierarchy(void (*callback)(const char *))
+{
+    g_saveViewHierarchy = callback;
 }
 
 void
@@ -217,9 +215,6 @@ sentrycrash_reportUserException(const char *name, const char *reason, const char
 {
     sentrycrashcm_reportUserException(
         name, reason, language, lineOfCode, stackTrace, logAllThreads, terminateProgram);
-    if (g_shouldAddConsoleLogToReport) {
-        sentrycrashlog_clearLogFile();
-    }
 }
 
 void
@@ -297,4 +292,16 @@ void
 sentrycrash_deleteReportWithID(int64_t reportID)
 {
     sentrycrashcrs_deleteReportWithID(reportID);
+}
+
+bool
+sentrycrash_hasSaveScreenshotCallback()
+{
+    return g_saveScreenShot != NULL;
+}
+
+bool
+sentrycrash_hasSaveViewHierarchyCallback()
+{
+    return g_saveViewHierarchy != NULL;
 }
