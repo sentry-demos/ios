@@ -189,7 +189,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=testorg-az\nexport SENTRY_PROJECT=ios\nexport SENTRY_AUTH_TOKEN=REPLACE_WITH_YOUR_AUTH_TOKEN\nERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=testorg-az\nexport SENTRY_PROJECT=ios\nexport SENTRY_AUTH_TOKEN=REPLACE_WITH_YOUR_AUTH_TOKEN\nERROR=$(sentry-cli upload-dif --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 		64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -306,7 +306,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
