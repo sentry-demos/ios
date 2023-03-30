@@ -141,17 +141,21 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Cart",
+            image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
             action: #selector(goToCart) // addToDb
         )
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+        //self.navigationItem.rightBarButtonItem?.badgeValue = "\(1)"
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "List App",
+            image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
             action: #selector(goToListApp) // clearDb
         )
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blue
     }
     
     // Writes to CoreData database
