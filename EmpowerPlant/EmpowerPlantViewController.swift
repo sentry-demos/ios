@@ -140,6 +140,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Cart",
             image: UIImage(systemName: "cart"),
             style: .plain,
             target: self,
