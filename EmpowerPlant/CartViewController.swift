@@ -40,7 +40,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             target: self,
             action: #selector(purchase)
         )
-    self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
+        self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Purchase"
     }
 
     @objc
