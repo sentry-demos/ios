@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "FFE52C1E-7E2C-4E28-A338-DFB717180F52",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:EmpowerPlant.xcodeproj",
+      "identifier" : "D17C73AE27D8291D006650AF",
+      "name" : "EmpowerPlant"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:EmpowerPlant.xcodeproj",
+        "identifier" : "8BA3AB2B2A201FE900BE1EA8",
+        "name" : "EmpowerPlantTests"
+      }
+    }
+  ],
+  "version" : 1
+}
