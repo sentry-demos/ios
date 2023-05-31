@@ -8,6 +8,14 @@ This app uses UIKit
 
 `pod install`
 
+Add `.env` file with the following in it:
+```
+SENTRY_ORG=<your org slug>
+SENTRY_PROJECT=<your project slug>
+```
+
+Make sure `sentry-cli info` succeeds, i.e. you have SENTRY_AUTH_TOKEN set somewhere.
+
 ## Run
 Click Play button
 
