@@ -1,13 +1,13 @@
 PODS:
-  - Sentry (8.3.3):
-    - Sentry/Core (= 8.3.3)
-    - SentryPrivate (= 8.3.3)
-  - Sentry/Core (8.3.3):
-    - SentryPrivate (= 8.3.3)
-  - SentryPrivate (8.3.3)
+  - Sentry (8.4.0):
+    - Sentry/Core (= 8.4.0)
+    - SentryPrivate (= 8.4.0)
+  - Sentry/Core (8.4.0):
+    - SentryPrivate (= 8.4.0)
+  - SentryPrivate (8.4.0)
 
 DEPENDENCIES:
-  - Sentry (from `https://github.com/getsentry/sentry-cocoa.git`, tag `8.3.3`)
+  - Sentry (from `https://github.com/getsentry/sentry-cocoa.git`, tag `8.4.0`)
 
 SPEC REPOS:
   trunk:
@@ -16,17 +16,17 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Sentry:
     :git: https://github.com/getsentry/sentry-cocoa.git
-    :tag: 8.3.3
+    :tag: 8.4.0
 
 CHECKOUT OPTIONS:
   Sentry:
     :git: https://github.com/getsentry/sentry-cocoa.git
-    :tag: 8.3.3
+    :tag: 8.4.0
 
 SPEC CHECKSUMS:
-  Sentry: 8ffc397d98fe58d693e73959b26ed0eaee55646a
-  SentryPrivate: bf776a47a131648f5023097215987b40fbd47025
+  Sentry: 16d46dd5ca10e7f4469a2611805a3de123188add
+  SentryPrivate: 2bb4f8d9ff558b25ac70b66c1dedc58a7c43630b
 
-PODFILE CHECKSUM: 909118885f1210ac516b9e15deb52a372230da94
+PODFILE CHECKSUM: 74c299574113e0656c8e7b4a2c9899ac27db19a9
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.11.3

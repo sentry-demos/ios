@@ -18,7 +18,7 @@ protocol URLSessionDataTaskProtocol {
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    private let session: URLSessionProtocol
+    //private let session: URLSessionProtocol
 
     let tableView: UITableView = {
         let table = UITableView()
@@ -28,12 +28,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // Used for mocking in unit test
     init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
-        self.session = session
+        //self.session = session
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        //fatalError("init(coder:) has not been implemented")
+        super.init(nibName: nil, bundle: nil)
     }
     
     override func viewDidLoad() {
