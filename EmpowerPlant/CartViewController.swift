@@ -52,6 +52,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // TODO make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
+        SentrySDK.reportFullyDisplayed()
     }
 
     private func configureNavigationItems() {

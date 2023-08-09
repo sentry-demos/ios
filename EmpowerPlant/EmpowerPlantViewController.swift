@@ -24,6 +24,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        SentrySDK.reportFullyDisplayed()
         title = "Empower Plant"
 
         self.view.addSubview(tableView)
