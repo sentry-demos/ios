@@ -24,10 +24,10 @@ Want to know how this app was originally set up? See https://www.notion.so/sentr
 
 ## Troubleshooting
 ### Unable to load contents of file list: 'xxxxx/Pods/Target Support Files/... .xcfilelist'
-`sudo gem update cocoapods --pre`
-`pod update`
-Product -> Clean Build Folder...
-Product -> Build
+- `sudo gem update cocoapods --pre`
+- `pod update`
+- Product -> Clean Build Folder...
+- Product -> Build
 
 ## Creating release and uploading app
 
