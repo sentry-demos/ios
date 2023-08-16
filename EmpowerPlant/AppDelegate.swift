@@ -27,6 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.enableCoreDataTracing = true
                 options.enableFileIOTracing = true
                 options.attachScreenshot = true
+                options.enableTimeToFullDisplay = true
             }
         return true
     }
