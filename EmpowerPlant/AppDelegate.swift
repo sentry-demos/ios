@@ -27,8 +27,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.enableCoreDataTracing = true
                 options.enableFileIOTracing = true
                 options.attachScreenshot = true
-                options.enableTimeToFullDisplay = true
+                options.attachViewHierarchy = true
+                options.enableTimeToFullDisplayTracing = true
             }
+        SentrySDK.configureScope{ scope in
+            scope.setTag(value: "corporate", key: "customer.type")
+        }cus
         return true
     }
 
