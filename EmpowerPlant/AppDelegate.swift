@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: "corporate", key: "customer.type")
-        }cus
+        }
         return true
     }
 
