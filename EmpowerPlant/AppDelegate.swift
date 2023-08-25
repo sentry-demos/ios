@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.enableTimeToFullDisplayTracing = true
             }
         SentrySDK.configureScope{ scope in
-            scope.setTag(value: "corporate", key: "customer.type")
+            scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
         }
         return true
     }
