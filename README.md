@@ -28,6 +28,8 @@ Want to know how this app was originally set up? See https://www.notion.so/sentr
 - `pod update`
 - Product -> Clean Build Folder...
 - Product -> Build
+### [!] CocoaPods could not find compatible versions for pod "SentryPrivate":
+Run `pod repo update` then try again
 
 ## Creating release and uploading app
 
