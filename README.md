@@ -1,35 +1,15 @@
 ## Overview
-This app uses UIKit
+
+An iOS app integrating Sentry to demo its various product features.
 
 ## Setup
-- install XCode
-- iPhone 11 tested
-- iPhone 14.4
-
-`pod install`
-
-Add `.env` file with the following in it:
-```
-SENTRY_ORG=<your org slug>
-SENTRY_PROJECT=<your project slug>
-```
-
-Make sure `sentry-cli info` succeeds, i.e. you have SENTRY_AUTH_TOKEN set somewhere.
+- Install XCode
+- In a terminal, run: 
+    - `make init`
+    - `sentry-cli login` (see [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more info)
 
 ## Run
-Click Play button
-
-## Bootstrapping iOS App
-Want to know how this app was originally set up? See https://www.notion.so/sentry/Bootstrapping-iOS-app-abcd0da2bca64cbcbf6d086fa5188caf
-
-## Troubleshooting
-### Unable to load contents of file list: 'xxxxx/Pods/Target Support Files/... .xcfilelist'
-- `sudo gem update cocoapods --pre`
-- `pod update`
-- Product -> Clean Build Folder...
-- Product -> Build
-### [!] CocoaPods could not find compatible versions for pod "SentryPrivate":
-Run `pod repo update` then try again
+Open Xcode and click the "Play" button or press ⌘R 
 
 ## Creating release and uploading app
 

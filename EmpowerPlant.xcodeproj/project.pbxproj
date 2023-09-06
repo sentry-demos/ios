@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -38,8 +38,14 @@
 /* Begin PBXFileReference section */
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
+		84A2641A2AA915B100A62A88 /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
+		84A2641B2AA915D800A62A88 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EmpowerPlantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84A2641E2AA926A300A62A88 /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
 		8B21663B29D3F8C80009C890 /* RandomErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomErrors.swift; sourceTree = "<group>"; };
-		8BA3AB2C2A201FE900BE1EA8 /* EmpowerPlantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EmpowerPlantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewControllerTests.swift; sourceTree = "<group>"; };
 		CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.debug.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.debug.xcconfig"; sourceTree = "<group>"; };
 		D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -55,7 +61,6 @@
 		D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantViewController.swift; sourceTree = "<group>"; };
 		D17C73CE27D82ED1006650AF /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		D17C73D127D83321006650AF /* ListAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppViewController.swift; sourceTree = "<group>"; };
-		D191948627E011F2007845C5 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D19EBE6E2805ED52007022DC /* ShoppingCart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCart.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -97,12 +102,17 @@
 		D17C73A627D8291D006650AF = {
 			isa = PBXGroup;
 			children = (
+				84A2641E2AA926A300A62A88 /* .env */,
+				84A264192AA915B100A62A88 /* Brewfile */,
+				84A2641A2AA915B100A62A88 /* Gemfile */,
+				84A264182AA9155800A62A88 /* Makefile */,
+				84A2641B2AA915D800A62A88 /* README.md */,
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
-				DBBFE14A41453664EF0F8F57 /* Pods */,
 				8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */,
 				A2BF5384A6D041CDB3FCA8D9 /* Frameworks */,
-				D191948627E011F2007845C5 /* EmpowerPlant.app */,
-				8BA3AB2C2A201FE900BE1EA8 /* EmpowerPlantTests.xctest */,
+				DBBFE14A41453664EF0F8F57 /* Pods */,
+				84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */,
+				84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,7 +165,7 @@
 			);
 			name = EmpowerPlantTests;
 			productName = EmpowerPlantTests;
-			productReference = 8BA3AB2C2A201FE900BE1EA8 /* EmpowerPlantTests.xctest */;
+			productReference = 84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		D17C73AE27D8291D006650AF /* EmpowerPlant */ = {
@@ -167,7 +177,7 @@
 				D17C73AC27D8291D006650AF /* Frameworks */,
 				D17C73AD27D8291D006650AF /* Resources */,
 				64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */,
-				21715E6128A2D59700248175 /* ShellScript */,
+				21715E6128A2D59700248175 /* [Sentry] Upload debug symbols */,
 			);
 			buildRules = (
 			);
@@ -175,7 +185,7 @@
 			);
 			name = EmpowerPlant;
 			productName = EmpowerPlant;
-			productReference = D191948627E011F2007845C5 /* EmpowerPlant.app */;
+			productReference = 84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -236,8 +246,9 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		21715E6128A2D59700248175 /* ShellScript */ = {
+		21715E6128A2D59700248175 /* [Sentry] Upload debug symbols */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -246,6 +257,7 @@
 			inputPaths = (
 				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
 			);
+			name = "[Sentry] Upload debug symbols";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -426,6 +438,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 97JCY7859U;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -487,6 +500,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 97JCY7859U;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -514,6 +528,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 97JCY7859U;
 				INFOPLIST_FILE = EmpowerPlant/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -534,6 +549,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 97JCY7859U;
 				INFOPLIST_FILE = EmpowerPlant/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

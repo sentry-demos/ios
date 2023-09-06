@@ -2,3 +2,4 @@
 .DS_Store
 /EmpowerPlant.xcodeproj/xcuserdata
 /EmpowerPlant.xcworkspace/xcuserdata
+.env
