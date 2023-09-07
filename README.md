@@ -1,6 +1,6 @@
 ## Overview
 
-An iOS app integrating Sentry to demo its various product features.
+An iOS app integrating Sentry to demo its various product features. See [Empower: How to Contribute](https://www.notion.so/sentry/Empower-How-to-Contribute-3190417cf9b14e7c895fb352d5c28bd6#0a64b16867e9418abc027f2450635510) for more information.
 
 ## Setup
 - Install XCode
