@@ -28,11 +28,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.enableFileIOTracing = true
                 options.attachScreenshot = true
                 options.attachViewHierarchy = true
-                options.enableTimeToFullDisplayTracing = true
+                //options.enableTimeToFullDisplayTracing = true
             }
+        /*
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
-        }
+        } */
         return true
     }
 
