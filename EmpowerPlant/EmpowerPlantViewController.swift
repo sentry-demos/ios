@@ -190,8 +190,29 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     func getAllProductsFromDb() {
+        if ProcessInfo.processInfo.arguments.contains("--generate-many-products") {
+            for i in 0..<1_000_000 {
+                let newProduct = Product(context: context)
+
+                newProduct.productId = "Product \(i)" // 'id' was a reserved word in swift
+                newProduct.title = "Product \(i)"
+                newProduct.productDescription = "Description for product \(i)" // 'description' was a reserved word in swift
+                newProduct.productDescriptionFull = "Full description for product (i)"
+                newProduct.img = "img"
+                newProduct.imgCropped = "img.cropped"
+                newProduct.price = "\(i)"
+            }
+            do {
+                try context.save()
+            } catch {
+                fatalError("failed to store generated products in db")
+            }
+        }
+
         do {
+            print("time: \(Date())")
             self.products = try context.fetch(Product.fetchRequest())
+            print("time: \(Date())")
             // for product in self.products {
             //     print(product.productId, product.title, product.productDescriptionFull)
             // }
@@ -225,7 +246,9 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                     if (self.products.count == 0) {
                         for product in productsResponse {
                             // Writes to CoreData database
-                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                            DispatchQueue.main.async {
+                                self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                            }
                         }
                     }
                 } else {
