@@ -38,6 +38,7 @@
 /* Begin PBXFileReference section */
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
 		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
 		84A2641A2AA915B100A62A88 /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
@@ -103,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				84A2641E2AA926A300A62A88 /* .env */,
+				846BEA1A2ABE46880032F77F /* upload-symbols.sh */,
 				84A264192AA915B100A62A88 /* Brewfile */,
 				84A2641A2AA915B100A62A88 /* Gemfile */,
 				84A264182AA9155800A62A88 /* Makefile */,
@@ -264,7 +266,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which sentry-cli >/dev/null; then\n    if [ -f .env ] && grep -q \"^SENTRY_ORG=\" .env && grep -q \"^SENTRY_PROJECT=\" .env; then\n        export $(grep -v '^#' .env | sed '/^\\s*$/d' | xargs)\n    else\n        echo \"[ERROR] .env does not exist or does not have SENTRY_ORG and SENTRY_PROJECT defined\"\n        exit 1\n    fi\n    if [ ! -n \"$SENTRY_AUTH_TOKEN\" ]; then\n        if [ -f ~/.sentryclirc ]; then\n            export SENTRY_AUTH_TOKEN=$(grep -oE \"token=([^\\n\\r]*)$\" ~/.sentryclirc | cut -d'=' -f2)\n        else \n            echo \".sentryclirc does not exist.\"\n        fi\n        if [ -f ~/.zshrc ] && grep -q \"export SENTRY_AUTH_TOKEN\" ~/.zshrc; then\n            grep -m 1 \"export SENTRY_AUTH_TOKEN\" ~/.zshrc > /tmp/ios.sentry-build.tmp && source /tmp/ios.sentry-build.tmp && rm /tmp/ios.sentry-build.tmp\n        else\n            echo \".zshrc does not exist or does not have SENTRY_AUTH_TOKEN in it.\"\n        fi\n    fi\n    if [ ! -n \"$SENTRY_AUTH_TOKEN\" ]; then\n        echo \"[ERROR] must provide SENTRY_AUTH_TOKEN either through command line, .zshrc or .sentryclirc\"\n        exit 1\n    fi\n\n    ERROR=$(sentry-cli upload-dif --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n    if [ ! $? -eq 0 ]; then\n        echo \"warning: sentry-cli - $ERROR\"\n    fi\nelse\n    echo \"[ERROR] sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\n    exit 1\nfi\n";
+			shellScript = "./upload-symbols.sh\n";
 		};
 		64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
