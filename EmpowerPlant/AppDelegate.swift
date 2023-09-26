@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.attachScreenshot = true
                 options.attachViewHierarchy = true
                 options.enableTimeToFullDisplayTracing = true
+                options.enableUserInteractionTracing = false
             }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
