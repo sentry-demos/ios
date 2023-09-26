@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 if which sentry-cli >/dev/null; then
     if [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
         export $(grep -v '^#' .env | sed '/^\s*$/d' | xargs)
@@ -17,6 +19,7 @@ if which sentry-cli >/dev/null; then
             echo "Using SENTRY_AUTH_TOKEN from .zshrc."
         fi
     fi
+    SENTRY_AUTH_TOKEN="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"
     if [ ! -n "$SENTRY_AUTH_TOKEN" ]; then
         echo "[ERROR] must provide SENTRY_AUTH_TOKEN either through command line, .zshrc or .sentryclirc"
         exit 1
