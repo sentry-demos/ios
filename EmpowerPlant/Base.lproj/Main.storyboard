@@ -142,7 +142,7 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
-                                        <rect key="frame" x="207" y="0.0" width="207" height="241.5"/>
+                                        <rect key="frame" x="207" y="0.0" width="207" height="276"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
                                                 <rect key="frame" x="38" y="0.0" width="131.5" height="34.5"/>
@@ -198,6 +198,14 @@
                                                 <buttonConfiguration key="configuration" style="plain" title="Force Unwrap Optional"/>
                                                 <connections>
                                                     <action selector="unwrapCrash:" destination="VXN-aD-u60" eventType="touchUpInside" id="1ao-hi-gPI"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GZT-qM-8pb">
+                                                <rect key="frame" x="36" y="241.5" width="135.5" height="34.5"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Regex on Main"/>
+                                                <connections>
+                                                    <action selector="regexOnMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="YvX-Kj-2l6"/>
                                                 </connections>
                                             </button>
                                         </subviews>

@@ -253,4 +253,12 @@ class ListAppViewController: UIViewController {
     @IBAction func close(_ sender: Any) {
         SentrySDK.close()
     }
+
+    @IBAction func regexOnMainThread(_ sender: Any) {
+        let string = try! String(contentsOf: Bundle.main.url(forResource: "mobydick", withExtension: "txt")!)
+        let regex = try! NSRegularExpression(pattern: "([Tt]he)?.*([Ww]hale)")
+        let span = SentrySDK.startTransaction(name: "regex on main thread test", operation: "test issue")
+        regex.matches(in: string, range: NSMakeRange(0, string.count))
+        span.finish()
+    }
 }
