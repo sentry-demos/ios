@@ -12,7 +12,7 @@ An iOS app integrating Sentry to demo its various product features. See [Empower
 Open Xcode and click the "Play" button or press ⌘R 
 
 ## Creating release and uploading app
-    
+
 - Create debug and release builds + locate them on your disk + zip up accordingly (`EmpowerPlant_debug.zip` + `EmpowerPlant_release.zip`)
 - Create release manually using UI (https://github.com/sentry-demos/ios/releases/new)
     - Increment version accordingly (release-title)
