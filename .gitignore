@@ -3,3 +3,6 @@
 /EmpowerPlant.xcodeproj/xcuserdata
 /EmpowerPlant.xcworkspace/xcuserdata
 .env
+build/
+release-build.log
+EmpowerPlant_release.zip
