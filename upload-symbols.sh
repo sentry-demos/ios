@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -x
-
 if which sentry-cli >/dev/null; then
     if [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
         export $(grep -v '^#' .env | sed '/^\s*$/d' | xargs)
