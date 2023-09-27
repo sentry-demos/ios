@@ -9,7 +9,7 @@ if which sentry-cli >/dev/null; then
     fi
     if [ -z "$SENTRY_AUTH_TOKEN" ]; then
         if [ -f ~/.sentryclirc ]; then
-            export SENTRY_AUTH_TOKEN=$(grep -oE "token=(.*)$" ~/.sentryclirc | cut -d'=' -f2)
+            export SENTRY_AUTH_TOKEN=$(grep -oE "token=(.*)$" ~/.sentryclirc | sed s/'token='//)
             echo "Using SENTRY_AUTH_TOKEN from .sentryclirc."
         fi
         if [ -f ~/.zshrc ] && grep -q "export SENTRY_AUTH_TOKEN" ~/.zshrc; then
