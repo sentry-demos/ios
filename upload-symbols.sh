@@ -9,9 +9,9 @@ if which sentry-cli >/dev/null; then
         echo "[ERROR] .env does not exist or does not have SENTRY_ORG and SENTRY_PROJECT defined"
         exit 1
     fi
-    if [ ! -n "$SENTRY_AUTH_TOKEN" ]; then
+    if [ -z "$SENTRY_AUTH_TOKEN" ]; then
         if [ -f ~/.sentryclirc ]; then
-            export SENTRY_AUTH_TOKEN=$(grep -oE "token=([^\n\r]*)$" ~/.sentryclirc | cut -d'=' -f2)
+            export SENTRY_AUTH_TOKEN=$(grep -oE "token=(.*)$" ~/.sentryclirc | cut -d'=' -f2)
             echo "Using SENTRY_AUTH_TOKEN from .sentryclirc."
         fi
         if [ -f ~/.zshrc ] && grep -q "export SENTRY_AUTH_TOKEN" ~/.zshrc; then
@@ -19,8 +19,7 @@ if which sentry-cli >/dev/null; then
             echo "Using SENTRY_AUTH_TOKEN from .zshrc."
         fi
     fi
-    SENTRY_AUTH_TOKEN="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"
-    if [ ! -n "$SENTRY_AUTH_TOKEN" ]; then
+    if [ -z "$SENTRY_AUTH_TOKEN" ]; then
         echo "[ERROR] must provide SENTRY_AUTH_TOKEN either through command line, .zshrc or .sentryclirc"
         exit 1
     fi
