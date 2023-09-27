@@ -48,7 +48,9 @@
                         <color key="backgroundColor" systemColor="systemYellowColor"/>
                     </view>
                     <navigationItem key="navigationItem" title="My Cart" id="HBc-3M-t3f">
-                        <barButtonItem key="backBarButtonItem" title="Empower Plants" id="SPv-hU-fem"/>
+                        <barButtonItem key="backBarButtonItem" title="Empower Plants" id="SPv-hU-fem">
+                            <color key="tintColor" name="AccentColor"/>
+                        </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lXk-wB-WcC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
