@@ -16,3 +16,7 @@ init:
 
 	# ensure there's a .env file present
 	stat .env 2>/dev/null || echo "SENTRY_ORG=<your org slug>\nSENTRY_PROJECT=<your project slug>" > .env
+
+release:
+	xcodebuild -configuration Release
+	gh release 
