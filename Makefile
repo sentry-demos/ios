@@ -18,5 +18,4 @@ init:
 	stat .env 2>/dev/null || echo "SENTRY_ORG=<your org slug>\nSENTRY_PROJECT=<your project slug>" > .env
 
 release:
-	xcodebuild -configuration Release
-	gh release 
+	CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphoneos clean build 2>&1 | tee release-build.log | xcbeautify
