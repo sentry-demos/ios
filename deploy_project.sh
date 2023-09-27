@@ -10,43 +10,23 @@ error_exit() {
 
 # Build the release bundle
 echo "Building the release bundle..."
-BUILD_OUTPUT=$(xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO 2>&1)
-
-# Extract the first path to the .app from the build output
-APP_PATH=$(echo "$BUILD_OUTPUT" | grep -Eo '/[^ ]+\.app($| )' | sed 's/ $//' | head -n 1)
-ZIP_PATH="EmpowerPlant_release.zip"
-
-# Check if the .app path was extracted successfully
-if [ ! -d "$APP_PATH" ]; then
-    error_exit "Failed to find .app path in the xcodebuild output."
-fi
-
-# Zip the .app file
-echo "Zipping up the .app file to $ZIP_PATH..."
-zip -rq "$ZIP_PATH" "$APP_PATH"
+make release
+ZIP_PATH="./EmpowerPlant_release.zip"
 
 # Check if gh is installed
 if ! command -v gh &> /dev/null; then
-    echo "gh is not installed, installing now..."
-    
-    # Install gh via Homebrew for macOS
-    if ! command -v brew &> /dev/null; then
-        # Install Homebrew if it's not installed
-        echo "Homebrew not found. Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || error_exit "Failed to install Homebrew."
-    fi
-
-    brew install gh || error_exit "Failed to install gh."
+  error_exit "gh is not installed, make sure you run 'make init' (see README.md)."
 fi
 
 # Get release version
 if [ "$#" -eq 1 ]; then
     TAG="$1"
 else
+    echo "Release name not provided as CLI argument, incrementing patch version of latest release in GH then..."
     # Fetch the most recent release tag using gh and sort
     LATEST_RELEASE=$(gh release list | sort -V | tail -n 1 | awk '{print $1}')
     if [ -z "$LATEST_RELEASE" ]; then
-        LATEST_RELEASE="0.0.0"
+        error_exit "Could not find any existing releases in GitHub. This is either a bug in the script or this is being run in a new repo with no releases."
     fi
     # Split the version and increment the last digit
     IFS='.' read -ra VERSION_PARTS <<< "$LATEST_RELEASE"
