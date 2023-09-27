@@ -19,3 +19,5 @@ init:
 
 release:
 	CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphoneos clean build 2>&1 | tee release-build.log | xcbeautify
+	zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphoneos/EmpowerPlant.app
+	@echo "\nBuild completed. Create a new release in GitHub and upload ./EmpowerPlant_release.zip."
