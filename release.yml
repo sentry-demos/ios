@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - armcknight/ci/release-action
 
 jobs:
   empower-plant-release:
