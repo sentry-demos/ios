@@ -1,5 +1,5 @@
 brew 'gh'
 brew 'rbenv'
 brew 'ruby-build'
-brew 'sentry-cli'
+brew 'getsentry/tools/sentry-cli'
 brew 'xcbeautify'
