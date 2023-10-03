@@ -4,10 +4,6 @@ on:
     branches:
       - master
 
-  pull_request:
-    paths:
-      - 'release.yml'
-
 jobs:
   empower-plant-release:
     name: Release Build of EmpowerPlant
