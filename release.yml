@@ -1,0 +1,15 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  empower-plant-release:
+    name: Release Build of EmpowerPlant
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Deploy Script
+        run: ./deploy_project.sh $(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ./EmpowerPlant/Info.plist)
+        shell: sh
