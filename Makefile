@@ -17,6 +17,15 @@ init:
 	# ensure there's a .env file present
 	stat .env 2>/dev/null || echo "SENTRY_ORG=<your org slug>\nSENTRY_PROJECT=<your project slug>" > .env
 
+	# fixes CoreSimulator out of date error 
+	# (happens on fresh xcode installation or MAS-managed major version update)
+	# requires password when run without sudo
+	xcodebuild -runFirstLaunch
+
+	# download iOS platform image
+	# (happens on fresh xcode installation or MAS-managed major version update)
+	xcodebuild -downloadPlatform iOS
+
 release:
 	xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphonesimulator clean build 2>&1 | tee release-build.log | xcbeautify
 	zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
