@@ -3,7 +3,10 @@ on:
   push:
     branches:
       - master
-      - armcknight/ci/release-action
+
+  pull_request:
+    paths:
+      - 'release.yml'
 
 jobs:
   empower-plant-release:
