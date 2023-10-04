@@ -8,9 +8,10 @@ error_exit() {
     exit 1
 }
 
-SENTRY_ORG_INPUT=${1}
-SENTRY_PROJECT_INPUT=${2}
-SENTRY_AUTH_TOKEN_INPUT=${3}
+VERSION_INPUT=${1}
+SENTRY_ORG_INPUT=${2}
+SENTRY_PROJECT_INPUT=${3}
+SENTRY_AUTH_TOKEN_INPUT=${4}
 
 # Build the release bundle
 echo "Building the release bundle..."
