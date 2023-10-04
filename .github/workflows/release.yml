@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up environment
-        run: make init
+        run: brew install gh xcbeautify
         shell: sh
       - name: Run Deploy Script
         run: ./deploy_project.sh $(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ./EmpowerPlant/Info.plist)
