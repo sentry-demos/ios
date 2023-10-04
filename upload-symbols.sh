@@ -22,7 +22,7 @@ if which sentry-cli >/dev/null; then
         exit 1
     fi
 
-    ERROR=$(sentry-cli upload-dif --force-foreground --include-sources "$DWARF_DSYM_FOLDER_PATH")
+    ERROR=$(sentry-cli upload-dif --force-foreground --include-sources --log-level debug "$DWARF_DSYM_FOLDER_PATH")
     if [ ! $? -eq 0 ]; then
         echo "warning: sentry-cli - $ERROR"
     fi
