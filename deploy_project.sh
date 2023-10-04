@@ -13,7 +13,7 @@ SENTRY_PROJECT_INPUT=${2}
 
 # Build the release bundle
 echo "Building the release bundle..."
-SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=SENTRY_PROJECT_INPUT xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphonesimulator -quiet clean build
+SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=SENTRY_PROJECT_INPUT xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 14" -quiet clean build
 zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
 ZIP_PATH="./EmpowerPlant_release.zip"
 
