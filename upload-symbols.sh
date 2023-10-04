@@ -3,7 +3,7 @@
 if which sentry-cli >/dev/null; then
 
     # get SENTRY_ORG and SENTRY_PROJECT values
-    if [ -n "${SENTRY_ORG}" && -n "${SENTRY_PROJECT}" ]; then
+    if [ -n "${SENTRY_ORG}" ] && [ -n "${SENTRY_PROJECT}" ]; then
         echo "Using SENTRY_ORG and SENTRY_PROJECT environment variables."
     elif [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
         echo "Using SENTRY_ORG and SENTRY_PROJECT from .env file."
