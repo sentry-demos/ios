@@ -3,10 +3,6 @@ on:
   push:
     branches:
       - master
-      
-  pull_request:
-    paths:
-      - '.github/workflows/release.yml'
 
 jobs:
   empower-plant-release:
