@@ -14,7 +14,7 @@ if which sentry-cli >/dev/null; then
     fi
     
     # get SENTRY_AUTH_TOKEN value
-    if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+    if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
         echo "Using SENTRY_AUTH_TOKEN environment variable."
     else
         if [ -f ~/.sentryclirc ]; then
