@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
-      - run: brew install xcbeautify
+      - run: brew install xcbeautify getsentry/tools/sentry-cli
         shell: sh
       - uses: ruby/setup-ruby@v1
         with:
