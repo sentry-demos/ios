@@ -19,8 +19,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - name: Install CocoaPods dependencies
-        run: bundle exec pod install
+      - run: bundle exec pod install
         shell: sh
       - name: Run Deploy Script
         run: ./deploy_project.sh $(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ./EmpowerPlant/Info.plist)
