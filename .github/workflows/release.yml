@@ -5,6 +5,10 @@ on:
       version:
         description: Version to release
         required: true
+      
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
 
 jobs:
   empower-plant-release:
@@ -22,7 +26,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./Pods
-          key: test-server-${{ hashFiles('./Podfile.lock') }}
+          key: cocoapods-install-${{ hashFiles('./Podfile.lock') }}
       - run: bundle exec pod install
         if: steps.cache_cocoapods.outputs.cache-hit != 'true'
         shell: sh
