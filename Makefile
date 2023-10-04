@@ -27,6 +27,6 @@ init:
 	xcodebuild -downloadPlatform iOS
 
 release:
-	xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphonesimulator clean build 2>&1 | tee release-build.log | xcbeautify && exit ${PIPESTATUS[0]}
+	set -o pipefail && xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphonesimulator clean build 2>&1 | tee release-build.log | xcbeautify
 	zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
 	@echo "\nBuild completed. Create a new release in GitHub and upload ./EmpowerPlant_release.zip."
