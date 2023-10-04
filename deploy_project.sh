@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 # Function to display error message and exit
 error_exit() {
@@ -8,9 +8,13 @@ error_exit() {
     exit 1
 }
 
+SENTRY_ORG_INPUT=${1}
+SENTRY_PROJECT_INPUT=${2}
+
 # Build the release bundle
 echo "Building the release bundle..."
-make release
+SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=SENTRY_PROJECT_INPUT xcodebuild -workspace EmpowerPlant.xcworkspace -scheme EmpowerPlant -configuration Release -derivedDataPath build -sdk iphonesimulator -quiet clean build
+zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
 ZIP_PATH="./EmpowerPlant_release.zip"
 
 # Check if gh is installed
