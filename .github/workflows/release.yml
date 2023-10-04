@@ -14,8 +14,13 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
-      - name: Set up environment
-        run: brew install gh xcbeautify
+      - run: brew install xcbeautify
+        shell: sh
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Install CocoaPods dependencies
+        run: bundle exec pod install
         shell: sh
       - name: Run Deploy Script
         run: ./deploy_project.sh $(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ./EmpowerPlant/Info.plist)
