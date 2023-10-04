@@ -1,8 +1,8 @@
-name: empower-ios-action
-run-name: empower-ios-action
+name: upload-codecov-report
+run-name: upload-codecov-report
 on: [push]
 jobs:
-  upload-codecov-report:
+  main:
     runs-on: ubuntu-latest
     steps:
       - name: Upload coverage reports to Codecov
