@@ -27,7 +27,7 @@ jobs:
         if: steps.cache_cocoapods.outputs.cache-hit != 'true'
         shell: sh
       - name: Run Deploy Script
-        run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJ }} ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
         shell: sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

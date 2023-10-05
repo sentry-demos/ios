@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -x
-
 if which sentry-cli >/dev/null; then
 
     # get SENTRY_ORG and SENTRY_PROJECT values
