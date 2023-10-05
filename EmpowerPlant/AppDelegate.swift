@@ -17,21 +17,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         SentrySDK.start { options in
-                options.dsn = "https://c88045e430864a8e864af6233e7c18ea@o87286.ingest.sentry.io/6249899"
-//                options.debug = true // Enabled debug when first installing is always helpful
+            options.dsn = "https://c88045e430864a8e864af6233e7c18ea@o87286.ingest.sentry.io/6249899"
+            #if DEBUG
+                options.debug = true
+            #endif
 
-                // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-                // We recommend adjusting this value in production.
-                options.tracesSampleRate = 1.0
-                options.profilesSampleRate = 1.0
-                options.enableCoreDataTracing = true
-                options.enableFileIOTracing = true
-                options.attachScreenshot = true
-                options.attachViewHierarchy = true
-                options.enableTimeToFullDisplayTracing = true
-                options.enableAutoPerformanceTracing = true
-                options.enableUserInteractionTracing = false
-            }
+            // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+            // We recommend adjusting this value in production.
+            options.tracesSampleRate = 1.0
+            options.profilesSampleRate = 1.0
+            options.enableCoreDataTracing = true
+            options.enableFileIOTracing = true
+            options.attachScreenshot = true
+            options.attachViewHierarchy = true
+            options.enableTimeToFullDisplayTracing = true
+            options.enableAutoPerformanceTracing = true
+            options.enableUserInteractionTracing = false
+        }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
             scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")

@@ -72,10 +72,6 @@
             argument = "--generate-many-products"
             isEnabled = "YES">
          </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--debug-mode"
-            isEnabled = "YES">
-         </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
