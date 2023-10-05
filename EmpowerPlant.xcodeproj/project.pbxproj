@@ -38,8 +38,8 @@
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
-		8474F0472ACCE23400F21E06 /* release.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = release.yml; path = .github/workflows/release.yml; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
+		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
 		84A2641A2AA915B100A62A88 /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
@@ -103,7 +103,7 @@
 		D17C73A627D8291D006650AF = {
 			isa = PBXGroup;
 			children = (
-				8474F0472ACCE23400F21E06 /* release.yml */,
+				8474F04D2ACE54F300F21E06 /* .github */,
 				8474F0482ACCE2D800F21E06 /* deploy_project.sh */,
 				84A2641E2AA926A300A62A88 /* .env */,
 				846BEA1A2ABE46880032F77F /* upload-symbols.sh */,

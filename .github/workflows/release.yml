@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
-      - run: brew install xcbeautify
+      - run: brew install getsentry/tools/sentry-cli
         shell: sh
       - uses: ruby/setup-ruby@v1
         with:
@@ -27,12 +27,7 @@ jobs:
         if: steps.cache_cocoapods.outputs.cache-hit != 'true'
         shell: sh
       - name: Run Deploy Script
-        run: ./deploy_project.sh ${{ github.event.inputs.version }}
+        run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
         shell: sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Archive Raw Build Log
-        uses: actions/upload-artifact@v3
-        with:
-          name: raw-build-log
-          path: release-build.log

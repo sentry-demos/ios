@@ -1,13 +1,22 @@
 #!/bin/sh
 
 if which sentry-cli >/dev/null; then
-    if [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
+
+    # get SENTRY_ORG and SENTRY_PROJECT values
+    if [ -n "${SENTRY_ORG}" ] && [ -n "${SENTRY_PROJECT}" ]; then
+        echo "Using SENTRY_ORG and SENTRY_PROJECT environment variables."
+    elif [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
+        echo "Using SENTRY_ORG and SENTRY_PROJECT from .env file."
         export $(grep -v '^#' .env | sed '/^\s*$/d' | xargs)
     else
-        echo "[ERROR] .env does not exist or does not have SENTRY_ORG and SENTRY_PROJECT defined"
+        echo "error: no SENTRY_ORG and SENTRY_PROJECT defined"
         exit 1
     fi
-    if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+    
+    # get SENTRY_AUTH_TOKEN value
+    if [ -n "${SENTRY_AUTH_TOKEN}" ]; then
+        echo "Using SENTRY_AUTH_TOKEN environment variable."
+    else
         if [ -f ~/.sentryclirc ]; then
             export SENTRY_AUTH_TOKEN=$(grep -oE "token=(.*)$" ~/.sentryclirc | sed s/'token='//)
             echo "Using SENTRY_AUTH_TOKEN from .sentryclirc."
@@ -18,15 +27,16 @@ if which sentry-cli >/dev/null; then
         fi
     fi
     if [ -z "$SENTRY_AUTH_TOKEN" ]; then
-        echo "[ERROR] must provide SENTRY_AUTH_TOKEN either through command line, .zshrc or .sentryclirc"
+        echo "error: must provide SENTRY_AUTH_TOKEN either through command line, environment variable, .zshrc or .sentryclirc"
         exit 1
     fi
 
-    ERROR=$(sentry-cli upload-dif --force-foreground --include-sources "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
+    ERROR=$(sentry-cli upload-dif --force-foreground --include-sources --log-level debug -o $SENTRY_ORG -p $SENTRY_PROJECT --auth-token $SENTRY_AUTH_TOKEN "$DWARF_DSYM_FOLDER_PATH" )
     if [ ! $? -eq 0 ]; then
         echo "warning: sentry-cli - $ERROR"
+        exit 1
     fi
 else
-    echo "[ERROR] sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
+    echo "error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
     exit 1
 fi
