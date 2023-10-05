@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set +x
+set -x
 
 if which sentry-cli >/dev/null; then
 
