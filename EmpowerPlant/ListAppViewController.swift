@@ -85,6 +85,7 @@ class ListAppViewController: UIViewController {
                 // It contains all data but mutations only influence the event being sent
                 scope.setTag(value: "value", key: "myTag")
             }
+            // TODO: error
         }
          
     }
@@ -252,5 +253,54 @@ class ListAppViewController: UIViewController {
     
     @IBAction func close(_ sender: Any) {
         SentrySDK.close()
+    }
+    
+    @IBAction func generateDBEntities(_ sender: Any) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let totalItems = 1_000_000
+        
+        let batches = 1_000
+        let itemsPerBatch = totalItems / batches
+        
+        DispatchQueue.global(qos: .utility).async {
+            for i in 0..<batches {
+                DispatchQueue.main.async {
+                    for j in 0..<itemsPerBatch {
+                        let newProduct = Product(context: context)
+                        let productNum = i * itemsPerBatch + j
+                        
+                        newProduct.productId = "Product \(productNum)" // 'id' was a reserved word in swift
+                        newProduct.title = "Product \(productNum)"
+                        newProduct.productDescription = "Description for product \(i)" // 'description' was a reserved word in swift
+                        newProduct.productDescriptionFull = "Full description for product \(productNum)"
+                        newProduct.img = "img"
+                        newProduct.imgCropped = "img.cropped"
+                        newProduct.price = "\(productNum)"
+                    }
+                    
+                    do {
+                        try context.save()
+                        NotificationCenter.default.post(name: generatedDBItemsNotificationName, object: nil)
+                    } catch {
+                        // TODO: error
+                    }
+                }
+                // add a small delay so it doesn't lock up the UI
+                usleep(50_000) // 50 milliseconds
+            }
+        }
+    }
+    
+    @IBAction func fetchAllDBEntities(_ sender: Any) {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        do {
+            let products = try context.fetch(Product.fetchRequest())
+        } catch {
+            // TODO: error
+        }
+    }
+    
+    @IBAction func removeDBEntries(_ sender: Any) {
+        wipeDB()
     }
 }

@@ -7,4 +7,5 @@ target 'EmpowerPlant' do
 
   # Pods for EmpowerPlant
   pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '8.10.0'
+  pod 'SwiftMessages'
 end

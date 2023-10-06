@@ -69,8 +69,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--generate-many-products"
-            isEnabled = "YES">
+            argument = "--wipe-db"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
