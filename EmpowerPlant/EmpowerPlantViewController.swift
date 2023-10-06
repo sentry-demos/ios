@@ -146,7 +146,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             target: self,
             action: #selector(goToCart) // addToDb
         )
-        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blue
         self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Cart"
         //self.navigationItem.rightBarButtonItem?.badgeValue = "\(1)"
         
@@ -156,7 +155,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             target: self,
             action: #selector(goToListApp) // clearDb
         )
-        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blue
     }
     
     // Writes to CoreData database
