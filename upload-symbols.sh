@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
+
 if which sentry-cli >/dev/null; then
 
     # get SENTRY_ORG and SENTRY_PROJECT values
