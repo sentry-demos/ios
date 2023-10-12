@@ -29,8 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 options.attachScreenshot = true
                 options.attachViewHierarchy = true
                 options.enableTimeToFullDisplayTracing = true
-                options.enableUIViewControllerTracing = false
-                options.enableAutoPerformanceTracing = false
                 options.enableUserInteractionTracing = false
             }
         SentrySDK.configureScope{ scope in
