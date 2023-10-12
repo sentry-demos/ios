@@ -17,7 +17,7 @@ public class Product: NSManagedObject {
 }
 
 
-// TODO Deprecate this soon
+// TODO: Deprecate this soon
 // This was all the boilerplate needed for mapping the HTTP Response directly into a Product CoreData Class,
 // in addition to changes needed in XCode settings for the Product Entity
 //        enum CodingKeys: String, CodingKey {

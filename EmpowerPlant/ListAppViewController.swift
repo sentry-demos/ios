@@ -85,6 +85,7 @@ class ListAppViewController: UIViewController {
                 // It contains all data but mutations only influence the event being sent
                 scope.setTag(value: "value", key: "myTag")
             }
+            // TODO: error
         }
          
     }

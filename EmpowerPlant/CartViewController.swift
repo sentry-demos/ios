@@ -23,6 +23,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     let tableView: UITableView = {
         let table = UITableView()
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -44,13 +45,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-
-        // Comment this out and to see the green background and no data in the rows
-        tableView.frame = view.bounds
+        
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
 
         configureNavigationItems()
 
-        // TODO make this 'total' appear in a UI element
+        // TODO: make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
         SentrySDK.reportFullyDisplayed()
     }
@@ -77,7 +82,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.httpMethod = "POST"
 
         let json: [String: Any] = [
-            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "form": ["email":"will@chat.io"], // TODO: email update + check if all tx's+errors have email
             "cart": [
                 "total": 100,
                 "quantities": ["4": 3],
@@ -128,10 +133,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // total DONE
         // quantities DONE below
-        // items TODO
+        // TODO: items
 
         let json: [String: Any] = [
-            "form": ["email":"will@chat.io"], // TODO email update + check if all tx's+errors have email
+            "form": ["email":"will@chat.io"], // TODO: email update + check if all tx's+errors have email
             "cart": [
                 "total": ShoppingCart.instance.total,
                 "quantities": [
@@ -151,7 +156,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // TODO could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
+        // TODO: could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
         // or continue showing all products, even if quantity is 0. the screen looks more full this way
         return 4 // products.count
     }

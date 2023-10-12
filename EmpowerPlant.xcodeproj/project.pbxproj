@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
+		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
 		8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */; };
 		D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */; };
@@ -37,6 +38,7 @@
 /* Begin PBXFileReference section */
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */,
 				D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */,
 				D17C73D127D83321006650AF /* ListAppViewController.swift */,
+				843BD60E2AD08CE900B0098F /* Utils.swift */,
 				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
 				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
 				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
@@ -330,6 +333,7 @@
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
 				8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */,
 				D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */,
+				843BD60F2AD08CE900B0098F /* Utils.swift in Sources */,
 				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
 				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
 				D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */,
@@ -461,8 +465,8 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;

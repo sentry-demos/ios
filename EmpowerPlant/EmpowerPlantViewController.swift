@@ -8,14 +8,15 @@
 import UIKit
 import Sentry
 
-class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
+class EmpowerPlantViewController: UIViewController {
+    
     // CoreData database
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     let tableView: UITableView = {
-        let table = UITableView()
+        let table = UITableView(frame: .zero, style: .plain)
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -24,20 +25,23 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        SentrySDK.reportFullyDisplayed()
-        title = "Empower Plant"
-
+        title = "Empower Plants"
+        
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        
-        // Comment this out and to see the green background and no data in the rows
-        tableView.frame = view.bounds
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
         
         // Configures the nav bar buttons
         configureNavigationItems()
-
-        /* TODO
+        
+        // ???: looks like this was already done?
+        /* TODO: implement:
          1 get products from server (so we get http.client span)
          2 check if any products in Core Data -> If Not -> insert the products from response into Core Data
          3 get products from DB (so we get db.query span) and reload the table with this data
@@ -47,6 +51,14 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         getAllProductsFromDb()
         readCurrentDirectory()
         
+        NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
+            self.getAllProductsFromDb()
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        SentrySDK.reportFullyDisplayed()
     }
     
     func readCurrentDirectory() {
@@ -58,7 +70,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                 readDirectory(path: path)
             }
         } catch {
-            
+            // TODO: error
         }
     }
     
@@ -77,28 +89,29 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
                 }
             }
         } catch {
+            // TODO: error
         }
         
     }
     
     func fibonacciSeries(num: Int) -> Int{
-       // The value of 0th and 1st number of the fibonacci series are 0 and 1
-       var n1 = 0
-       var n2 = 1
-
-       // To store the result
-       var nR = 0
-       // Adding two previous numbers to find ith number of the series
-       for _ in 0..<num{
-          nR = n1
-          n1 = n2
-          n2 = nR + n2
-       }
-    
-       if (n1 < 4000) {
-           return fibonacciSeries(num: n1)
-       }
-       return n1
+        // The value of 0th and 1st number of the fibonacci series are 0 and 1
+        var n1 = 0
+        var n2 = 1
+        
+        // To store the result
+        var nR = 0
+        // Adding two previous numbers to find ith number of the series
+        for _ in 0..<num{
+            nR = n1
+            n1 = n2
+            n2 = nR + n2
+        }
+        
+        if (n1 < 4000) {
+            return fibonacciSeries(num: n1)
+        }
+        return n1
     }
     
     @objc
@@ -149,12 +162,76 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Cart"
         //self.navigationItem.rightBarButtonItem?.badgeValue = "\(1)"
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+        self.navigationItem.leftBarButtonItems = [UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
-            action: #selector(goToListApp) // clearDb
-        )
+            action: #selector(goToListApp)
+        ), UIBarButtonItem(title: "DB", style: .plain, target: self, action: #selector(dbActions))]
+    }
+    
+    @objc func dbActions() {
+        let actionSheet = UIAlertController(title: "Database actions", message: nil, preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Generate items", style: .default, handler: { _ in
+            self.generateDBItems()
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Clear DB", style: .default, handler: { _ in
+            wipeDB()
+            NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        present(actionSheet, animated: true)
+    }
+    
+    func generateDBItems() {
+        let defaultTotalItems = 100_000
+        let alert = UIAlertController(title: "Add items", message: nil, preferredStyle: .alert)
+
+        var numberOfItemsTextField: UITextField?
+        alert.addTextField { textfield in
+            textfield.placeholder = "Number of items (default: \(defaultTotalItems))"
+            textfield.keyboardType = .numberPad
+            numberOfItemsTextField = textfield
+        }
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            var totalItems = (numberOfItemsTextField?.text as? NSString)?.integerValue ?? defaultTotalItems
+            if totalItems == 0 {
+                totalItems = defaultTotalItems
+            }
+            var itemsPerBatch = 1_000
+            let batches = totalItems / itemsPerBatch
+            
+            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            DispatchQueue.global(qos: .utility).async {
+                for i in 0..<batches {
+                    DispatchQueue.main.async {
+                        for j in 0..<itemsPerBatch {
+                            let newProduct = Product(context: context)
+                            let productNum = i * itemsPerBatch + j
+                            
+                            newProduct.productId = "Product \(productNum)" // 'id' was a reserved word in swift
+                            newProduct.title = "Product \(productNum)"
+                            newProduct.productDescription = "Description for product \(i)" // 'description' was a reserved word in swift
+                            newProduct.productDescriptionFull = "Full description for product \(productNum)"
+                            newProduct.img = "img"
+                            newProduct.imgCropped = "img.cropped"
+                            newProduct.price = "\(productNum)"
+                        }
+                        
+                        do {
+                            try context.save()
+                            NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
+                        } catch {
+                            // TODO: error
+                        }
+                    }
+                    // add a small delay so it doesn't lock up the UI
+                    usleep(100_000) // 100 milliseconds
+                }
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        present(alert, animated: true)
     }
     
     // Writes to CoreData database
@@ -168,14 +245,6 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         newProduct.img = img
         newProduct.imgCropped = imgCropped
         newProduct.price = price
-        
-        do {
-            try context.save()
-            getAllProductsFromDb()
-        }
-        catch {
-            // error
-        }
     }
     
     // Don't deprecate this until major release of this demo
@@ -185,7 +254,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             try context.save()
         }
         catch {
-            
+            // TODO: error
         }
     }
     
@@ -198,7 +267,7 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             refreshTable()
         }
         catch {
-            // error
+            // TODO: error
         }
     }
     
@@ -223,19 +292,38 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
                     if (self.products.count == 0) {
+                        var operations = [BlockOperation]()
+                        let saveOp = BlockOperation() {
+                            do {
+                                try self.context.save()
+                                self.getAllProductsFromDb()
+                            } catch {
+                                // TODO: error
+                            }
+                        }
                         for product in productsResponse {
                             // Writes to CoreData database
-                            self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                            let addOp = BlockOperation() {
+                                self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
+                            }
+                            operations.append(addOp)
+                            saveOp.addDependency(addOp)
+                        }
+                        if operations.count > 0 {
+                            operations.append(saveOp)
+                            OperationQueue.main.addOperations(operations, waitUntilFinished: false)
                         }
                     }
                 } else {
                     print("Invalid Response")
+                    // TODO: error
                 }
             } else if let error = error {
                 print("HTTP Request Failed \(error)")
+                // TODO: error
             }
         }
-
+        
         task.resume()
     }
     
@@ -248,16 +336,19 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
     func goToListApp() {
         self.performSegue(withIdentifier: "goToListApp", sender: self)
     }
-
+    
     @objc
     func refreshTable() {
-        // TODO why is this executing so many times on load?
-        // print("> refresh table") 
+        // ???: why is this executing so many times on load?
+        // !!!: because it is called from createProduct, which is called for each item in the response from the network request to get products from server. In general, it's better to use UITableView.insertRow(...) instead of UITableView.reloadData() when simply adding things to the table.
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
-    
+}
+
+// MARK: UITableViewDataSource
+extension EmpowerPlantViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return products.count
     }
@@ -270,32 +361,17 @@ class EmpowerPlantViewController: UIViewController, UITableViewDelegate, UITable
         return cell
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "\(products.count) items"
+    }
+}
+
+// MARK: UITableViewDelegate
+extension EmpowerPlantViewController: UITableViewDelegate {
     // Code that executes on Click'ing table row, adds the product item to shopping cart
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let product = products[indexPath.row]
         
         ShoppingCart.addProduct(product: product)
     }
-
-    
-    // Don't deprecate this until major release of this demo
-    func updateProduct(product: Product, newTitle:  String) {
-        product.title = newTitle
-        do {
-            try context.save()
-        }
-        catch {
-            
-        }
-    }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 }
