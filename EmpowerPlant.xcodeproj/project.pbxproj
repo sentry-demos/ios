@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
+		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
 		8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */; };
@@ -40,6 +41,7 @@
 		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
 		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				D17C73BB27D8291D006650AF /* Assets.xcassets */,
 				D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */,
 				D17C73C027D8291D006650AF /* Info.plist */,
+				843BD6262AD7798C00B0098F /* jwt-deep-field.png */,
 			);
 			path = EmpowerPlant;
 			sourceTree = "<group>";
@@ -249,6 +252,7 @@
 				846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */,
 				D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */,
 				D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */,
+				843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */,
 				D17C73BA27D8291D006650AF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

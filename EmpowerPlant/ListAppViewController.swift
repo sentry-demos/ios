@@ -255,6 +255,12 @@ class ListAppViewController: UIViewController {
         SentrySDK.close()
     }
     
+    @IBOutlet weak var imageView: UIImageView!
+    @IBAction func imageOnMain(_ sender: Any) {
+        imageView.isHidden = false
+        imageView.image = UIImage(named: "jwt-deep-field.png")
+    }
+    
     @IBOutlet weak var progressIndicator: UIProgressView!
     @IBAction func jsonMainThread(_ sender: Any) {
         // build up a huge JSON structure
