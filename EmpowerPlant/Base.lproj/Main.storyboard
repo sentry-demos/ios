@@ -54,7 +54,7 @@
             </objects>
             <point key="canvasLocation" x="2000" y="127"/>
         </scene>
-        <!--Actions-->
+        <!--List App View Controller-->
         <scene sceneID="NJ4-dB-pzJ">
             <objects>
                 <viewController id="VXN-aD-u60" customClass="ListAppViewController" customModule="EmpowerPlant" sceneMemberID="viewController">
@@ -62,137 +62,153 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CCo-Yo-I2U">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="f0u-69-w4x">
                                 <rect key="frame" x="0.0" y="144" width="414" height="718"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="99H-zP-cDK">
-                                        <rect key="frame" x="0.0" y="0.0" width="207" height="276"/>
+                                    <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="b5N-Es-1yE">
+                                        <rect key="frame" x="20" y="0.0" width="374" height="0.0"/>
+                                    </progressView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CCo-Yo-I2U">
+                                        <rect key="frame" x="8" y="0.0" width="398" height="718"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tAq-kn-tvw">
-                                                <rect key="frame" x="28" y="0.0" width="151.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="add Breadcrumb"/>
-                                                <connections>
-                                                    <action selector="addBreadcrumb:" destination="VXN-aD-u60" eventType="touchUpInside" id="aCc-ed-Rgp"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7jA-Qd-XJy">
-                                                <rect key="frame" x="57" y="34.5" width="93" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Message"/>
-                                                <connections>
-                                                    <action selector="captureMessage:" destination="VXN-aD-u60" eventType="touchUpInside" id="l7x-e9-yTg"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bUW-Je-qPg">
-                                                <rect key="frame" x="18" y="69" width="171" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="UIClick Transaction"/>
-                                                <connections>
-                                                    <action selector="uiClickTransaction:" destination="VXN-aD-u60" eventType="touchUpInside" id="wyK-N5-EJB"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Isf-Ed-2fv">
-                                                <rect key="frame" x="34" y="103.5" width="139" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="User Feedback"/>
-                                                <connections>
-                                                    <action selector="captureUserFeedback:" destination="VXN-aD-u60" eventType="touchUpInside" id="sX3-dR-jdD"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3rs-EA-TGq">
-                                                <rect key="frame" x="73" y="138" width="61.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Error"/>
-                                                <connections>
-                                                    <action selector="captureError:" destination="VXN-aD-u60" eventType="touchUpInside" id="4Bi-kz-z7a"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mWT-xp-neO">
-                                                <rect key="frame" x="43" y="172.5" width="121.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="NSException"/>
-                                                <connections>
-                                                    <action selector="captureNSException:" destination="VXN-aD-u60" eventType="touchUpInside" id="yeF-JK-5pu"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q2z-DR-kJn">
-                                                <rect key="frame" x="52.5" y="207" width="102" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Fatal Error"/>
-                                                <connections>
-                                                    <action selector="captureFatalError:" destination="VXN-aD-u60" eventType="touchUpInside" id="rgn-pX-gj0"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jPI-M5-We0">
-                                                <rect key="frame" x="69" y="241.5" width="69" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Crash"/>
-                                                <connections>
-                                                    <action selector="crash:" destination="VXN-aD-u60" eventType="touchUpInside" id="vHp-s1-CDF"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                    </stackView>
-                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
-                                        <rect key="frame" x="207" y="0.0" width="207" height="241.5"/>
-                                        <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
-                                                <rect key="frame" x="38" y="0.0" width="131.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="HighCPULoad"/>
-                                                <connections>
-                                                    <action selector="highCPULoad:" destination="VXN-aD-u60" eventType="touchUpInside" id="LfF-L9-d3V"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WQf-cX-VgB">
-                                                <rect key="frame" x="70" y="34.5" width="67" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Close"/>
-                                                <connections>
-                                                    <action selector="close:" destination="VXN-aD-u60" eventType="touchUpInside" id="twr-8m-T6t"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="luo-N9-kW2">
-                                                <rect key="frame" x="47" y="69" width="113" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="OOM Crash"/>
-                                                <connections>
-                                                    <action selector="oomCrash:" destination="VXN-aD-u60" eventType="touchUpInside" id="KFU-xO-7Fc"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0c7-yc-5bC">
-                                                <rect key="frame" x="20" y="103.5" width="167.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="ANR Fully Blocking"/>
-                                                <connections>
-                                                    <action selector="anrFullyBlocking:" destination="VXN-aD-u60" eventType="touchUpInside" id="3UW-OK-Pdg"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YRj-7t-YZK">
-                                                <rect key="frame" x="12" y="138" width="183" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="ANR Filling Run Loop"/>
-                                                <connections>
-                                                    <action selector="anrFillingRunLoop:" destination="VXN-aD-u60" eventType="touchUpInside" id="RSx-na-KEx"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vvk-5K-mNL">
-                                                <rect key="frame" x="14.5" y="172.5" width="178.5" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Capture Transaction"/>
-                                                <connections>
-                                                    <action selector="captureTransaction:" destination="VXN-aD-u60" eventType="touchUpInside" id="1D9-vP-slW"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dq9-Ym-6qn">
-                                                <rect key="frame" x="4" y="207" width="199" height="34.5"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Force Unwrap Optional"/>
-                                                <connections>
-                                                    <action selector="unwrapCrash:" destination="VXN-aD-u60" eventType="touchUpInside" id="1ao-hi-gPI"/>
-                                                </connections>
-                                            </button>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="99H-zP-cDK">
+                                                <rect key="frame" x="0.0" y="0.0" width="199" height="276"/>
+                                                <subviews>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tAq-kn-tvw">
+                                                        <rect key="frame" x="24" y="0.0" width="151.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="add Breadcrumb"/>
+                                                        <connections>
+                                                            <action selector="addBreadcrumb:" destination="VXN-aD-u60" eventType="touchUpInside" id="aCc-ed-Rgp"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7jA-Qd-XJy">
+                                                        <rect key="frame" x="53" y="34.5" width="93" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Message"/>
+                                                        <connections>
+                                                            <action selector="captureMessage:" destination="VXN-aD-u60" eventType="touchUpInside" id="l7x-e9-yTg"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bUW-Je-qPg">
+                                                        <rect key="frame" x="14" y="69" width="171" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="UIClick Transaction"/>
+                                                        <connections>
+                                                            <action selector="uiClickTransaction:" destination="VXN-aD-u60" eventType="touchUpInside" id="wyK-N5-EJB"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Isf-Ed-2fv">
+                                                        <rect key="frame" x="30" y="103.5" width="139" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="User Feedback"/>
+                                                        <connections>
+                                                            <action selector="captureUserFeedback:" destination="VXN-aD-u60" eventType="touchUpInside" id="sX3-dR-jdD"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3rs-EA-TGq">
+                                                        <rect key="frame" x="69" y="138" width="61.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Error"/>
+                                                        <connections>
+                                                            <action selector="captureError:" destination="VXN-aD-u60" eventType="touchUpInside" id="4Bi-kz-z7a"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mWT-xp-neO">
+                                                        <rect key="frame" x="39" y="172.5" width="121.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="NSException"/>
+                                                        <connections>
+                                                            <action selector="captureNSException:" destination="VXN-aD-u60" eventType="touchUpInside" id="yeF-JK-5pu"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q2z-DR-kJn">
+                                                        <rect key="frame" x="48.5" y="207" width="102" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Fatal Error"/>
+                                                        <connections>
+                                                            <action selector="captureFatalError:" destination="VXN-aD-u60" eventType="touchUpInside" id="rgn-pX-gj0"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jPI-M5-We0">
+                                                        <rect key="frame" x="65" y="241.5" width="69" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Crash"/>
+                                                        <connections>
+                                                            <action selector="crash:" destination="VXN-aD-u60" eventType="touchUpInside" id="vHp-s1-CDF"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
+                                                <rect key="frame" x="199" y="0.0" width="199" height="276"/>
+                                                <subviews>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
+                                                        <rect key="frame" x="34" y="0.0" width="131.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="HighCPULoad"/>
+                                                        <connections>
+                                                            <action selector="highCPULoad:" destination="VXN-aD-u60" eventType="touchUpInside" id="LfF-L9-d3V"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WQf-cX-VgB">
+                                                        <rect key="frame" x="66" y="34.5" width="67" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Close"/>
+                                                        <connections>
+                                                            <action selector="close:" destination="VXN-aD-u60" eventType="touchUpInside" id="twr-8m-T6t"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="luo-N9-kW2">
+                                                        <rect key="frame" x="43" y="69" width="113" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="OOM Crash"/>
+                                                        <connections>
+                                                            <action selector="oomCrash:" destination="VXN-aD-u60" eventType="touchUpInside" id="KFU-xO-7Fc"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0c7-yc-5bC">
+                                                        <rect key="frame" x="16" y="103.5" width="167.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="ANR Fully Blocking"/>
+                                                        <connections>
+                                                            <action selector="anrFullyBlocking:" destination="VXN-aD-u60" eventType="touchUpInside" id="3UW-OK-Pdg"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YRj-7t-YZK">
+                                                        <rect key="frame" x="8" y="138" width="183" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="ANR Filling Run Loop"/>
+                                                        <connections>
+                                                            <action selector="anrFillingRunLoop:" destination="VXN-aD-u60" eventType="touchUpInside" id="RSx-na-KEx"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vvk-5K-mNL">
+                                                        <rect key="frame" x="10.5" y="172.5" width="178.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Capture Transaction"/>
+                                                        <connections>
+                                                            <action selector="captureTransaction:" destination="VXN-aD-u60" eventType="touchUpInside" id="1D9-vP-slW"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dq9-Ym-6qn">
+                                                        <rect key="frame" x="0.0" y="207" width="199" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Force Unwrap Optional"/>
+                                                        <connections>
+                                                            <action selector="unwrapCrash:" destination="VXN-aD-u60" eventType="touchUpInside" id="1ao-hi-gPI"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YJc-z6-Cm2">
+                                                        <rect key="frame" x="6.5" y="241.5" width="186.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="JSON on main thread"/>
+                                                        <connections>
+                                                            <action selector="jsonMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="qQX-nt-eti"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
                                         </subviews>
                                     </stackView>
                                 </subviews>
@@ -201,17 +217,23 @@
                         <viewLayoutGuide key="safeArea" id="CaI-jg-IPv"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="CCo-Yo-I2U" firstAttribute="top" secondItem="CaI-jg-IPv" secondAttribute="top" id="36z-dq-N3C"/>
-                            <constraint firstItem="CCo-Yo-I2U" firstAttribute="bottom" secondItem="CaI-jg-IPv" secondAttribute="bottom" id="P25-CH-1D5"/>
-                            <constraint firstItem="CaI-jg-IPv" firstAttribute="trailing" secondItem="CCo-Yo-I2U" secondAttribute="trailing" id="Q7D-cP-MKf"/>
-                            <constraint firstItem="CaI-jg-IPv" firstAttribute="leading" secondItem="CCo-Yo-I2U" secondAttribute="leading" id="nA6-3e-HfB"/>
+                            <constraint firstItem="f0u-69-w4x" firstAttribute="top" secondItem="CaI-jg-IPv" secondAttribute="top" id="2G6-Ag-USq"/>
+                            <constraint firstItem="f0u-69-w4x" firstAttribute="trailing" secondItem="CaI-jg-IPv" secondAttribute="trailing" id="8xl-wI-gVZ"/>
+                            <constraint firstItem="f0u-69-w4x" firstAttribute="bottom" secondItem="CaI-jg-IPv" secondAttribute="bottom" id="N32-oU-NIS"/>
+                            <constraint firstItem="b5N-Es-1yE" firstAttribute="leading" secondItem="CaI-jg-IPv" secondAttribute="leading" constant="20" id="XDH-Fb-7N5"/>
+                            <constraint firstItem="CaI-jg-IPv" firstAttribute="trailing" secondItem="b5N-Es-1yE" secondAttribute="trailing" constant="20" id="mkA-w9-qys"/>
+                            <constraint firstItem="CaI-jg-IPv" firstAttribute="leading" secondItem="f0u-69-w4x" secondAttribute="leading" id="w2b-p0-b01"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Actions" id="r5d-gZ-zyX">
+                    <navigationItem key="navigationItem" id="r5d-gZ-zyX">
+                        <nil key="title"/>
                         <barButtonItem key="backBarButtonItem" title="Empower Plants" id="Yiv-HT-IE1">
                             <color key="tintColor" name="AccentColor"/>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="progressIndicator" destination="b5N-Es-1yE" id="2AX-n4-293"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bgO-GR-jh9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
