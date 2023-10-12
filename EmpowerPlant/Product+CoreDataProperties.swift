@@ -13,7 +13,9 @@ import CoreData
 extension Product {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
-        return NSFetchRequest<Product>(entityName: "Product")
+        let fr = NSFetchRequest<Product>(entityName: "Product")
+        fr.sortDescriptors = [.init(key: "title", ascending: true)]
+        return fr
     }
     
 //    @NSManaged public var text: String?

@@ -7,7 +7,7 @@
 
 import UIKit
 
-public let generatedDBItemsNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
+public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
 
 public func wipeDB() {
     guard let url = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.persistentStoreCoordinator.persistentStores.first?.url else {

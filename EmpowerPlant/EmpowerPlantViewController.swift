@@ -47,11 +47,11 @@ class EmpowerPlantViewController: UIViewController {
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
         
-//        getAllProductsFromServer()
+        getAllProductsFromServer()
         getAllProductsFromDb()
         readCurrentDirectory()
         
-        NotificationCenter.default.addObserver(forName: generatedDBItemsNotificationName, object: nil, queue: nil) { _ in
+        NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             self.getAllProductsFromDb()
         }
     }
@@ -162,12 +162,76 @@ class EmpowerPlantViewController: UIViewController {
         self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Cart"
         //self.navigationItem.rightBarButtonItem?.badgeValue = "\(1)"
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+        self.navigationItem.leftBarButtonItems = [UIBarButtonItem(
             image: UIImage(systemName: "ellipsis"),
             style: .plain,
             target: self,
-            action: #selector(goToListApp) // clearDb
-        )
+            action: #selector(goToListApp)
+        ), UIBarButtonItem(title: "DB", style: .plain, target: self, action: #selector(dbActions))]
+    }
+    
+    @objc func dbActions() {
+        let actionSheet = UIAlertController(title: "Database actions", message: nil, preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Generate items", style: .default, handler: { _ in
+            self.generateDBItems()
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Clear DB", style: .default, handler: { _ in
+            wipeDB()
+            NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        present(actionSheet, animated: true)
+    }
+    
+    func generateDBItems() {
+        let defaultTotalItems = 100_000
+        let alert = UIAlertController(title: "Add items", message: nil, preferredStyle: .alert)
+
+        var numberOfItemsTextField: UITextField?
+        alert.addTextField { textfield in
+            textfield.placeholder = "Number of items (default: \(defaultTotalItems))"
+            textfield.keyboardType = .numberPad
+            numberOfItemsTextField = textfield
+        }
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            var totalItems = (numberOfItemsTextField?.text as? NSString)?.integerValue ?? defaultTotalItems
+            if totalItems == 0 {
+                totalItems = defaultTotalItems
+            }
+            var itemsPerBatch = 1_000
+            let batches = totalItems / itemsPerBatch
+            
+            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            DispatchQueue.global(qos: .utility).async {
+                for i in 0..<batches {
+                    DispatchQueue.main.async {
+                        for j in 0..<itemsPerBatch {
+                            let newProduct = Product(context: context)
+                            let productNum = i * itemsPerBatch + j
+                            
+                            newProduct.productId = "Product \(productNum)" // 'id' was a reserved word in swift
+                            newProduct.title = "Product \(productNum)"
+                            newProduct.productDescription = "Description for product \(i)" // 'description' was a reserved word in swift
+                            newProduct.productDescriptionFull = "Full description for product \(productNum)"
+                            newProduct.img = "img"
+                            newProduct.imgCropped = "img.cropped"
+                            newProduct.price = "\(productNum)"
+                        }
+                        
+                        do {
+                            try context.save()
+                            NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
+                        } catch {
+                            // TODO: error
+                        }
+                    }
+                    // add a small delay so it doesn't lock up the UI
+                    usleep(100_000) // 100 milliseconds
+                }
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        present(alert, animated: true)
     }
     
     // Writes to CoreData database
@@ -181,14 +245,6 @@ class EmpowerPlantViewController: UIViewController {
         newProduct.img = img
         newProduct.imgCropped = imgCropped
         newProduct.price = price
-        
-        do {
-            try context.save()
-            getAllProductsFromDb()
-        }
-        catch {
-            // TODO: error
-        }
     }
     
     // Don't deprecate this until major release of this demo
@@ -236,11 +292,26 @@ class EmpowerPlantViewController: UIViewController {
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
                     if (self.products.count == 0) {
+                        var operations = [BlockOperation]()
+                        let saveOp = BlockOperation() {
+                            do {
+                                try self.context.save()
+                                self.getAllProductsFromDb()
+                            } catch {
+                                // TODO: error
+                            }
+                        }
                         for product in productsResponse {
                             // Writes to CoreData database
-                            DispatchQueue.main.async {
+                            let addOp = BlockOperation() {
                                 self.createProduct(productId: String(product.id), title: product.title, productDescription: product.description, productDescriptionFull: product.descriptionfull, img: product.img, imgCropped: product.imgcropped, price: String(product.price))
                             }
+                            operations.append(addOp)
+                            saveOp.addDependency(addOp)
+                        }
+                        if operations.count > 0 {
+                            operations.append(saveOp)
+                            OperationQueue.main.addOperations(operations, waitUntilFinished: false)
                         }
                     }
                 } else {
