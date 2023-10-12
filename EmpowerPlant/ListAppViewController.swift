@@ -253,4 +253,27 @@ class ListAppViewController: UIViewController {
     @IBAction func close(_ sender: Any) {
         SentrySDK.close()
     }
+    
+    @IBOutlet weak var progressIndicator: UIProgressView!
+    @IBAction func jsonMainThread(_ sender: Any) {
+        // build up a huge JSON structure
+        progressIndicator.isHidden = false
+        DispatchQueue.global(qos: .utility).async {
+            var dict = [String: String]()
+            let limit = 10_000_000
+            for i in 0..<limit {
+                dict["\(i)"] = "\(i)\(i)"
+                DispatchQueue.main.async {
+                    self.progressIndicator.progress = Float(i) / Float(limit)
+                }
+            }
+            let data = try! JSONSerialization.data(withJSONObject: dict)
+            DispatchQueue.main.async {
+                let span = SentrySDK.startTransaction(name: "test", operation: "json-on-main")
+                let _ = try! JSONSerialization.jsonObject(with: data)
+                span.finish()
+                self.progressIndicator.isHidden = true
+            }
+        }
+    }
 }
