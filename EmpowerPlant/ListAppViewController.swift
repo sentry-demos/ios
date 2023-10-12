@@ -260,7 +260,7 @@ class ListAppViewController: UIViewController {
         progressIndicator.isHidden = false
         DispatchQueue.global(qos: .utility).async {
             var dict = [String: String]()
-            let limit = 10_000_000
+            let limit = 1_000_000
             for i in 0..<limit {
                 dict["\(i)"] = "\(i)\(i)"
                 DispatchQueue.main.async {
