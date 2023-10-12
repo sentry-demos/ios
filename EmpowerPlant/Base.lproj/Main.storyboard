@@ -69,7 +69,7 @@
                                         <rect key="frame" x="20" y="0.0" width="374" height="0.0"/>
                                     </progressView>
                                     <stackView opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CCo-Yo-I2U">
-                                        <rect key="frame" x="8" y="0.0" width="398" height="276"/>
+                                        <rect key="frame" x="8" y="0.0" width="398" height="310.5"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="99H-zP-cDK">
                                                 <rect key="frame" x="0.0" y="0.0" width="199" height="276"/>
@@ -141,7 +141,7 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
-                                                <rect key="frame" x="199" y="0.0" width="199" height="276"/>
+                                                <rect key="frame" x="199" y="0.0" width="199" height="310.5"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
                                                         <rect key="frame" x="34" y="0.0" width="131.5" height="34.5"/>
@@ -205,7 +205,14 @@
                                                         <buttonConfiguration key="configuration" style="plain" title="Decode image on main"/>
                                                         <connections>
                                                             <action selector="imageOnMain:" destination="VXN-aD-u60" eventType="touchUpInside" id="3hA-YV-UdC"/>
-                                                            <action selector="jsonMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="qQX-nt-eti"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rfc-dE-FxP">
+                                                        <rect key="frame" x="1.5" y="276" width="196" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Decode JSON on main"/>
+                                                        <connections>
+                                                            <action selector="jsonMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="iM7-uu-pjl"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -227,14 +234,10 @@
                         <constraints>
                             <constraint firstItem="CaI-jg-IPv" firstAttribute="leading" secondItem="xnN-Pe-VKe" secondAttribute="leading" id="9wl-hN-71I"/>
                             <constraint firstItem="CaI-jg-IPv" firstAttribute="trailing" secondItem="xnN-Pe-VKe" secondAttribute="trailing" id="MaZ-Wb-7nU"/>
-                            <constraint firstItem="f0u-69-w4x" firstAttribute="top" secondItem="CaI-jg-IPv" secondAttribute="top" id="2G6-Ag-USq"/>
-                            <constraint firstItem="f0u-69-w4x" firstAttribute="trailing" secondItem="CaI-jg-IPv" secondAttribute="trailing" id="8xl-wI-gVZ"/>
-                            <constraint firstItem="f0u-69-w4x" firstAttribute="bottom" secondItem="CaI-jg-IPv" secondAttribute="bottom" id="N32-oU-NIS"/>
                             <constraint firstItem="xnN-Pe-VKe" firstAttribute="top" secondItem="CaI-jg-IPv" secondAttribute="top" id="OGI-ac-tOr"/>
-                            <constraint firstItem="CaI-jg-IPv" firstAttribute="bottom" secondItem="xnN-Pe-VKe" secondAttribute="bottom" id="kh4-CY-icP"/>
                             <constraint firstItem="b5N-Es-1yE" firstAttribute="leading" secondItem="CaI-jg-IPv" secondAttribute="leading" constant="20" id="XDH-Fb-7N5"/>
+                            <constraint firstItem="CaI-jg-IPv" firstAttribute="bottom" secondItem="xnN-Pe-VKe" secondAttribute="bottom" id="kh4-CY-icP"/>
                             <constraint firstItem="CaI-jg-IPv" firstAttribute="trailing" secondItem="b5N-Es-1yE" secondAttribute="trailing" constant="20" id="mkA-w9-qys"/>
-                            <constraint firstItem="CaI-jg-IPv" firstAttribute="leading" secondItem="f0u-69-w4x" secondAttribute="leading" id="w2b-p0-b01"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="r5d-gZ-zyX">
@@ -281,12 +284,6 @@
         </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
