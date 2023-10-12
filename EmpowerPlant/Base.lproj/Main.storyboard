@@ -207,8 +207,16 @@
                                                             <action selector="imageOnMain:" destination="VXN-aD-u60" eventType="touchUpInside" id="3hA-YV-UdC"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rfc-dE-FxP">
-                                                        <rect key="frame" x="1.5" y="276" width="196" height="34.5"/>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yrg-wG-isT">
+                                                        <rect key="frame" x="5" y="241.5" width="189.5" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="Regex on main thread"/>
+                                                        <connections>
+                                                            <action selector="regexOnMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="abO-hY-sPP"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YJc-z6-Cm2">
+                                                        <rect key="frame" x="6.5" y="276" width="186.5" height="34.5"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" title="Decode JSON on main"/>
                                                         <connections>
