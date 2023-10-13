@@ -69,10 +69,10 @@
                                         <rect key="frame" x="20" y="0.0" width="374" height="0.0"/>
                                     </progressView>
                                     <stackView opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CCo-Yo-I2U">
-                                        <rect key="frame" x="8" y="0.0" width="398" height="310.5"/>
+                                        <rect key="frame" x="8" y="0.0" width="398" height="345"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="99H-zP-cDK">
-                                                <rect key="frame" x="0.0" y="0.0" width="199" height="276"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="199" height="310.5"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tAq-kn-tvw">
                                                         <rect key="frame" x="24" y="0.0" width="151.5" height="34.5"/>
@@ -138,10 +138,18 @@
                                                             <action selector="crash:" destination="VXN-aD-u60" eventType="touchUpInside" id="vHp-s1-CDF"/>
                                                         </connections>
                                                     </button>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1mi-y8-sLr">
+                                                        <rect key="frame" x="21.5" y="276" width="156" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" title="GPU frame drops"/>
+                                                        <connections>
+                                                            <action selector="simulateDroppedFrame:" destination="VXN-aD-u60" eventType="touchUpInside" id="iAW-Jw-Jjs"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
-                                                <rect key="frame" x="199" y="0.0" width="199" height="310.5"/>
+                                                <rect key="frame" x="199" y="0.0" width="199" height="345"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
                                                         <rect key="frame" x="34" y="0.0" width="131.5" height="34.5"/>
@@ -208,7 +216,7 @@
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yrg-wG-isT">
-                                                        <rect key="frame" x="5" y="241.5" width="189.5" height="34.5"/>
+                                                        <rect key="frame" x="5" y="276" width="189.5" height="34.5"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" title="Regex on main thread"/>
                                                         <connections>
@@ -216,7 +224,7 @@
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YJc-z6-Cm2">
-                                                        <rect key="frame" x="6.5" y="276" width="186.5" height="34.5"/>
+                                                        <rect key="frame" x="1.5" y="310.5" width="196" height="34.5"/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" title="Decode JSON on main"/>
                                                         <connections>

@@ -5,8 +5,10 @@
 //  Created by William Capozzoli on 3/8/22.
 //
 
-import UIKit
+import BigInt
+import JGProgressHUD
 import Sentry
+import UIKit
 
 class ListAppViewController: UIViewController {
 
@@ -292,5 +294,31 @@ class ListAppViewController: UIViewController {
         let span = SentrySDK.startTransaction(name: "test", operation: "regex-on-main")
         regex.matches(in: string, range: NSMakeRange(0, string.count))
         span.finish()
+    }
+    
+    // !!!: profiling doesn't correctly collect backtraces with this (armcknight 12 Oct 2023)
+    func factorialRecursive(int x: BigInt) -> BigInt {
+        if x == 0 { return 1 }
+        return x * factorialRecursive(int: x - 1)
+    }
+    
+    func factorialIterative(int x: BigInt) -> BigInt {
+        var i: BigInt = x
+        var result: BigInt = 1
+        while i > 0 {
+            result *= i
+            i -= 1
+        }
+        return result
+    }
+    @IBAction func simulateDroppedFrame(_ sender: Any) {
+//        let progress = JGProgressHUD()
+//        progress.show(in: view)
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
+            let _ = self.factorialIterative(int: 15_000)
+            span.finish()
+//            progress.dismiss()
+//        }
     }
 }

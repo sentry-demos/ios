@@ -8,9 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
-		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
-		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
+		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
+		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
+		8487169D2AD8BB3400756467 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = 8487169C2AD8BB3400756467 /* SwiftMessages */; };
+		848716A02AD8BB4600756467 /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 8487169F2AD8BB4600756467 /* JGProgressHUD */; };
+		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
 		8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */; };
 		D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */; };
@@ -43,8 +46,8 @@
 		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
-		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
+		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
@@ -83,7 +86,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8487169D2AD8BB3400756467 /* SwiftMessages in Frameworks */,
+				848716A02AD8BB4600756467 /* JGProgressHUD in Frameworks */,
 				674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */,
+				848716A32AD8C3CD00756467 /* BigInt in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +202,11 @@
 			dependencies = (
 			);
 			name = EmpowerPlant;
+			packageProductDependencies = (
+				8487169C2AD8BB3400756467 /* SwiftMessages */,
+				8487169F2AD8BB4600756467 /* JGProgressHUD */,
+				848716A22AD8C3CD00756467 /* BigInt */,
+			);
 			productName = EmpowerPlant;
 			productReference = 84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */;
 			productType = "com.apple.product-type.application";
@@ -227,6 +238,11 @@
 				Base,
 			);
 			mainGroup = D17C73A627D8291D006650AF;
+			packageReferences = (
+				8487169B2AD8BB3400756467 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
+				8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
+				848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */,
+			);
 			productRefGroup = D17C73A627D8291D006650AF;
 			projectDirPath = "";
 			projectRoot = "";
@@ -608,6 +624,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8487169B2AD8BB3400756467 /* XCRemoteSwiftPackageReference "SwiftMessages" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftKickMobile/SwiftMessages";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.8;
+			};
+		};
+		8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/attaswift/BigInt";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8487169C2AD8BB3400756467 /* SwiftMessages */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8487169B2AD8BB3400756467 /* XCRemoteSwiftPackageReference "SwiftMessages" */;
+			productName = SwiftMessages;
+		};
+		8487169F2AD8BB4600756467 /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		848716A22AD8C3CD00756467 /* BigInt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */;
+			productName = BigInt;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */ = {
