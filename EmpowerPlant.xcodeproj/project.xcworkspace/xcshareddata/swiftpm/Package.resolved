@@ -10,12 +10,12 @@
       }
     },
     {
-      "identity" : "jgprogresshud",
+      "identity" : "sentry-cocoa",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/JonasGessner/JGProgressHUD",
+      "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "revision" : "78d7cd35f1d90ff74fd82e486f2cbe4b24be8cf9",
-        "version" : "2.2.0"
+        "revision" : "7b0d185631a6d4b7756468efa464a68725c061d2",
+        "version" : "8.13.1"
       }
     },
     {

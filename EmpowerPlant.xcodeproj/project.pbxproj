@@ -7,15 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */; };
-		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
-		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
 		8487169D2AD8BB3400756467 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = 8487169C2AD8BB3400756467 /* SwiftMessages */; };
-		848716A02AD8BB4600756467 /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 8487169F2AD8BB4600756467 /* JGProgressHUD */; };
 		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
+		848716B72ADFAA2000756467 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 848716B62ADFAA2000756467 /* Sentry */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
 		8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */; };
 		D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */; };
@@ -43,24 +40,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.release.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.release.xcconfig"; sourceTree = "<group>"; };
-		74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmpowerPlant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
-		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
+		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
-		84A2641A2AA915B100A62A88 /* Gemfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
 		84A2641B2AA915D800A62A88 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EmpowerPlantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A2641E2AA926A300A62A88 /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
 		8B21663B29D3F8C80009C890 /* RandomErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomErrors.swift; sourceTree = "<group>"; };
 		8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewControllerTests.swift; sourceTree = "<group>"; };
-		CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmpowerPlant.debug.xcconfig"; path = "Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant.debug.xcconfig"; sourceTree = "<group>"; };
 		D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -89,9 +82,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8487169D2AD8BB3400756467 /* SwiftMessages in Frameworks */,
-				848716A02AD8BB4600756467 /* JGProgressHUD in Frameworks */,
-				674899180B469D888700A555 /* Pods_EmpowerPlant.framework in Frameworks */,
 				848716A32AD8C3CD00756467 /* BigInt in Frameworks */,
+				848716B72ADFAA2000756467 /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,14 +98,6 @@
 			path = EmpowerPlantTests;
 			sourceTree = "<group>";
 		};
-		A2BF5384A6D041CDB3FCA8D9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				74014747DE857D26E9BD7B24 /* Pods_EmpowerPlant.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		D17C73A627D8291D006650AF = {
 			isa = PBXGroup;
 			children = (
@@ -122,13 +106,10 @@
 				84A2641E2AA926A300A62A88 /* .env */,
 				846BEA1A2ABE46880032F77F /* upload-symbols.sh */,
 				84A264192AA915B100A62A88 /* Brewfile */,
-				84A2641A2AA915B100A62A88 /* Gemfile */,
 				84A264182AA9155800A62A88 /* Makefile */,
 				84A2641B2AA915D800A62A88 /* README.md */,
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
 				8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */,
-				A2BF5384A6D041CDB3FCA8D9 /* Frameworks */,
-				DBBFE14A41453664EF0F8F57 /* Pods */,
 				84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */,
 				84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */,
 			);
@@ -158,15 +139,6 @@
 			path = EmpowerPlant;
 			sourceTree = "<group>";
 		};
-		DBBFE14A41453664EF0F8F57 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */,
-				57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -192,11 +164,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D17C73C327D8291D006650AF /* Build configuration list for PBXNativeTarget "EmpowerPlant" */;
 			buildPhases = (
-				C23F49D22CAB6B4570AD18F4 /* [CP] Check Pods Manifest.lock */,
 				D17C73AB27D8291D006650AF /* Sources */,
 				D17C73AC27D8291D006650AF /* Frameworks */,
 				D17C73AD27D8291D006650AF /* Resources */,
-				64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */,
 				21715E6128A2D59700248175 /* [Sentry] Upload debug symbols */,
 			);
 			buildRules = (
@@ -206,8 +176,8 @@
 			name = EmpowerPlant;
 			packageProductDependencies = (
 				8487169C2AD8BB3400756467 /* SwiftMessages */,
-				8487169F2AD8BB4600756467 /* JGProgressHUD */,
 				848716A22AD8C3CD00756467 /* BigInt */,
+				848716B62ADFAA2000756467 /* Sentry */,
 			);
 			productName = EmpowerPlant;
 			productReference = 84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */;
@@ -242,8 +212,8 @@
 			mainGroup = D17C73A627D8291D006650AF;
 			packageReferences = (
 				8487169B2AD8BB3400756467 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
-				8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
 				848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */,
+				848716B52ADFAA2000756467 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			productRefGroup = D17C73A627D8291D006650AF;
 			projectDirPath = "";
@@ -297,45 +267,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "./upload-symbols.sh\n";
-		};
-		64CD5DF2D474DFE9B615DAE0 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EmpowerPlant/Pods-EmpowerPlant-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C23F49D22CAB6B4570AD18F4 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmpowerPlant-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -555,7 +486,6 @@
 		};
 		D17C73C427D8291D006650AF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CC58FA1A8A084A40FC763820 /* Pods-EmpowerPlant.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -576,7 +506,6 @@
 		};
 		D17C73C527D8291D006650AF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57BE79023D12DCDCB69BA73D /* Pods-EmpowerPlant.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -636,20 +565,20 @@
 				minimumVersion = 9.0.8;
 			};
 		};
-		8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.0;
-			};
-		};
 		848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/attaswift/BigInt";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.1.0;
+			};
+		};
+		848716B52ADFAA2000756467 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.13.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -660,15 +589,15 @@
 			package = 8487169B2AD8BB3400756467 /* XCRemoteSwiftPackageReference "SwiftMessages" */;
 			productName = SwiftMessages;
 		};
-		8487169F2AD8BB4600756467 /* JGProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8487169E2AD8BB4600756467 /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
-			productName = JGProgressHUD;
-		};
 		848716A22AD8C3CD00756467 /* BigInt */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */;
 			productName = BigInt;
+		};
+		848716B62ADFAA2000756467 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 848716B52ADFAA2000756467 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
 		};
 /* End XCSwiftPackageProductDependency section */
 

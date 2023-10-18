@@ -1,7 +1,6 @@
 /Pods
 .DS_Store
-/EmpowerPlant.xcodeproj/xcuserdata
-/EmpowerPlant.xcworkspace/xcuserdata
+*xcuserdata*
 .env
 build/
 release-build.log
