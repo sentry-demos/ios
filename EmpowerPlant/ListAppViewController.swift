@@ -312,12 +312,14 @@ class ListAppViewController: UIViewController {
     @IBAction func simulateDroppedFrame(_ sender: Any) {
         activityIndicator.startAnimating()
         activityIndicator.isHidden = false
+        let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
             let _ = self.factorialIterative(int: 15_000)
-            span.finish()
-            self.activityIndicator.stopAnimating()
-            self.activityIndicator.isHidden = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                span.finish()
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+            }
         }
     }
 }
