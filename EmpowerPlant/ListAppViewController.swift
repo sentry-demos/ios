@@ -6,7 +6,6 @@
 //
 
 import BigInt
-import JGProgressHUD
 import Sentry
 import UIKit
 
@@ -23,14 +22,8 @@ class ListAppViewController: UIViewController {
     //private let diskWriteException = DiskWriteException()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = "Actions"
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-             
+        activityIndicator.isHidden = true
     }
     
     @IBAction func addBreadcrumb(_ sender: Any) {
@@ -258,6 +251,7 @@ class ListAppViewController: UIViewController {
     }
     
     @IBOutlet weak var imageView: UIImageView!
+    @available(iOS 15.0, *)
     @IBAction func imageOnMain(_ sender: Any) {
         imageView.isHidden = false
         let span = SentrySDK.startTransaction(name: "test", operation: "image-on-main")
@@ -311,14 +305,19 @@ class ListAppViewController: UIViewController {
         }
         return result
     }
+    
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     @IBAction func simulateDroppedFrame(_ sender: Any) {
-//        let progress = JGProgressHUD()
-//        progress.show(in: view)
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
             let _ = self.factorialIterative(int: 15_000)
             span.finish()
-//            progress.dismiss()
-//        }
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
+        }
     }
 }

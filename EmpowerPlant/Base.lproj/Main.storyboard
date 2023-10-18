@@ -138,14 +138,22 @@
                                                             <action selector="crash:" destination="VXN-aD-u60" eventType="touchUpInside" id="vHp-s1-CDF"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1mi-y8-sLr">
-                                                        <rect key="frame" x="21.5" y="276" width="156" height="34.5"/>
-                                                        <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" title="GPU frame drops"/>
-                                                        <connections>
-                                                            <action selector="simulateDroppedFrame:" destination="VXN-aD-u60" eventType="touchUpInside" id="iAW-Jw-Jjs"/>
-                                                        </connections>
-                                                    </button>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="BBu-Wu-bJu">
+                                                        <rect key="frame" x="11.5" y="276" width="176" height="34.5"/>
+                                                        <subviews>
+                                                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="9aD-PV-KN2">
+                                                                <rect key="frame" x="0.0" y="7.5" width="20" height="20"/>
+                                                            </activityIndicatorView>
+                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1mi-y8-sLr">
+                                                                <rect key="frame" x="20" y="0.0" width="156" height="34.5"/>
+                                                                <state key="normal" title="Button"/>
+                                                                <buttonConfiguration key="configuration" style="plain" title="GPU frame drops"/>
+                                                                <connections>
+                                                                    <action selector="simulateDroppedFrame:" destination="VXN-aD-u60" eventType="touchUpInside" id="iAW-Jw-Jjs"/>
+                                                                </connections>
+                                                            </button>
+                                                        </subviews>
+                                                    </stackView>
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
@@ -263,6 +271,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="activityIndicator" destination="9aD-PV-KN2" id="mWb-0J-5Lb"/>
                         <outlet property="imageView" destination="I0Z-7H-qXj" id="rOX-B5-9Ch"/>
                         <outlet property="progressIndicator" destination="b5N-Es-1yE" id="2AX-n4-293"/>
                     </connections>
