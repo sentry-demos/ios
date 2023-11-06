@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
 
 if which sentry-cli >/dev/null; then
