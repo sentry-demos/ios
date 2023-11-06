@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -x
-
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
 
 if which sentry-cli >/dev/null; then
@@ -35,7 +33,7 @@ if which sentry-cli >/dev/null; then
         exit 1
     fi
 
-#    sentry-cli upload-dif --force-foreground --include-sources -o $SENTRY_ORG -p $SENTRY_PROJECT --auth-token $SENTRY_AUTH_TOKEN "$DWARF_DSYM_FOLDER_PATH"
+    sentry-cli upload-dif --force-foreground --include-sources -o $SENTRY_ORG -p $SENTRY_PROJECT --auth-token $SENTRY_AUTH_TOKEN "$DWARF_DSYM_FOLDER_PATH"
 else
     echo "error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
     exit 1
