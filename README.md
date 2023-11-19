@@ -9,7 +9,7 @@ An iOS app integrating Sentry to demo its various product features. See [Empower
     - `sentry-cli login` (see [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more info) and use an **org-level** auth token from the `demo` org
 
 ## Run
-Open Xcode and click the "Play" button or press ⌘R 
+Open EmpowerPlant.xcodeproj in Xcode and click the "Play" button or press ⌘R 
 
 ## Creating release and uploading app
 

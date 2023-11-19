@@ -5,8 +5,9 @@
 //  Created by William Capozzoli on 3/8/22.
 //
 
-import UIKit
+import BigInt
 import Sentry
+import UIKit
 
 class ListAppViewController: UIViewController {
 
@@ -21,14 +22,8 @@ class ListAppViewController: UIViewController {
     //private let diskWriteException = DiskWriteException()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = "Actions"
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-             
+        activityIndicator.isHidden = true
     }
     
     @IBAction func addBreadcrumb(_ sender: Any) {
@@ -256,6 +251,7 @@ class ListAppViewController: UIViewController {
     }
     
     @IBOutlet weak var imageView: UIImageView!
+    @available(iOS 15.0, *)
     @IBAction func imageOnMain(_ sender: Any) {
         imageView.isHidden = false
         let span = SentrySDK.startTransaction(name: "test", operation: "image-on-main")
@@ -292,5 +288,38 @@ class ListAppViewController: UIViewController {
         let span = SentrySDK.startTransaction(name: "test", operation: "regex-on-main")
         regex.matches(in: string, range: NSMakeRange(0, string.count))
         span.finish()
+    }
+    
+    // !!!: profiling doesn't correctly collect backtraces with this (armcknight 12 Oct 2023)
+    func factorialRecursive(int x: BigInt) -> BigInt {
+        if x == 0 { return 1 }
+        return x * factorialRecursive(int: x - 1)
+    }
+    
+    func factorialIterative(int x: BigInt) -> BigInt {
+        var i: BigInt = x
+        var result: BigInt = 1
+        while i > 0 {
+            result *= i
+            i -= 1
+        }
+        return result
+    }
+    
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    @IBAction func simulateDroppedFrame(_ sender: Any) {
+        activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            let _ = self.factorialIterative(int: 15_000)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                span.finish()
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+            }
+        }
     }
 }
