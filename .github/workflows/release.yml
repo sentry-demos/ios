@@ -17,18 +17,6 @@ jobs:
         with:
           version: 2.21.2
           token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-      - name: Cache CocoaPods installation
-        id: cache_cocoapods
-        uses: actions/cache@v3
-        with:
-          path: ./Pods
-          key: cocoapods-install-${{ hashFiles('./Podfile.lock') }}
-      - run: bundle exec pod install
-        if: steps.cache_cocoapods.outputs.cache-hit != 'true'
-        shell: sh
       - name: Run Deploy Script
         run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
         shell: sh
