@@ -50,7 +50,9 @@ class EmpowerPlantViewController: UIViewController {
         getAllProductsFromServer()
         getAllProductsFromDb()
         readCurrentDirectory()
+        performLongFileOperation()
         processProducts()
+
         
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             self.getAllProductsFromDb()
@@ -62,6 +64,14 @@ class EmpowerPlantViewController: UIViewController {
         SentrySDK.reportFullyDisplayed()
     }
     
+    func performLongFileOperation() {
+        let longString = String(repeating: UUID().uuidString, count: 5_000_000)
+        let data = longString.data(using: .utf8)!
+        let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
+        try! data.write(to: filePath)
+        try! FileManager.default.removeItem(at: filePath)
+    }
+
     func processProducts() {
         let span = SentrySDK.span?.startChild(operation: "product_processing")
         _ = getIterator(42);
@@ -78,6 +88,7 @@ class EmpowerPlantViewController: UIViewController {
        }
        return getIterator(n - 1) + getIterator(n - 2);
    }
+
     
     func readCurrentDirectory() {
         let path = FileManager.default.currentDirectoryPath
