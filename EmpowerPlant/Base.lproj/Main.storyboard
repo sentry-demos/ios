@@ -69,7 +69,7 @@
                                         <rect key="frame" x="20" y="0.0" width="374" height="0.0"/>
                                     </progressView>
                                     <stackView opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CCo-Yo-I2U">
-                                        <rect key="frame" x="8" y="0.0" width="398" height="379.5"/>
+                                        <rect key="frame" x="8" y="0.0" width="398" height="345"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="99H-zP-cDK">
                                                 <rect key="frame" x="0.0" y="0.0" width="199" height="310.5"/>
@@ -157,7 +157,7 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="KlN-al-BhV">
-                                                <rect key="frame" x="199" y="0.0" width="199" height="379.5"/>
+                                                <rect key="frame" x="199" y="0.0" width="199" height="345"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="esb-g7-ouy">
                                                         <rect key="frame" x="34" y="0.0" width="131.5" height="34.5"/>
@@ -237,14 +237,6 @@
                                                         <buttonConfiguration key="configuration" style="plain" title="Decode JSON on main"/>
                                                         <connections>
                                                             <action selector="jsonMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="iM7-uu-pjl"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nuh-js-Myu">
-                                                        <rect key="frame" x="29.5" y="345" width="140.5" height="34.5"/>
-                                                        <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" title="File I/O on main"/>
-                                                        <connections>
-                                                            <action selector="fileIoOnMainThread:" destination="VXN-aD-u60" eventType="touchUpInside" id="WuA-Fh-H1D"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
