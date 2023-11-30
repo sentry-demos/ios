@@ -290,6 +290,24 @@ class ListAppViewController: UIViewController {
         span.finish()
     }
     
+    @IBAction func fileIoOnMainThread(_ sender: Any) {
+        progressIndicator.isHidden = false
+        DispatchQueue.global(qos: .utility).async {
+            let longString = String(repeating: UUID().uuidString, count: 5_000_000)
+            let data = longString.data(using: .utf8)!
+            let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
+            DispatchQueue.main.async {
+                let transaction = SentrySDK.startTransaction(name: "test", operation: "fileio-on-main", bindToScope: true)
+                try! data.write(to: filePath)
+                transaction.finish()
+                self.progressIndicator.isHidden = true
+                DispatchQueue.global(qos: .utility).async {
+                    try! FileManager.default.removeItem(at: filePath)
+                }
+            }
+        }
+    }
+    
     // !!!: profiling doesn't correctly collect backtraces with this (armcknight 12 Oct 2023)
     func factorialRecursive(int x: BigInt) -> BigInt {
         if x == 0 { return 1 }
