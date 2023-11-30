@@ -50,6 +50,7 @@ class EmpowerPlantViewController: UIViewController {
         getAllProductsFromServer()
         getAllProductsFromDb()
         readCurrentDirectory()
+        processProducts()
         
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             self.getAllProductsFromDb()
@@ -60,6 +61,23 @@ class EmpowerPlantViewController: UIViewController {
         super.viewDidAppear(animated)
         SentrySDK.reportFullyDisplayed()
     }
+    
+    func processProducts() {
+        let span = SentrySDK.span?.startChild(operation: "product_processing")
+        _ = getIterator(42);
+        sleep(50 / 1000)
+        span?.finish()
+    }
+
+    func getIterator(_ n: Int) -> Int {
+       if (n <= 0) {
+           return 0;
+       }
+       if (n == 1 || n == 2) {
+           return 1;
+       }
+       return getIterator(n - 1) + getIterator(n - 2);
+   }
     
     func readCurrentDirectory() {
         let path = FileManager.default.currentDirectoryPath
