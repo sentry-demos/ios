@@ -105,6 +105,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             // print("> URLSession response", response)
+            // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
