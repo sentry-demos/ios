@@ -94,7 +94,7 @@ class ListAppViewController: UIViewController {
     }
     
     @IBAction func captureFatalError(_ sender: Any) {
-        fatalError("This is a fatal error. Oh no 😬.")
+        fatalError("You've encountered a fatal error. Bummer. 😬")
     }
     
     @IBAction func captureTransaction(_ sender: Any) {
