@@ -110,8 +110,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
                     let err = PurchaseError.insufficientInventory
-                    //Empowerplant Flagship Error
-                    SentrySDK.capture(error: err)
+                    SentrySDK.capture(error: err) //Empowerplant Flagship Error
                 }
             }
 
