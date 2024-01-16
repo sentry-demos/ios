@@ -52,7 +52,8 @@ class EmpowerPlantViewController: UIViewController {
         readCurrentDirectory()
         performLongFileOperation()
         processProducts()
-
+        checkRelease()
+        
         
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             self.getAllProductsFromDb()
