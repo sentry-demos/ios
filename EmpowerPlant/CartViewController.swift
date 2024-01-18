@@ -54,7 +54,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ])
 
         configureNavigationItems()
-        checkRelease()
 
         // TODO: make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
