@@ -15,8 +15,8 @@ jobs:
 
     - name: Set up Xcode
       uses: actions/setup-xcode@v2
-      with:
-        xcode-version: '14.3.1 '  # Adjust the Xcode version as needed
+      # with:
+      #   xcode-version: '14.3.1 '  # Adjust the Xcode version as needed
 
     - name: Install Bundler
       run: gem install bundler
