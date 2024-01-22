@@ -29,7 +29,7 @@ jobs:
         xcodebuild \
           -project EmpowerPlant.xcodeproj \
           -scheme EmpowerPlant \
-          -destination 'platform=iOS Simulator,OS=14.0,name=iPhone 11' \
+          -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 11' \
           test
 
     - name: Generate code coverage report
