@@ -1,0 +1,41 @@
+name: iOS Tests with Coverage
+
+on:
+  push:
+    branches:
+      - integrate_codecov
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Xcode
+      uses: actions/setup-xcode@v2
+      with:
+        xcode-version: '14.3.1 '  # Adjust the Xcode version as needed
+
+    - name: Install Bundler
+      run: gem install bundler
+
+    - name: Install dependencies
+      run: bundle install
+
+    - name: Build and run tests
+      run: |
+        xcodebuild \
+          -project EmpowerPlant.xcodeproj \
+          -scheme EmpowerPlant \
+          -destination 'platform=iOS Simulator,OS=14.0,name=iPhone 11' \
+          test
+
+    - name: Generate code coverage report
+      run: |
+        bundle exec slather coverage \
+          --scheme YourScheme \
+          --input-format profdata \
+          --build-directory "build" \
+          --output-directory "coverage"
