@@ -26,11 +26,11 @@ jobs:
 
     - name: Build and run tests
       run: |
-        xcodebuild \
+        xcodebuild test \
           -project EmpowerPlant.xcodeproj \
           -scheme EmpowerPlant \
           -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 11' \
-          test
+          build test
 
     - name: Generate code coverage report
       run: |
