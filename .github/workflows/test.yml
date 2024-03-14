@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - integrate_codecov
+  workflow_dispatch:
 
 jobs:
   build:
