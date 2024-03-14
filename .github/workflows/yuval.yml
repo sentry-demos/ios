@@ -19,6 +19,11 @@ jobs:
     - name: Install dependencies
       run: bundle install
 
+    - name: Install CocoaPods
+      run: |
+        gem install cocoapods
+        pod install
+
     - name: Build and Test
       run: |
         swift build
