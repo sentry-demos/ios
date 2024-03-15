@@ -1,34 +1,9 @@
-name: iOS Tests with Coverage
-
-on:
-  push:
-    branches:
-      - integrate_codecov
-
+name: upload-codecov-report
+run-name: upload-codecov-report
+on: [push]
 jobs:
-  build:
-    runs-on: macos-latest
-
+  main:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Install Bundler
-      run: gem install bundler
-
-    - name: Install dependencies
-      run: bundle install
-
-    - name: Install CocoaPods
-      run: |
-        gem install cocoapods
-        pod install
-
-    - name: Build and Test
-      run: |
-        swift build
-        swift test --enable-code-coverage
-
-    # - name: Generate Coverage Report
-    #   run: |
-    #     xcrun xccov view --report <derived-data-path>/Logs/Test/*.xccovreport > coverage.txt
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
