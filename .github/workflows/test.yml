@@ -1,4 +1,4 @@
-name: iOS Tests with Coverage
+name: test
 
 on:
   push:
