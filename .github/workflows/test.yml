@@ -25,6 +25,6 @@ jobs:
         swift build
         swift test
 
-    # - name: Generate Coverage Report
-    #   run: |
-    #     xcrun xccov view --report <derived-data-path>/Logs/Test/*.xccovreport > coverage.txt
+    - name: Generate Coverage Report
+      run: |
+        xcrun xccov view --report <derived-data-path>/Logs/Test/*.xccovreport > coverage.txt
