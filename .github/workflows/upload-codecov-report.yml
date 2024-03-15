@@ -1,5 +1,4 @@
-name: upload-codecov-report
-run-name: upload-codecov-report
+name: upload-codecov-report.yml
 on: [push]
 jobs:
   main:
