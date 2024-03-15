@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - integrate_codecov
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,16 +20,11 @@ jobs:
     - name: Install dependencies
       run: bundle install
 
-    - name: Install CocoaPods
-      run: |
-        gem install cocoapods
-        pod install
-
     - name: Build and Test
       run: |
         swift build
-        swift test --enable-code-coverage
+        swift test
 
-    # - name: Generate Coverage Report
-    #   run: |
-    #     xcrun xccov view --report <derived-data-path>/Logs/Test/*.xccovreport > coverage.txt
+    - name: Generate Coverage Report
+      run: |
+        xcrun xccov view --report <derived-data-path>/Logs/Test/*.xccovreport > coverage.txt
