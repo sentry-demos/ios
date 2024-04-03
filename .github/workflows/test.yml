@@ -1,10 +1,7 @@
 name: test.yml
 
 on:
-  push:
-    branches:
-      - integrate_codecov
-  workflow_dispatch:
+  pull_request:
 
 jobs:
   build:
