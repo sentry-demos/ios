@@ -39,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		840B7EF12BBF3C70008B8120 /* .slather.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .slather.yml; sourceTree = "<group>"; };
 		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
@@ -103,6 +104,7 @@
 				8474F0482ACCE2D800F21E06 /* deploy_project.sh */,
 				84A2641E2AA926A300A62A88 /* .env */,
 				846BEA1A2ABE46880032F77F /* upload-symbols.sh */,
+				840B7EF12BBF3C70008B8120 /* .slather.yml */,
 				84A264192AA915B100A62A88 /* Brewfile */,
 				84A264182AA9155800A62A88 /* Makefile */,
 				84A2641B2AA915D800A62A88 /* README.md */,
