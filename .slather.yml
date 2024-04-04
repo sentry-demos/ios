@@ -4,4 +4,4 @@ workspace: EmpowerPlant.xcworkspace
 scheme: EmpowerPlant
 source_directory: EmpowerPlant
 output_directory: slather
-
+build_directory: build
