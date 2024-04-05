@@ -46,6 +46,7 @@
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
+		848A45262BBFC79E006AAAEC /* .codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .codecov.yml; sourceTree = "<group>"; };
 		84A264182AA9155800A62A88 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		84A264192AA915B100A62A88 /* Brewfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brewfile; sourceTree = "<group>"; };
 		84A2641B2AA915D800A62A88 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -107,6 +108,7 @@
 				840B7EF12BBF3C70008B8120 /* .slather.yml */,
 				84A264192AA915B100A62A88 /* Brewfile */,
 				84A264182AA9155800A62A88 /* Makefile */,
+				848A45262BBFC79E006AAAEC /* .codecov.yml */,
 				84A2641B2AA915D800A62A88 /* README.md */,
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
 				8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */,
