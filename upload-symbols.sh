@@ -2,11 +2,6 @@
 
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
 
-if [ $CONFIGURATION != 'Release' ]; then
-    echo "Will not upload debug symbols for non-release build."
-    exit 0
-fi
-
 if which sentry-cli >/dev/null; then
 
     # get SENTRY_ORG and SENTRY_PROJECT values
