@@ -20,5 +20,5 @@ init:
 
 .PHONY: test
 test:
-	xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Debug -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 15" -quiet build-for-testing
-	xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Debug -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 15" -quiet test-without-building | slather coverage --verbose && exit ${PIPESTATUS[0]}
+	xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Debug -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 15" -quiet test
+	slather coverage --verbose
