@@ -1,0 +1,6 @@
+coverage_service: cobertura_xml
+xcodeproj: EmpowerPlant.xcodeproj
+scheme: EmpowerPlant
+source_directory: EmpowerPlant
+output_directory: slather
+build_directory: build

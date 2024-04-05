@@ -15,7 +15,7 @@ SENTRY_AUTH_TOKEN_INPUT=${4}
 
 # Build the release bundle
 echo "Building the release bundle..."
-SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=$SENTRY_PROJECT_INPUT SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN_INPUT xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Release -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 14" -quiet clean build
+SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=$SENTRY_PROJECT_INPUT SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN_INPUT xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Release -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 15" -quiet clean build
 zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
 ZIP_PATH="./EmpowerPlant_release.zip"
 
