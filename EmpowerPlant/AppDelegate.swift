@@ -33,12 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             options.tracesSampleRate = 1.0
             options.profilesSampleRate = 1.0
-            options.attachScreenshot = true
+            options.enableAppLaunchProfiling = true
             options.attachViewHierarchy = true
-            options.enableTimeToFullDisplayTracing = true
-            
             options.enableSwizzling = enableSwizzling
-            
+            options.enablePerformanceV2 = true
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
