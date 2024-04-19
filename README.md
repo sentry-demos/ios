@@ -24,3 +24,7 @@ This runs the workflow defined in [release.yml](.github/workflows/release.yml). 
 See https://github.com/sentry-demos/ios/releases/tag/0.0.1 for a sample release
 
 Note: TDA must be restarted for it to pick up new version
+
+## TDA
+
+The command that runs this in TDA can be found here: https://github.com/sentry-demos/empower/blob/a77428aec6cb8e6563caf3d9671419461946db2e/tda/conftest.py#L480-L514
