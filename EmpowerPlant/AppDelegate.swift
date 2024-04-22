@@ -34,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.tracesSampleRate = 1.0
             options.profilesSampleRate = 1.0
             options.enableAppLaunchProfiling = true
+            options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
             options.enablePerformanceV2 = true
