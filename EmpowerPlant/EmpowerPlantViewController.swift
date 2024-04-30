@@ -303,7 +303,9 @@ class EmpowerPlantViewController: UIViewController {
     
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
-        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join")!
+        let startTime = Date()
+        let urlStr = "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join"
+        let url = URL(string: urlStr)!
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
@@ -319,6 +321,15 @@ class EmpowerPlantViewController: UIViewController {
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            let endTime = Date()
+            let duration = endTime.timeIntervalSince(startTime)
+            SentrySDK.metrics.distribution(
+                key: "products_request.duration",
+                value: duration,
+                unit: MeasurementUnitDuration.millisecond,
+                tags: ["endpoint": urlStr]
+            )
+            
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
                     if (self.products.count == 0) {
@@ -359,6 +370,7 @@ class EmpowerPlantViewController: UIViewController {
     
     @objc
     func goToCart() {
+        SentrySDK.metrics.increment(key: "checkout.click")
         self.performSegue(withIdentifier: "goToCart", sender: self)
     }
     

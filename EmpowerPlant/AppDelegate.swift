@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
         
         SentrySDK.start { options in
-            options.dsn = "https://c88045e430864a8e864af6233e7c18ea@o87286.ingest.sentry.io/6249899"
+            options.dsn = "https://48f441ffcd372c5ce788c7a0bf945509@o4504533099937792.ingest.us.sentry.io/4507058089361408"
             
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
@@ -38,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
             options.enablePerformanceV2 = true
+            options.enableMetrics = true
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
