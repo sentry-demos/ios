@@ -113,6 +113,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     SentrySDK.metrics.increment(key: "checkout.error")
                     let err = PurchaseError.insufficientInventory
                     SentrySDK.capture(error: err) //Empowerplant Flagship Error
+                } else {
+                    SentrySDK.metrics.increment(key: "checkout.success")
                 }
             }
 
