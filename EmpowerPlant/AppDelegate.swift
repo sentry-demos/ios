@@ -38,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
             options.enablePerformanceV2 = true
+            options.enableMetrics = true
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
