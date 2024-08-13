@@ -138,7 +138,7 @@ class EmpowerPlantViewController: UIViewController {
             n2 = nR + n2
         }
         
-        if (n1 < 4000) {
+        if (n1 < 500) {
             return fibonacciSeries(num: n1)
         }
         return n1
