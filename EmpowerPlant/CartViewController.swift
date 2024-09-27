@@ -92,6 +92,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     // ["id":"5", "title":"Plant Stroller"]
                 ]
             ],
+            "validate_inventory": "true"
         ]
 
         let bodyData = try? JSONSerialization.data(
