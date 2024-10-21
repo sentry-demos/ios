@@ -8,7 +8,7 @@ An iOS app integrating Sentry to demo its various product features. See [Empower
 - In a terminal, run: 
     - `make init`
     - `sentry-cli login` (see [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more info) and use an **org-level** auth token from the `demo` org [or whatever org you applied to the `.env` file in the next step]
-- Open EmpowerPlant.xcodeproj. Open the `.env` file and provide valid values for `SENTRY_ORG` and `SENTRY_PROJECT`. The org should mat
+- Open EmpowerPlant.xcodeproj. Open the `.env` file and provide valid values for `SENTRY_ORG` and `SENTRY_PROJECT`.
 
 #### (Do this if you want to send events to a different org/project than the default)
 - Update the default DSN, located in `AppDelegate.swift`, to your new DSN
