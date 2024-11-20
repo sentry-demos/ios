@@ -82,18 +82,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
 
-        let json: [String: Any] = [
-            "form": ["email":"will@chat.io"], // TODO: email update + check if all tx's+errors have email
-            "cart": [
-                "total": 100,
-                "quantities": ["4": 3],
-                "items": [
-                    ["id":"4", "title":"Plant Nodes"]
-                    // ["id":"5", "title":"Plant Stroller"]
-                ]
-            ],
-        ]
-
         let bodyData = try? JSONSerialization.data(
             withJSONObject: setJson(),
             options: []
@@ -155,6 +143,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     // ["id":"5", "title":"Plant Stroller"]
                 ]
             ],
+            "validate_inventory": "true"
         ]
 
         return json
