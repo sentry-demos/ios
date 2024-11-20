@@ -38,7 +38,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
             options.enablePerformanceV2 = true
-            options.enableMetrics = true
+            // options.enableMetrics = true
+            
+            // Enable Mobile Session Replay
+            options.experimental.sessionReplay.onErrorSampleRate = 1.0
+            options.experimental.sessionReplay.sessionSampleRate = 1.0
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")

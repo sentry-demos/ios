@@ -323,12 +323,12 @@ class EmpowerPlantViewController: UIViewController {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             let endTime = Date()
             let duration = endTime.timeIntervalSince(startTime)
-            SentrySDK.metrics.distribution(
+            /*SentrySDK.metrics.distribution(
                 key: "products_request.duration",
                 value: duration,
                 unit: MeasurementUnitDuration.millisecond,
                 tags: ["endpoint": urlStr]
-            )
+            )*/
             
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
@@ -370,7 +370,7 @@ class EmpowerPlantViewController: UIViewController {
     
     @objc
     func goToCart() {
-        SentrySDK.metrics.increment(key: "checkout.click")
+        //SentrySDK.metrics.increment(key: "checkout.click")
         self.performSegue(withIdentifier: "goToCart", sender: self)
     }
     
