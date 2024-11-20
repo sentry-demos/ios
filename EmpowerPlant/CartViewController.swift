@@ -98,11 +98,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
-                    SentrySDK.metrics.increment(key: "checkout.error")
+                    //SentrySDK.metrics.increment(key: "checkout.error")
                     let err = PurchaseError.insufficientInventory
                     SentrySDK.capture(error: err) //Empowerplant Flagship Error
                 } else {
-                    SentrySDK.metrics.increment(key: "checkout.success")
+                    //SentrySDK.metrics.increment(key: "checkout.success")
                 }
             }
 
