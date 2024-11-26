@@ -91,55 +91,48 @@ class EmpowerPlantViewController: UIViewController {
    }
 
     
+    
     func readCurrentDirectory() {
         let path = FileManager.default.currentDirectoryPath
+        let maxDepth = 5 // Prevent too deep recursion
+        
         do {
-            let items = try FileManager.default.contentsOfDirectory(atPath: path)
-            let loop = fibonacciSeries(num: items.count)
-            for i in 1...loop {
-                readDirectory(path: path)
-            }
+            // Single pass through directory structure
+            try readDirectory(path: path, currentDepth: 0, maxDepth: maxDepth)
         } catch {
-            // TODO: error
+            SentrySDK.capture(error: error)
         }
     }
     
-    func readDirectory(path: String) {
-        let fm = FileManager.default
+    func readDirectory(path: String, currentDepth: Int, maxDepth: Int) throws {
+        // Guard against excessive recursion
+        guard currentDepth < maxDepth else {
+            return
+        }
         
-        do {
-            let items = try fm.contentsOfDirectory(atPath: path)
+        let fm = FileManager.default
+        let span = SentrySDK.span?.startChild(operation: "file.read_directory")
+        span?.setData(value: path, key: "path")
+        defer { span?.finish() }
+        
+        let items = try fm.contentsOfDirectory(atPath: path)
+        
+        for item in items {
+            let fullPath = (path as NSString).appendingPathComponent(item)
+            var isDirectory: ObjCBool = false
             
-            for item in items {
-                var isDirectory: ObjCBool = false
-                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    readDirectory(path: item)
-                } else {
-                    return
+            if fm.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
+                if isDirectory.boolValue {
+                    // Only recurse into directories
+                    try readDirectory(
+                        path: fullPath,
+                        currentDepth: currentDepth + 1,
+                        maxDepth: maxDepth
+                    )
                 }
             }
-        } catch {
-            // TODO: error
         }
-        
     }
-    
-    func fibonacciSeries(num: Int) -> Int{
-        // The value of 0th and 1st number of the fibonacci series are 0 and 1
-        var n1 = 0
-        var n2 = 1
-        
-        // To store the result
-        var nR = 0
-        // Adding two previous numbers to find ith number of the series
-        for _ in 0..<num{
-            nR = n1
-            n1 = n2
-            n2 = nR + n2
-        }
-        
-        if (n1 < 500) {
-            return fibonacciSeries(num: n1)
         }
         return n1
     }
