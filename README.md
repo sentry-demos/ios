@@ -4,7 +4,7 @@ An iOS app integrating Sentry to demo its various product features. See [Empower
 
 ## Setup
 
-- Install XCode
+- Install Xcode
 - In a terminal, run: 
     - `make init`
     - `sentry-cli login` (see [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more info) and use an **org-level** auth token from the `demo` org [or whatever org you applied to the `.env` file in the next step]
