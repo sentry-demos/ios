@@ -38,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
             options.enablePerformanceV2 = true
+            options.enableAutoPerformanceTracing = true
             
             // Enable Mobile Session Replay
             options.experimental.sessionReplay.onErrorSampleRate = 1.0
