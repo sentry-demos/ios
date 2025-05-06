@@ -127,7 +127,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         // TODO: items
 
         let json: [String: Any] = [
-            "form": ["email":"will@chat.io"], // TODO: email update + check if all tx's+errors have email
+            "form": ["email":"will@example.com"], // TODO: email update + check if all tx's+errors have email
             "cart": [
                 "total": ShoppingCart.instance.total,
                 "quantities": [
