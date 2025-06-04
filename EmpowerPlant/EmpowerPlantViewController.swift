@@ -66,18 +66,22 @@ class EmpowerPlantViewController: UIViewController {
     }
     
     func performLongFileOperation() {
-        let longString = String(repeating: UUID().uuidString, count: 5_000_000)
-        let data = longString.data(using: .utf8)!
-        let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
-        try! data.write(to: filePath)
-        try! FileManager.default.removeItem(at: filePath)
+        DispatchQueue.global(qos: .background).async {
+            let longString = String(repeating: UUID().uuidString, count: 5_000_000)
+            let data = longString.data(using: .utf8)!
+            let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
+            try! data.write(to: filePath)
+            try! FileManager.default.removeItem(at: filePath)
+        }
     }
 
     func processProducts() {
-        let span = SentrySDK.span?.startChild(operation: "product_processing")
-        _ = getIterator(42);
-        sleep(50 / 1000)
-        span?.finish()
+        DispatchQueue.global(qos: .background).async {
+            let span = SentrySDK.span?.startChild(operation: "product_processing")
+            _ = self.getIterator(42)
+            Thread.sleep(forTimeInterval: 50.0 / 1000.0)
+            span?.finish()
+        }
     }
 
     func getIterator(_ n: Int) -> Int {
@@ -92,15 +96,17 @@ class EmpowerPlantViewController: UIViewController {
 
     
     func readCurrentDirectory() {
-        let path = FileManager.default.currentDirectoryPath
-        do {
-            let items = try FileManager.default.contentsOfDirectory(atPath: path)
-            let loop = fibonacciSeries(num: items.count)
-            for i in 1...loop {
-                readDirectory(path: path)
+        DispatchQueue.global(qos: .background).async {
+            let path = FileManager.default.currentDirectoryPath
+            do {
+                let items = try FileManager.default.contentsOfDirectory(atPath: path)
+                let loop = self.fibonacciSeries(num: items.count)
+                for i in 1...loop {
+                    self.readDirectory(path: path)
+                }
+            } catch {
+                // TODO: error
             }
-        } catch {
-            // TODO: error
         }
     }
     
