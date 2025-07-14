@@ -88,18 +88,26 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         )
         request.httpBody = bodyData
 
-        enum PurchaseError: Error {
+        enum PurchaseError: Error, LocalizedError {
             case insufficientInventory
+            
+            var errorDescription: String? {
+                switch self {
+                case .insufficientInventory:
+                    return "Insufficient inventory available"
+                }
+            }
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // print("> URLSession response", response)
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
-                    print("> 500 response")
                     let err = PurchaseError.insufficientInventory
-                    SentrySDK.capture(error: err) //This will throw the Empowerplant Flagship Error
+                        ErrorToastManager.shared.logErrorAndShowToast(
+                            error: err,
+                            message: "Purchase failed: Insufficient inventory available (HTTP 500)"
+                        )
                 } else {
                 }
             }

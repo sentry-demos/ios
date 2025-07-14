@@ -6,10 +6,21 @@
 //
 import Foundation
 
-enum SampleError: Error {
+enum SampleError: Error, LocalizedError {
     case bestDeveloper
     case happyCustomer
     case awesomeCentaur
+    
+    var errorDescription: String? {
+        switch self {
+        case .bestDeveloper:
+            return "Best Developer error occurred"
+        case .happyCustomer:
+            return "Happy Customer error occurred"
+        case .awesomeCentaur:
+            return "Awesome Centaur error occurred"
+        }
+    }
 }
 
 class RandomErrorGenerator {
