@@ -9,7 +9,7 @@ on:
 jobs:
   empower-plant-release:
     name: Release Build of EmpowerPlant
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Setup Sentry CLI
