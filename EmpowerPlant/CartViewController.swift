@@ -34,8 +34,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     required init?(coder: NSCoder) {
-        //fatalError("init(coder:) has not been implemented")
-        super.init(nibName: nil, bundle: nil)
+        super.init(coder: coder)
     }
     
     override func viewDidLoad() {
