@@ -127,3 +127,19 @@ class CoreDataController {
         }
     }
 }
+
+public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
+
+public func wipeDB() {
+    guard let url = CoreDataController.shared.persistentContainer.persistentStoreCoordinator.persistentStores.first?.url else {
+        // TODO: error
+        return
+    }
+
+    do {
+        try FileManager.default.removeItem(at: url)
+    } catch {
+        // TODO: error
+        return
+    }
+}

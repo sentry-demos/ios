@@ -7,7 +7,6 @@
 
 import UIKit
 import Sentry
-import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

@@ -10,8 +10,6 @@ import Sentry
 import UIKit
 
 class ListAppViewController: UIViewController {
-
-    
     @IBOutlet weak var dsnTextField: UITextField!
     @IBOutlet weak var anrFullyBlockingButton: UIButton!
     @IBOutlet weak var anrFillingRunLoopButton: UIButton!

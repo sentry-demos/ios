@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 class ShoppingCart {
     
     //creates the instance and guarantees that it's unique
