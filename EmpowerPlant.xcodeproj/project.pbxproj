@@ -10,6 +10,7 @@
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
+		846D3F642E297C3E00D4E7E3 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F632E297C3E00D4E7E3 /* CoreDataController.swift */; };
 		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
 		848716B72ADFAA2000756467 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 848716B62ADFAA2000756467 /* Sentry */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
@@ -44,6 +45,7 @@
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
+		846D3F632E297C3E00D4E7E3 /* CoreDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		848A45262BBFC79E006AAAEC /* .codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .codecov.yml; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				843BD60E2AD08CE900B0098F /* Utils.swift */,
 				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
 				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
+				846D3F632E297C3E00D4E7E3 /* CoreDataController.swift */,
 				846BEA1B2ABE611A0032F77F /* mobydick.txt */,
 				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
 				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
@@ -285,6 +288,7 @@
 			files = (
 				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
 				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
+				846D3F642E297C3E00D4E7E3 /* CoreDataController.swift in Sources */,
 				D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */,
 				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
