@@ -9,14 +9,14 @@ init:
 	# ensure there's a .env file present
 	stat .env 2>/dev/null || echo "SENTRY_ORG=<your org slug>\nSENTRY_PROJECT=<your project slug>" > .env
 
-	# fixes CoreSimulator out of date error 
+	# perform first launch operations if needed. fixes CoreSimulator out of date error 
 	# (happens on fresh xcode installation or MAS-managed major version update)
 	# requires password when run without sudo
-	xcodebuild -runFirstLaunch
+	xcodebuild -checkFirstLaunchStatus || xcodebuild -runFirstLaunch
 
-	# download iOS platform image
+	# download iOS platform image if needed
 	# (happens on fresh xcode installation or MAS-managed major version update)
-	xcodebuild -downloadPlatform iOS
+	xcodebuild -showsdks | grep -q "iOS.*-sdk iphoneos" || xcodebuild -downloadPlatform iOS
 
 .PHONY: test
 test:
