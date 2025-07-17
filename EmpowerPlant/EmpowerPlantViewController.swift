@@ -144,18 +144,6 @@ class EmpowerPlantViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    // TODO: merge this and and wipeDB
-    @objc
-    func clearDb() {
-        print("> clearDb")
-        // self.products was already set by viewDidLoad()
-        // self.products = try context.fetch(Product.fetchRequest())
-        for product in self.products {
-            CoreDataController.shared.deleteProduct(product: product)
-        }
-        refreshTable()
-    }
-    
     private func configureNavigationItems() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "cart"),
@@ -180,7 +168,7 @@ class EmpowerPlantViewController: UIViewController {
         }))
         actionSheet.addAction(UIAlertAction(title: "Clear DB", style: .default, handler: { _ in
             wipeDB()
-            NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
+            self.getAllProductsFromDb()
         }))
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .destructive))
         present(actionSheet, animated: true)
