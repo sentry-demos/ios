@@ -10,6 +10,11 @@
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
+		846D3F662E2988EC00D4E7E3 /* InAppDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F652E2988EC00D4E7E3 /* InAppDebugMenu.swift */; };
+		846D3F682E29893100D4E7E3 /* DSNDisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F672E29893100D4E7E3 /* DSNDisplayViewController.swift */; };
+		846D3F6A2E29895C00D4E7E3 /* Toasts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F692E29895C00D4E7E3 /* Toasts.swift */; };
+		846D3F6C2E29A43F00D4E7E3 /* DSNStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F6B2E29A43F00D4E7E3 /* DSNStorage.swift */; };
+		846D3F712E29AB8700D4E7E3 /* SentrySDKWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846D3F702E29AB8300D4E7E3 /* SentrySDKWrapper.swift */; };
 		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
 		848716B72ADFAA2000756467 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 848716B62ADFAA2000756467 /* Sentry */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
@@ -44,6 +49,11 @@
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
 		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
+		846D3F652E2988EC00D4E7E3 /* InAppDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppDebugMenu.swift; sourceTree = "<group>"; };
+		846D3F672E29893100D4E7E3 /* DSNDisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSNDisplayViewController.swift; sourceTree = "<group>"; };
+		846D3F692E29895C00D4E7E3 /* Toasts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toasts.swift; sourceTree = "<group>"; };
+		846D3F6B2E29A43F00D4E7E3 /* DSNStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSNStorage.swift; sourceTree = "<group>"; };
+		846D3F702E29AB8300D4E7E3 /* SentrySDKWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentrySDKWrapper.swift; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		848A45262BBFC79E006AAAEC /* .codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .codecov.yml; sourceTree = "<group>"; };
@@ -90,6 +100,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		846D3F6F2E29AB7100D4E7E3 /* InAppDebugMenu */ = {
+			isa = PBXGroup;
+			children = (
+				846D3F652E2988EC00D4E7E3 /* InAppDebugMenu.swift */,
+				846D3F672E29893100D4E7E3 /* DSNDisplayViewController.swift */,
+				846D3F6B2E29A43F00D4E7E3 /* DSNStorage.swift */,
+				846D3F692E29895C00D4E7E3 /* Toasts.swift */,
+			);
+			path = InAppDebugMenu;
+			sourceTree = "<group>";
+		};
 		8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -120,6 +141,8 @@
 		D17C73B127D8291D006650AF /* EmpowerPlant */ = {
 			isa = PBXGroup;
 			children = (
+				846D3F702E29AB8300D4E7E3 /* SentrySDKWrapper.swift */,
+				846D3F6F2E29AB7100D4E7E3 /* InAppDebugMenu */,
 				8B21663B29D3F8C80009C890 /* RandomErrors.swift */,
 				D17C73B227D8291D006650AF /* AppDelegate.swift */,
 				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
@@ -285,9 +308,14 @@
 			files = (
 				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
 				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
+				846D3F662E2988EC00D4E7E3 /* InAppDebugMenu.swift in Sources */,
 				D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */,
 				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
+				846D3F6C2E29A43F00D4E7E3 /* DSNStorage.swift in Sources */,
+				846D3F682E29893100D4E7E3 /* DSNDisplayViewController.swift in Sources */,
 				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
+				846D3F6A2E29895C00D4E7E3 /* Toasts.swift in Sources */,
+				846D3F712E29AB8700D4E7E3 /* SentrySDKWrapper.swift in Sources */,
 				8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */,
 				D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */,
 				843BD60F2AD08CE900B0098F /* Utils.swift in Sources */,
