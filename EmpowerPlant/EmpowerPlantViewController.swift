@@ -27,6 +27,18 @@ class EmpowerPlantViewController: UIViewController {
         super.viewDidLoad()
         title = "Empower Plants"
         
+        // Set user context early in the flow
+        SentrySDK.setUser(User(userId: "demo_user_\(UUID().uuidString)"))
+        
+        // Add session-level context
+        SentrySDK.configureScope { scope in
+            scope.setContext("app_state", value: [
+                "products_loaded": products.count > 0,
+                "cart_items": ShoppingCart.instance.items.count,
+                "session_start": Date().timeIntervalSince1970
+            ])
+        }
+        
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
@@ -303,6 +315,16 @@ class EmpowerPlantViewController: UIViewController {
     
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
+        let productLoadTransaction = SentrySDK.startTransaction(
+            name: "product_discovery",
+            operation: "ecommerce.product_load"
+        )
+        
+        let networkSpan = productLoadTransaction.startChild(
+            operation: "http.client",
+            description: "GET /products-join"
+        )
+        
         let startTime = Date()
         let urlStr = "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join"
         let url = URL(string: urlStr)!
@@ -321,11 +343,34 @@ class EmpowerPlantViewController: UIViewController {
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            defer { 
+                networkSpan.finish()
+            }
+            
             let endTime = Date()
             let duration = endTime.timeIntervalSince(startTime)
             
+            // Track performance metrics
+            productLoadTransaction.setMeasurement(name: "network_duration", value: duration, unit: MeasurementUnitDuration.second)
+            
             if let data = data {
+                let parseSpan = productLoadTransaction.startChild(
+                    operation: "serialize.json",
+                    description: "parse_products"
+                )
+                
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
+                    parseSpan.finish()
+                    
+                    // Track Core Data operations
+                    let coreDataSpan = productLoadTransaction.startChild(
+                        operation: "db.operation",
+                        description: "save_products_to_coredata"
+                    )
+                    
+                    // Add product count metrics
+                    productLoadTransaction.setData("product_count", value: productsResponse.count)
+                    
                     if (self.products.count == 0) {
                         var operations = [BlockOperation]()
                         let saveOp = BlockOperation() {
@@ -333,7 +378,10 @@ class EmpowerPlantViewController: UIViewController {
                                 try self.context.save()
                                 self.getAllProductsFromDb()
                             } catch {
-                                // TODO: error
+                                SentrySDK.capture(error: error) { scope in
+                                    scope.setLevel(.error)
+                                    scope.setTag(value: "coredata_save", key: "error_type")
+                                }
                             }
                         }
                         for product in productsResponse {
@@ -349,14 +397,34 @@ class EmpowerPlantViewController: UIViewController {
                             OperationQueue.main.addOperations(operations, waitUntilFinished: false)
                         }
                     }
+                    
+                    coreDataSpan.finish()
+                    productLoadTransaction.setStatus(.ok)
                 } else {
+                    parseSpan.setStatus(.dataLoss)
+                    parseSpan.finish()
+                    productLoadTransaction.setStatus(.dataLoss)
+                    
+                    SentrySDK.capture(message: "Failed to parse products response") { scope in
+                        scope.setLevel(.warning)
+                        scope.setTag(value: "product_load", key: "error_type")
+                    }
                     print("Invalid Response")
-                    // TODO: error
                 }
             } else if let error = error {
+                productLoadTransaction.setStatus(.unknownError)
+                SentrySDK.capture(error: error) { scope in
+                    scope.setLevel(.error)
+                    scope.setTag(value: "network_error", key: "error_type")
+                    scope.setContext("request_details", value: [
+                        "url": urlStr,
+                        "method": "GET"
+                    ])
+                }
                 print("HTTP Request Failed \(error)")
-                // TODO: error
             }
+            
+            productLoadTransaction.finish()
         }
         
         task.resume()

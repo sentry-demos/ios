@@ -73,34 +73,104 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
+        // Start checkout transaction
+        let checkoutTransaction = SentrySDK.startTransaction(
+            name: "checkout_flow", 
+            operation: "ecommerce.checkout"
+        )
+        
+        // Add checkout context
+        SentrySDK.configureScope { scope in
+            scope.setContext("checkout", value: [
+                "cart_total": ShoppingCart.instance.total,
+                "item_count": ShoppingCart.instance.items.count,
+                "customer_type": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown"
+            ])
+            scope.setTag(value: "checkout", key: "flow_step")
+        }
+        
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
-
 
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
 
+        // Track JSON serialization span
+        let jsonSpan = checkoutTransaction.startChild(
+            operation: "serialize", 
+            description: "cart_to_json"
+        )
         let bodyData = try? JSONSerialization.data(
             withJSONObject: setJson(),
             options: []
         )
         request.httpBody = bodyData
+        jsonSpan.finish()
 
         enum PurchaseError: Error {
             case insufficientInventory
         }
+        
+        // Track network request span
+        let networkSpan = checkoutTransaction.startChild(
+            operation: "http.client",
+            description: "POST /checkout"
+        )
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            defer { 
+                networkSpan.finish()
+                checkoutTransaction.finish() 
+            }
+            
             // print("> URLSession response", response)
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
+                // Add response context
+                networkSpan.setData("status_code", value: httpResponse.statusCode)
+                checkoutTransaction.setData("response_status", value: httpResponse.statusCode)
+                
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
                     let err = PurchaseError.insufficientInventory
-                    SentrySDK.capture(error: err) //This will throw the Empowerplant Flagship Error
+                    
+                    // Enhanced error capture with more context
+                    SentrySDK.capture(error: err) { scope in
+                        scope.setLevel(.error)
+                        scope.setTag(value: "checkout_failure", key: "error_type")
+                        scope.setContext("purchase_attempt", value: [
+                            "cart_total": ShoppingCart.instance.total,
+                            "items": ShoppingCart.instance.items.map { $0.title ?? "unknown" }
+                        ])
+                    }
+                    
+                    checkoutTransaction.setStatus(.internalError)
+                    
+                    // Add failure metrics
+                    SentrySDK.metrics.increment("checkout.failure", value: 1.0, tags: [
+                        "error_type": "insufficient_inventory",
+                        "platform": "ios"
+                    ])
                 } else {
+                    checkoutTransaction.setStatus(.ok)
+                    
+                    // Add success breadcrumb
+                    let crumb = Breadcrumb(level: .info, category: "checkout")
+                    crumb.message = "Purchase completed successfully"
+                    crumb.data = ["total": ShoppingCart.instance.total]
+                    SentrySDK.addBreadcrumb(crumb)
+                    
+                    // Add success metrics
+                    SentrySDK.metrics.increment("checkout.success", value: 1.0, tags: [
+                        "customer_type": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
+                        "platform": "ios"
+                    ])
+                    
+                    SentrySDK.metrics.distribution("checkout.cart_value", value: Double(ShoppingCart.instance.total), tags: [
+                        "currency": "USD"
+                    ])
                 }
             }
 

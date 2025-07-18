@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Sentry
 
 
 class ShoppingCart {
@@ -22,6 +23,20 @@ class ShoppingCart {
     
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
+        let span = SentrySDK.span?.startChild(
+            operation: "cart.add_product",
+            description: "add_\(product.productId ?? "unknown")"
+        )
+        
+        // Add breadcrumb for user action
+        let crumb = Breadcrumb(level: .info, category: "user_action")
+        crumb.message = "Product added to cart"
+        crumb.data = [
+            "product_id": product.productId ?? "unknown",
+            "product_title": product.title ?? "unknown",
+            "cart_total_before": instance.total
+        ]
+        SentrySDK.addBreadcrumb(crumb)
         
         if !self.instance.items.contains(product) {
             self.instance.items.append(product)
@@ -58,6 +73,10 @@ class ShoppingCart {
         default:
             print("product id not found in ShoppingCart switch statement")
         }
+        
+        span?.setData("new_total", value: instance.total)
+        span?.setData("item_count", value: instance.items.count)
+        span?.finish()
         
         print("> TOTAL", self.instance.total)
     }

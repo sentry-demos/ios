@@ -44,6 +44,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
+            
+            // Enable enhanced app hang detection (requires 8.50.0+)
+            options.enableAppHangTrackingV2 = true
+            options.appHangTimeoutInterval = 2.0
+            options.enableReportNonFullyBlockingAppHangs = true
+            
+            // Enhanced user interaction tracking
+            options.enableUserInteractionTracing = true
+            options.enableFileIOTracking = true
+            
+            // Add custom sample rates for different scenarios
+            options.tracesSampler = { context in
+                // Sample 100% of checkout flows
+                if let transactionName = context["transaction"] as? String,
+                   transactionName.contains("checkout") {
+                    return 1.0
+                }
+                // Sample 100% of product discovery
+                if let transactionName = context["transaction"] as? String,
+                   transactionName.contains("product") {
+                    return 1.0
+                }
+                return 0.5 // 50% for everything else
+            }
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
