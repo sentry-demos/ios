@@ -9,16 +9,26 @@ import UIKit
 
 public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
 
+enum DBError: Error {
+    case noPersistentStore
+}
+
 public func wipeDB() {
     guard let url = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.persistentStoreCoordinator.persistentStores.first?.url else {
-        // TODO: error
+        ErrorToastManager.shared.logErrorAndShowToast(
+            error: DBError.noPersistentStore,
+            message: "Failed to locate database file for wiping"
+        )
         return
     }
     
     do {
         try FileManager.default.removeItem(at: url)
     } catch {
-        // TODO: error
+        ErrorToastManager.shared.logErrorAndShowToast(
+            error: error,
+            message: "Failed to wipe database file"
+        )
         return
     }
 }

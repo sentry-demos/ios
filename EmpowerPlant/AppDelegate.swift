@@ -107,7 +107,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 do {
                     try context.save()
                 } catch {
-                    // TODO: error
+                    ErrorToastManager.shared.logErrorAndShowToast(
+                        error: error,
+                        message: "Failed to save context changes"
+                    )
                 }
             }
         }

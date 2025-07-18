@@ -100,7 +100,10 @@ class EmpowerPlantViewController: UIViewController {
                 readDirectory(path: path)
             }
         } catch {
-            // TODO: error
+            ErrorToastManager.shared.logErrorAndShowToast(
+                error: error,
+                message: "Failed to read current directory"
+            )
         }
     }
     
@@ -119,7 +122,10 @@ class EmpowerPlantViewController: UIViewController {
                 }
             }
         } catch {
-            // TODO: error
+            ErrorToastManager.shared.logErrorAndShowToast(
+                error: error,
+                message: "Failed to read directory: \(path)"
+            )
         }
         
     }
@@ -252,7 +258,10 @@ class EmpowerPlantViewController: UIViewController {
                             try context.save()
                             NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
                         } catch {
-                            // TODO: error
+                            ErrorToastManager.shared.logErrorAndShowToast(
+                                error: error,
+                                message: "Failed to save generated products to database"
+                            )
                         }
                     }
                     // add a small delay so it doesn't lock up the UI
@@ -284,7 +293,10 @@ class EmpowerPlantViewController: UIViewController {
             try context.save()
         }
         catch {
-            // TODO: error
+            ErrorToastManager.shared.logErrorAndShowToast(
+                error: error,
+                message: "Failed to delete product from database"
+            )
         }
     }
     
@@ -297,7 +309,10 @@ class EmpowerPlantViewController: UIViewController {
             refreshTable()
         }
         catch {
-            // TODO: error
+            ErrorToastManager.shared.logErrorAndShowToast(
+                error: error,
+                message: "Failed to fetch products from database"
+            )
         }
     }
     
@@ -333,7 +348,10 @@ class EmpowerPlantViewController: UIViewController {
                                 try self.context.save()
                                 self.getAllProductsFromDb()
                             } catch {
-                                // TODO: error
+                                ErrorToastManager.shared.logErrorAndShowToast(
+                                    error: error,
+                                    message: "Failed to save products from server to database"
+                                )
                             }
                         }
                         for product in productsResponse {
@@ -350,12 +368,15 @@ class EmpowerPlantViewController: UIViewController {
                         }
                     }
                 } else {
-                    print("Invalid Response")
-                    // TODO: error
+                    ErrorToastManager.shared.showErrorToast(
+                        message: "Invalid response from server when fetching products"
+                    )
                 }
             } else if let error = error {
-                print("HTTP Request Failed \(error)")
-                // TODO: error
+                ErrorToastManager.shared.logErrorAndShowToast(
+                    error: error,
+                    message: "Failed to fetch products from server"
+                )
             }
         }
         
