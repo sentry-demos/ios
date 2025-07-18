@@ -49,12 +49,9 @@ class EmpowerPlantViewController: UIViewController {
         
         getAllProductsFromServer()
         getAllProductsFromDb()
-        readCurrentDirectory()
-        performLongFileOperation()
         processProducts()
         checkRelease()
-        
-        
+
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             self.getAllProductsFromDb()
         }
@@ -62,86 +59,21 @@ class EmpowerPlantViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        if !ProcessInfo.processInfo.arguments.contains("--skip-slow-launch-work") {
+            SlowOperation.fileRead()
+            SlowOperation.fileWrite()
+        }
+
         SentrySDK.reportFullyDisplayed()
-    }
-    
-    func performLongFileOperation() {
-        let longString = String(repeating: UUID().uuidString, count: 5_000_000)
-        let data = longString.data(using: .utf8)!
-        let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
-        try! data.write(to: filePath)
-        try! FileManager.default.removeItem(at: filePath)
     }
 
     func processProducts() {
         let span = SentrySDK.span?.startChild(operation: "product_processing")
-        _ = getIterator(42);
-        sleep(50 / 1000)
+        if !ProcessInfo.processInfo.arguments.contains("--skip-slow-launch-work") {
+            SlowOperation.computation()
+        }
         span?.finish()
-    }
-
-    func getIterator(_ n: Int) -> Int {
-       if (n <= 0) {
-           return 0;
-       }
-       if (n == 1 || n == 2) {
-           return 1;
-       }
-       return getIterator(n - 1) + getIterator(n - 2);
-   }
-
-    
-    func readCurrentDirectory() {
-        let path = FileManager.default.currentDirectoryPath
-        do {
-            let items = try FileManager.default.contentsOfDirectory(atPath: path)
-            let loop = fibonacciSeries(num: items.count)
-            for i in 1...loop {
-                readDirectory(path: path)
-            }
-        } catch {
-            // TODO: error
-        }
-    }
-    
-    func readDirectory(path: String) {
-        let fm = FileManager.default
-        
-        do {
-            let items = try fm.contentsOfDirectory(atPath: path)
-            
-            for item in items {
-                var isDirectory: ObjCBool = false
-                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    readDirectory(path: item)
-                } else {
-                    return
-                }
-            }
-        } catch {
-            // TODO: error
-        }
-        
-    }
-    
-    func fibonacciSeries(num: Int) -> Int{
-        // The value of 0th and 1st number of the fibonacci series are 0 and 1
-        var n1 = 0
-        var n2 = 1
-        
-        // To store the result
-        var nR = 0
-        // Adding two previous numbers to find ith number of the series
-        for _ in 0..<num{
-            nR = n1
-            n1 = n2
-            n2 = nR + n2
-        }
-        
-        if (n1 < 500) {
-            return fibonacciSeries(num: n1)
-        }
-        return n1
     }
     
     @objc
