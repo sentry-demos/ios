@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		843226DB2E29E12C000311A4 /* SlowOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843226DA2E29E12C000311A4 /* SlowOperations.swift */; };
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
@@ -40,6 +41,7 @@
 
 /* Begin PBXFileReference section */
 		840B7EF12BBF3C70008B8120 /* .slather.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .slather.yml; sourceTree = "<group>"; };
+		843226DA2E29E12C000311A4 /* SlowOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowOperations.swift; sourceTree = "<group>"; };
 		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				843BD60E2AD08CE900B0098F /* Utils.swift */,
 				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
 				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
+				843226DA2E29E12C000311A4 /* SlowOperations.swift */,
 				846BEA1B2ABE611A0032F77F /* mobydick.txt */,
 				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
 				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
@@ -283,6 +286,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				843226DB2E29E12C000311A4 /* SlowOperations.swift in Sources */,
 				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
 				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
 				D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */,

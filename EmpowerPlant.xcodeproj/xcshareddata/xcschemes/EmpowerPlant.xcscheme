@@ -73,6 +73,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--skip-slow-launch-work"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--no-debug-mode-in-debug-build"
             isEnabled = "YES">
          </CommandLineArgument>
