@@ -137,12 +137,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // print("> URLSession response", response)
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
+                print("> Got HTTP Response with status: \(httpResponse.statusCode)")
                 // Add response context
                 networkSpan.setData(value: httpResponse.statusCode, key: "status_code")
                 checkoutTransaction.setData(value: httpResponse.statusCode, key: "response_status")
                 
                 if (httpResponse.statusCode) == 500 {
-                    print("> 500 response")
+                    print("> 500 response - Triggering demo error")
                     let err = PurchaseError.insufficientInventory
                     
                     // Enhanced error capture with more context
@@ -156,24 +157,42 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     }
                     
                 } else {
+                    print("> Non-500 response: \(httpResponse.statusCode)")
                     // Add success breadcrumb
                     let crumb = Breadcrumb(level: .info, category: "checkout")
                     crumb.message = "Purchase completed successfully"
                     crumb.data = ["total": ShoppingCart.instance.total]
                     SentrySDK.addBreadcrumb(crumb)
                 }
+            } else if let error = error {
+                print("> Network Error Occurred: \(error)")
+                // Network-level errors (like -1005, -1017) - these prevent reaching backend
+                SentrySDK.capture(error: error) { scope in
+                    scope.setLevel(.error)
+                    scope.setTag(value: "network_error", key: "error_type")
+                    scope.setContext(value: [
+                        "cart_total": ShoppingCart.instance.total,
+                        "error_code": (error as NSError).code,
+                        "error_domain": (error as NSError).domain
+                    ], key: "network_failure")
+                }
+                
+                // For demo purposes, also trigger the business logic error
+                // This ensures the demo works even with network issues
+                print("> Also triggering demo business error for demonstration")
+                let demoErr = PurchaseError.insufficientInventory
+                SentrySDK.capture(error: demoErr) { scope in
+                    scope.setLevel(.error)
+                    scope.setTag(value: "demo_checkout_failure", key: "error_type")
+                    scope.setContext(value: [
+                        "cart_total": ShoppingCart.instance.total,
+                        "items": ShoppingCart.instance.items.map { $0.title ?? "unknown" },
+                        "note": "Demo error triggered due to network connectivity issues"
+                    ], key: "demo_purchase_attempt")
+                }
+            } else {
+                print("> Unexpected: No response and no error")
             }
-
-            // not getting met
-            // if let error = error {
-            //    print("> HTTP Request Failed \(error)")
-            //    SentrySDK.capture(error: error)
-            //}
-
-            // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            // if let data = data {
-            //     print("> no error, do nothing", data)
-            //}
         }
 
         task.resume()
