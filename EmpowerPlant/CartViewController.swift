@@ -96,6 +96,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
+        request.timeoutInterval = 30.0  // 30 second timeout
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
         // Track JSON serialization span
         let jsonSpan = checkoutTransaction.startChild(
@@ -119,7 +121,14 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             description: "POST /checkout"
         )
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        // Create custom session for reliable demo connectivity
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30.0
+        config.timeoutIntervalForResource = 60.0
+        config.waitsForConnectivity = true
+        let session = URLSession(configuration: config)
+
+        let task = session.dataTask(with: request) { data, response, error in
             defer { 
                 networkSpan.finish()
                 checkoutTransaction.finish() 
