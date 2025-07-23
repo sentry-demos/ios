@@ -20,7 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
         
         SentrySDK.start { options in
-            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@o87286.ingest.us.sentry.io/4508968167538688"
+            //options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
             
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
@@ -52,22 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enhanced user interaction tracking
             options.enableUserInteractionTracing = true
-            options.enableFileIOTracking = true
             
-            // Add custom sample rates for different scenarios
-            options.tracesSampler = { context in
-                // Sample 100% of checkout flows
-                if let transactionName = context["transaction"] as? String,
-                   transactionName.contains("checkout") {
-                    return 1.0
-                }
-                // Sample 100% of product discovery
-                if let transactionName = context["transaction"] as? String,
-                   transactionName.contains("product") {
-                    return 1.0
-                }
-                return 0.5 // 50% for everything else
-            }
+            // Set sampling rates
+            options.tracesSampleRate = 1.0  // 100% sampling for demonstration
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")

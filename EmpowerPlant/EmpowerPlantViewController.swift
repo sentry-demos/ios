@@ -32,11 +32,11 @@ class EmpowerPlantViewController: UIViewController {
         
         // Add session-level context
         SentrySDK.configureScope { scope in
-            scope.setContext("app_state", value: [
-                "products_loaded": products.count > 0,
+            scope.setContext(value: [
+                "products_loaded": self.products.count > 0,
                 "cart_items": ShoppingCart.instance.items.count,
                 "session_start": Date().timeIntervalSince1970
-            ])
+            ], key: "app_state")
         }
         
         self.view.addSubview(tableView)
@@ -351,7 +351,7 @@ class EmpowerPlantViewController: UIViewController {
             let duration = endTime.timeIntervalSince(startTime)
             
             // Track performance metrics
-            productLoadTransaction.setMeasurement(name: "network_duration", value: duration, unit: MeasurementUnitDuration.second)
+            productLoadTransaction.setMeasurement(name: "network_duration", value: duration as NSNumber, unit: MeasurementUnitDuration.second)
             
             if let data = data {
                 let parseSpan = productLoadTransaction.startChild(
@@ -369,7 +369,7 @@ class EmpowerPlantViewController: UIViewController {
                     )
                     
                     // Add product count metrics
-                    productLoadTransaction.setData("product_count", value: productsResponse.count)
+                    productLoadTransaction.setData(value: productsResponse.count, key: "product_count")
                     
                     if (self.products.count == 0) {
                         var operations = [BlockOperation]()
@@ -399,11 +399,8 @@ class EmpowerPlantViewController: UIViewController {
                     }
                     
                     coreDataSpan.finish()
-                    productLoadTransaction.setStatus(.ok)
                 } else {
-                    parseSpan.setStatus(.dataLoss)
                     parseSpan.finish()
-                    productLoadTransaction.setStatus(.dataLoss)
                     
                     SentrySDK.capture(message: "Failed to parse products response") { scope in
                         scope.setLevel(.warning)
@@ -412,14 +409,13 @@ class EmpowerPlantViewController: UIViewController {
                     print("Invalid Response")
                 }
             } else if let error = error {
-                productLoadTransaction.setStatus(.unknownError)
                 SentrySDK.capture(error: error) { scope in
                     scope.setLevel(.error)
                     scope.setTag(value: "network_error", key: "error_type")
-                    scope.setContext("request_details", value: [
+                    scope.setContext(value: [
                         "url": urlStr,
                         "method": "GET"
-                    ])
+                    ], key: "request_details")
                 }
                 print("HTTP Request Failed \(error)")
             }

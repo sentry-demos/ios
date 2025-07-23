@@ -74,8 +74,8 @@ class ShoppingCart {
             print("product id not found in ShoppingCart switch statement")
         }
         
-        span?.setData("new_total", value: instance.total)
-        span?.setData("item_count", value: instance.items.count)
+        span?.setData(value: instance.total, key: "new_total")
+        span?.setData(value: instance.items.count, key: "item_count")
         span?.finish()
         
         print("> TOTAL", self.instance.total)

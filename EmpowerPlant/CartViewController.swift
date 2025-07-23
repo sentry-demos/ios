@@ -81,11 +81,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         // Add checkout context
         SentrySDK.configureScope { scope in
-            scope.setContext("checkout", value: [
+            scope.setContext(value: [
                 "cart_total": ShoppingCart.instance.total,
                 "item_count": ShoppingCart.instance.items.count,
                 "customer_type": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown"
-            ])
+            ], key: "checkout")
             scope.setTag(value: "checkout", key: "flow_step")
         }
         
@@ -129,8 +129,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 // Add response context
-                networkSpan.setData("status_code", value: httpResponse.statusCode)
-                checkoutTransaction.setData("response_status", value: httpResponse.statusCode)
+                networkSpan.setData(value: httpResponse.statusCode, key: "status_code")
+                checkoutTransaction.setData(value: httpResponse.statusCode, key: "response_status")
                 
                 if (httpResponse.statusCode) == 500 {
                     print("> 500 response")
@@ -140,37 +140,18 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     SentrySDK.capture(error: err) { scope in
                         scope.setLevel(.error)
                         scope.setTag(value: "checkout_failure", key: "error_type")
-                        scope.setContext("purchase_attempt", value: [
+                        scope.setContext(value: [
                             "cart_total": ShoppingCart.instance.total,
                             "items": ShoppingCart.instance.items.map { $0.title ?? "unknown" }
-                        ])
+                        ], key: "purchase_attempt")
                     }
                     
-                    checkoutTransaction.setStatus(.internalError)
-                    
-                    // Add failure metrics
-                    SentrySDK.metrics.increment("checkout.failure", value: 1.0, tags: [
-                        "error_type": "insufficient_inventory",
-                        "platform": "ios"
-                    ])
                 } else {
-                    checkoutTransaction.setStatus(.ok)
-                    
                     // Add success breadcrumb
                     let crumb = Breadcrumb(level: .info, category: "checkout")
                     crumb.message = "Purchase completed successfully"
                     crumb.data = ["total": ShoppingCart.instance.total]
                     SentrySDK.addBreadcrumb(crumb)
-                    
-                    // Add success metrics
-                    SentrySDK.metrics.increment("checkout.success", value: 1.0, tags: [
-                        "customer_type": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
-                        "platform": "ios"
-                    ])
-                    
-                    SentrySDK.metrics.distribution("checkout.cart_value", value: Double(ShoppingCart.instance.total), tags: [
-                        "currency": "USD"
-                    ])
                 }
             }
 
