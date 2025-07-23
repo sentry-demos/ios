@@ -10,6 +10,7 @@
 		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
 		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
 		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
+		846D3E742E25921A00D4E7E3 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = 846D3E732E25921A00D4E7E3 /* SwiftMessages */; };
 		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
 		848716B72ADFAA2000756467 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 848716B62ADFAA2000756467 /* Sentry */; };
 		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
@@ -19,6 +20,7 @@
 		D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */; };
 		D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B227D8291D006650AF /* AppDelegate.swift */; };
 		D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B427D8291D006650AF /* SceneDelegate.swift */; };
+		D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ERRORTOAST002 /* ErrorToastManager.swift */; };
 		D17C73BA27D8291D006650AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73B827D8291D006650AF /* Main.storyboard */; };
 		D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BB27D8291D006650AF /* Assets.xcassets */; };
 		D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */; };
@@ -60,6 +62,7 @@
 		D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		D17C73B227D8291D006650AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D17C73B427D8291D006650AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D1ERRORTOAST002 /* ErrorToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorToastManager.swift; sourceTree = "<group>"; };
 		D17C73B927D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D17C73BB27D8291D006650AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D17C73BE27D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -83,6 +86,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				848716A32AD8C3CD00756467 /* BigInt in Frameworks */,
+				846D3E742E25921A00D4E7E3 /* SwiftMessages in Frameworks */,
 				848716B72ADFAA2000756467 /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,6 +127,7 @@
 				8B21663B29D3F8C80009C890 /* RandomErrors.swift */,
 				D17C73B227D8291D006650AF /* AppDelegate.swift */,
 				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
+				D1ERRORTOAST002 /* ErrorToastManager.swift */,
 				D17C73B827D8291D006650AF /* Main.storyboard */,
 				D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */,
 				D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */,
@@ -179,6 +184,7 @@
 			packageProductDependencies = (
 				848716A22AD8C3CD00756467 /* BigInt */,
 				848716B62ADFAA2000756467 /* Sentry */,
+				846D3E732E25921A00D4E7E3 /* SwiftMessages */,
 			);
 			productName = EmpowerPlant;
 			productReference = 84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */;
@@ -214,6 +220,7 @@
 			packageReferences = (
 				848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */,
 				848716B52ADFAA2000756467 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				846D3E722E25921A00D4E7E3 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
 			);
 			productRefGroup = D17C73A627D8291D006650AF;
 			projectDirPath = "";
@@ -293,6 +300,7 @@
 				843BD60F2AD08CE900B0098F /* Utils.swift in Sources */,
 				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
 				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
+				D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */,
 				D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -662,6 +670,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		846D3E722E25921A00D4E7E3 /* XCRemoteSwiftPackageReference "SwiftMessages" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftKickMobile/SwiftMessages";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.1;
+			};
+		};
 		848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/attaswift/BigInt";
@@ -681,6 +697,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		846D3E732E25921A00D4E7E3 /* SwiftMessages */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 846D3E722E25921A00D4E7E3 /* XCRemoteSwiftPackageReference "SwiftMessages" */;
+			productName = SwiftMessages;
+		};
 		848716A22AD8C3CD00756467 /* BigInt */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 848716A12AD8C3CD00756467 /* XCRemoteSwiftPackageReference "BigInt" */;
