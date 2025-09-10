@@ -44,6 +44,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
+            
+            //Enable User Feedback Widget
+            options.configureUserFeedback = { config in
+                      config.onSubmitSuccess = { data in
+                           print("Feedback submitted successfully: \(data)")
+                      }
+                      config.onSubmitError = { error in
+                           print("Failed to submit feedback: \(error)")
+                      }
+                 }
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")

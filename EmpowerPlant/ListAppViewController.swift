@@ -56,16 +56,28 @@ class ListAppViewController: UIViewController {
     }
     
     @IBAction func captureUserFeedback(_ sender: Any) {
-        let error = NSError(domain: "UserFeedbackErrorDomain", code: 0, userInfo: [NSLocalizedDescriptionKey: "This never happens."])
+        // Create a realistic ecommerce-related error
+        let error = NSError(domain: "EmpowerPlant.EcommerceError", code: 1001, userInfo: [
+            NSLocalizedDescriptionKey: "Checkout process failed due to payment processing error",
+            "error_type": "payment_failure",
+            "checkout_step": "payment_processing"
+        ])
 
         let eventId = SentrySDK.capture(error: error) { scope in
-            scope.setLevel(.fatal)
+            scope.setLevel(.error) // Changed from .fatal to .error for user-initiated feedback
+            scope.setTag(value: "ecommerce_feedback", key: "feedback_type")
+            scope.setTag(value: "checkout", key: "user_journey")
+            scope.setContext(value: [
+                "cart_items": ShoppingCart.instance.items.count,
+                "total_amount": ShoppingCart.instance.total,
+                "user_action": "manual_feedback_request"
+            ], key: "ecommerce_context")
         }
         
         let userFeedback = UserFeedback(eventId: eventId)
-        userFeedback.comments = "It broke on iOS-Swift. I don't know why, but this happens."
-        userFeedback.email = "john@me.com"
-        userFeedback.name = "John Me"
+        userFeedback.comments = "I was trying to purchase some plants but the checkout process failed. The payment button didn't respond and I'm not sure if my order went through. This is frustrating as I really wanted to buy the Plant Mood and Botana Voice products."
+        userFeedback.email = "customer@example.com"
+        userFeedback.name = "Plant Enthusiast"
         SentrySDK.capture(userFeedback: userFeedback)
     }
     
