@@ -47,13 +47,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             //Enable User Feedback Widget
             options.configureUserFeedback = { config in
-                      config.onSubmitSuccess = { data in
-                           print("Feedback submitted successfully: \(data)")
-                      }
-                      config.onSubmitError = { error in
-                           print("Failed to submit feedback: \(error)")
-                      }
-                 }
+                config.onSubmitSuccess = { data in
+                    print("Feedback submitted successfully: \(data)")
+                }
+                config.onSubmitError = { error in
+                    print("Failed to submit feedback: \(error)")
+                }
+            }
+            
+            // Enable Logs
+            options.experimental.enableLogs = true
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
