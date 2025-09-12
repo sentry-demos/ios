@@ -106,7 +106,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     let err = PurchaseError.insufficientInventory
                         ErrorToastManager.shared.logErrorAndShowToast(
                             error: err,
-                            message: "Purchase failed: Insufficient inventory available (HTTP 500)"
+                            message: "Purchase failed: Insufficient inventory available (HTTP 500)",
+                            showFeedbackOption: true  // Enable User Feedback for checkout errors
                         )
                 } else {
                 }
