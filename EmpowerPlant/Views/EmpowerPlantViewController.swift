@@ -318,6 +318,9 @@ class EmpowerPlantViewController: UIViewController {
     
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
+        let logger = SentrySDK.logger
+        logger.info("Fetching products from server")
+        
         let startTime = Date()
         let urlStr = "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join"
         let url = URL(string: urlStr)!
@@ -339,8 +342,17 @@ class EmpowerPlantViewController: UIViewController {
             let endTime = Date()
             let duration = endTime.timeIntervalSince(startTime)
             
+            logger.debug("Products API request completed", attributes: [
+                "duration": duration,
+                "hasData": data != nil
+            ])
+            
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
+                    logger.info("Products successfully decoded from server", attributes: [
+                        "productCount": productsResponse.count,
+                        "duration": duration
+                    ])
                     if (self.products.count == 0) {
                         var operations = [BlockOperation]()
                         let saveOp = BlockOperation() {
@@ -427,6 +439,13 @@ extension EmpowerPlantViewController: UITableViewDelegate {
     // Code that executes on Click'ing table row, adds the product item to shopping cart
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let product = products[indexPath.row]
+        let logger = SentrySDK.logger
+        
+        logger.info("Product selected and added to cart", attributes: [
+            "productId": product.productId ?? "unknown",
+            "productTitle": product.title ?? "unknown",
+            "selectedIndex": indexPath.row
+        ])
         
         ShoppingCart.addProduct(product: product)
     }

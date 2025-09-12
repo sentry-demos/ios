@@ -73,6 +73,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
+        let logger = SentrySDK.logger
+        logger.info("Purchase initiated", attributes: [
+            "cartTotal": ShoppingCart.instance.total,
+            "itemCount": ShoppingCart.instance.items.count
+        ])
+        
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
         let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
@@ -100,16 +106,30 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            let logger = SentrySDK.logger
+            
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     let err = PurchaseError.insufficientInventory
-                        ErrorToastManager.shared.logErrorAndShowToast(
-                            error: err,
-                            message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                            showFeedbackOption: true  // Enable User Feedback for checkout errors
-                        )
+                    logger.error("Purchase failed with server error", attributes: [
+                        "statusCode": 500,
+                        "errorType": "insufficient_inventory"
+                    ])
+                    ErrorToastManager.shared.logErrorAndShowToast(
+                        error: err,
+                        message: "Purchase failed: Insufficient inventory available (HTTP 500)",
+                        showFeedbackOption: true  // Enable User Feedback for checkout errors
+                    )
+                } else if (httpResponse.statusCode) == 200 {
+                    logger.info("Purchase completed successfully", attributes: [
+                        "statusCode": 200,
+                        "cartTotal": ShoppingCart.instance.total
+                    ])
                 } else {
+                    logger.warn("Purchase completed with unexpected status", attributes: [
+                        "statusCode": httpResponse.statusCode
+                    ])
                 }
             }
 

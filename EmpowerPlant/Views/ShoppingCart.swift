@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Sentry
 
 
 class ShoppingCart {
@@ -22,9 +23,14 @@ class ShoppingCart {
     
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
+        let logger = SentrySDK.logger
         
         if !self.instance.items.contains(product) {
             self.instance.items.append(product)
+            logger.debug("New product added to cart", attributes: [
+                "productId": product.productId ?? "unknown",
+                "productTitle": product.title ?? "unknown"
+            ])
         }
         
         let productId = product.productId!
@@ -56,9 +62,18 @@ class ShoppingCart {
             updateTotal(product: product)
             break
         default:
+            logger.warn("Unknown product ID in shopping cart", attributes: [
+                "productId": productId,
+                "expectedIds": "3, 4, 5, 6"
+            ])
             print("product id not found in ShoppingCart switch statement")
         }
         
+        logger.info("Product quantity updated in cart", attributes: [
+            "productId": productId,
+            "newTotal": self.instance.total,
+            "cartItemCount": self.instance.items.count
+        ])
         print("> TOTAL", self.instance.total)
     }
     

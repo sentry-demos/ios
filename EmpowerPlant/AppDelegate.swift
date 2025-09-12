@@ -64,7 +64,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
         }
         
+        let logger = SentrySDK.logger
+        logger.info("Sentry SDK initialized", attributes: [
+            "enableSwizzling": enableSwizzling,
+            "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown"
+        ])
+        
         if ProcessInfo.processInfo.arguments.contains("--wipe-db") {
+            logger.warn("Database wipe requested via launch argument")
             wipeDB()
         }
         
@@ -94,6 +101,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
              */
             let container = NSPersistentContainer(name: "Model")
             container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+                let logger = SentrySDK.logger
                 if let error = error as NSError? {
                     // Replace this implementation with code to handle the error appropriately.
                     // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -106,7 +114,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                      * The store could not be migrated to the current model version.
                      Check the error message to determine what the actual problem was.
                      */
+                    
+                    logger.fatal("Core Data persistent store failed to load", attributes: [
+                        "error": error.localizedDescription,
+                        "errorCode": error.code,
+                        "storeDescription": storeDescription.description
+                    ])
                     fatalError("Unresolved error \(error), \(error.userInfo)")
+                } else {
+                    logger.info("Core Data persistent store loaded successfully", attributes: [
+                        "storeDescription": storeDescription.description
+                    ])
                 }
             })
             return container
@@ -115,11 +133,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: - Core Data Saving support
         
         func saveContext () {
+            let logger = SentrySDK.logger
             let context = persistentContainer.viewContext
             if context.hasChanges {
+                logger.debug("Attempting to save Core Data context changes")
                 do {
                     try context.save()
+                    logger.info("Core Data context saved successfully")
                 } catch {
+                    logger.error("Failed to save Core Data context", attributes: [
+                        "error": error.localizedDescription
+                    ])
                     ErrorToastManager.shared.logErrorAndShowToast(
                         error: error,
                         message: "Failed to save context changes"
