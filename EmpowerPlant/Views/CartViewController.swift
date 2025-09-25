@@ -73,7 +73,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
-itay/add_logs
         let logger = SentrySDK.logger
         logger.info("Purchase initiated", attributes: [
             "cartTotal": ShoppingCart.instance.total,
