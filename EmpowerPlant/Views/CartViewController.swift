@@ -73,14 +73,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
-        // Add user interaction breadcrumb for Sentry User Interaction Tracing
-        let crumb = Breadcrumb(level: .info, category: "user_action")
-        crumb.message = "User initiated checkout process"
-        crumb.data = [
-            "cart_total": ShoppingCart.instance.total,
-            "cart_items": ShoppingCart.instance.items.count
-        ]
-        SentrySDK.addBreadcrumb(crumb)
+itay/add_logs
+        let logger = SentrySDK.logger
+        logger.info("Purchase initiated", attributes: [
+            "cartTotal": ShoppingCart.instance.total,
+            "itemCount": ShoppingCart.instance.items.count
+        ])
         
         // Simulate potential app hang scenario for AppHang V2 demonstration
         // This creates a brief delay that could trigger hang detection if it exceeds threshold
@@ -88,6 +86,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // Simulate processing delay that might cause UI to appear unresponsive
             Thread.sleep(forTimeInterval: 0.5) // 500ms delay - under 2s threshold but shows interaction
         }
+
         
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
@@ -116,19 +115,33 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            let logger = SentrySDK.logger
             // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
             self.performCheckoutFileIO()
+
             
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     let err = PurchaseError.insufficientInventory
-                        ErrorToastManager.shared.logErrorAndShowToast(
-                            error: err,
-                            message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                            showFeedbackOption: true  // Enable User Feedback for checkout errors
-                        )
+                    logger.error("Purchase failed with server error", attributes: [
+                        "statusCode": 500,
+                        "errorType": "insufficient_inventory"
+                    ])
+                    ErrorToastManager.shared.logErrorAndShowToast(
+                        error: err,
+                        message: "Purchase failed: Insufficient inventory available (HTTP 500)",
+                        showFeedbackOption: true  // Enable User Feedback for checkout errors
+                    )
+                } else if (httpResponse.statusCode) == 200 {
+                    logger.info("Purchase completed successfully", attributes: [
+                        "statusCode": 200,
+                        "cartTotal": ShoppingCart.instance.total
+                    ])
                 } else {
+                    logger.warn("Purchase completed with unexpected status", attributes: [
+                        "statusCode": httpResponse.statusCode
+                    ])
                 }
             }
 
