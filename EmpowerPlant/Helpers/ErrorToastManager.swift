@@ -24,7 +24,7 @@ class ErrorToastManager {
 
         let eventId: SentryId
         if let scopeCallback = scopeCallback {
-            eventId = SentrySDK.capture(error: error, block: scopeCallback)
+            eventId = SentrySDK.capture(error: error, block: scopeCallback) //Flagship
         } else {
             eventId = SentrySDK.capture(error: error)
         }
