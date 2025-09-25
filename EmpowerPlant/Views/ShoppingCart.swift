@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Sentry
 
 
 class ShoppingCart {
@@ -58,6 +59,16 @@ class ShoppingCart {
         default:
             print("product id not found in ShoppingCart switch statement")
         }
+        
+        // Add user interaction breadcrumb for Sentry User Interaction Tracing
+        let crumb = Breadcrumb(level: .info, category: "user_action")
+        crumb.message = "Product added to cart"
+        crumb.data = [
+            "product_id": product.productId ?? "unknown",
+            "product_title": product.title ?? "unknown",
+            "cart_total_after": instance.total
+        ]
+        SentrySDK.addBreadcrumb(crumb)
         
         print("> TOTAL", self.instance.total)
     }
