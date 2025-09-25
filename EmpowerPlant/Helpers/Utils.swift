@@ -6,7 +6,9 @@
 //
 
 import UIKit
+
 import Sentry
+
 
 public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
 
@@ -20,6 +22,7 @@ public func wipeDB() {
     
     guard let url = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.persistentStoreCoordinator.persistentStores.first?.url else {
         logger.error("Failed to locate database file for wiping")
+
         ErrorToastManager.shared.logErrorAndShowToast(
             error: DBError.noPersistentStore,
             message: "Failed to locate database file for wiping"

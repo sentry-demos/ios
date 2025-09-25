@@ -41,6 +41,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             
+            // Enable AppHang V2 configurations
+            options.enableAppHangTrackingV2 = true
+            options.appHangTimeoutInterval = 2.0
+            options.enableReportNonFullyBlockingAppHangs = true
+            
+            // Enable Mobile Session Health configurations
+            options.enableUserInteractionTracing = true
+            
+            // Enable Distributed Tracing
+            options.tracePropagationTargets = [
+                "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com"
+            ]
+            
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0

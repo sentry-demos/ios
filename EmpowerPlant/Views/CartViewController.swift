@@ -73,11 +73,20 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
+itay/add_logs
         let logger = SentrySDK.logger
         logger.info("Purchase initiated", attributes: [
             "cartTotal": ShoppingCart.instance.total,
             "itemCount": ShoppingCart.instance.items.count
         ])
+        
+        // Simulate potential app hang scenario for AppHang V2 demonstration
+        // This creates a brief delay that could trigger hang detection if it exceeds threshold
+        DispatchQueue.main.async {
+            // Simulate processing delay that might cause UI to appear unresponsive
+            Thread.sleep(forTimeInterval: 0.5) // 500ms delay - under 2s threshold but shows interaction
+        }
+
         
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
@@ -107,6 +116,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             let logger = SentrySDK.logger
+            // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
+            self.performCheckoutFileIO()
+
             
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
@@ -146,6 +158,33 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         task.resume()
+    }
+    
+    // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
+    private func performCheckoutFileIO() {
+        // Create temporary file to demonstrate file I/O tracking
+        let tempDir = FileManager.default.temporaryDirectory
+        let checkoutLogFile = tempDir.appendingPathComponent("checkout_log_\(UUID().uuidString).txt")
+        
+        let checkoutData = """
+        Checkout initiated at: \(Date())
+        Cart total: \(ShoppingCart.instance.total)
+        Items count: \(ShoppingCart.instance.items.count)
+        User interaction: Purchase button tapped
+        """.data(using: .utf8)!
+        
+        do {
+            try checkoutData.write(to: checkoutLogFile)
+            
+            // Simulate reading the file back (common in checkout processes)
+            let readData = try Data(contentsOf: checkoutLogFile)
+            print("Checkout log written and read: \(readData.count) bytes")
+            
+            // Clean up the temporary file
+            try FileManager.default.removeItem(at: checkoutLogFile)
+        } catch {
+            print("File I/O error during checkout: \(error)")
+        }
     }
 
     // total, quantities, items

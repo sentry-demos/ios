@@ -320,7 +320,7 @@ class EmpowerPlantViewController: UIViewController {
     func getAllProductsFromServer() {
         let logger = SentrySDK.logger
         logger.info("Fetching products from server")
-        
+
         let startTime = Date()
         let urlStr = "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join"
         let url = URL(string: urlStr)!
