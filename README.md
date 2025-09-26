@@ -2,33 +2,144 @@
 
 An iOS app integrating Sentry to demo its various product features. See [Empower: How to Contribute](https://www.notion.so/sentry/Empower-How-to-Contribute-3190417cf9b14e7c895fb352d5c28bd6#0a64b16867e9418abc027f2450635510) for more information.
 
+## Prerequisites
+
+- **macOS** with Xcode 15.0 or later
+- **Homebrew** (will be installed automatically if not present)
+- **Git** (for cloning the repository)
+
 ## Setup
 
-- Install Xcode
-- In a terminal, run: 
-    - `make init`
-    - `sentry-cli login` (see [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more info) and use an **org-level** auth token from the `demo` org [or whatever org you applied to the `.env` file in the next step]
-- Open EmpowerPlant.xcodeproj. Open the `.env` file and provide valid values for `SENTRY_ORG` and `SENTRY_PROJECT`.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/sentry-demos/ios.git
+   cd ios
+   ```
 
-#### (Do this if you want to send events to a different org/project than the default)
-- Update the default DSN, located in `AppDelegate.swift`, to your new DSN
+2. **Run the automated setup:**
+   ```bash
+   make init
+   ```
+   This command will:
+   - Install Homebrew (if not already installed)
+   - Install required tools via `brew bundle` (sentry-cli, gh)
+   - Create a `.env` file with placeholder values
+   - Set up Xcode first launch (fixes CoreSimulator issues)
+   - Download iOS platform images if needed
 
-## Run
-Open EmpowerPlant.xcodeproj in Xcode and click the "Play" button or press ⌘R 
+3. **Configure Sentry authentication:**
+   ```bash
+   sentry-cli login
+   ```
+   Use an **org-level** auth token from your Sentry organization. See [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more information.
 
-## Creating release and uploading app
+4. **Update environment configuration:**
+   Edit the `.env` file and provide valid values:
+   ```bash
+   SENTRY_ORG=<your-org-slug>
+   SENTRY_PROJECT=<your-project-slug>
+   ```
 
-- Ensure the Info.plist has the version you want to release on the `master` branch (the release job can actually currently run off of any branch that's been pushed to GitHub but this is not recommended; perhaps in the future this can be disallowed by some option in the workflow YAML)
-- Go to the iOS demo repo's [Actions](https://github.com/sentry-demos/ios/actions) area
-- Go to the [Release](https://github.com/sentry-demos/ios/actions/workflows/release.yml) action
-- Click "Run workflow" dropdown box on the right [![The first "Run workflow" button](docs/run-workflow1.png)
-- Enter the version number you want it to build and deploy and click "Run workflow" [![The second "Run workflow" button](docs/run-workflow2.png)
+   **Default values** (for demo purposes):
+   ```
+   SENTRY_ORG=demo
+   SENTRY_PROJECT=ios
+   ```
 
-This runs the workflow defined in [release.yml](.github/workflows/release.yml). It uses the [secrets](https://github.com/sentry-demos/ios/settings/secrets/actions) configured in the repo for `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` for `sentry-cli` auth/upload, and the automatic ephemeral [`GITHUB_TOKEN`](https://github.blog/changelog/2021-09-20-github-actions-ephemeral-self-hosted-runners-new-webhooks-for-auto-scaling/) for `gh` auth.
+5. **Optional - Use custom Sentry DSN:**
+   If you want to send events to a different org/project than the default, update the DSN in `EmpowerPlant/AppDelegate.swift`:
+   ```swift
+   options.dsn = "https://your-dsn-here@sentry.io/project-id"
+   ```
 
-See https://github.com/sentry-demos/ios/releases/tag/0.0.1 for a sample release
+## Running the App
 
-Note: TDA must be restarted for it to pick up new version
+1. **Open the project in Xcode:**
+   ```bash
+   open EmpowerPlant.xcodeproj
+   ```
+
+2. **Run the app:**
+   - Click the "Play" button (▶️) in Xcode, or
+   - Press `⌘R`, or
+   - Select **Product > Run** from the menu
+
+3. **Choose your target:**
+   - **iOS Simulator** (recommended for development)
+   - **Physical device** (requires Apple Developer account)
+
+## Testing
+
+Run the test suite:
+```bash
+make test
+```
+
+This will:
+- Run unit tests on the latest iOS Simulator
+- Generate code coverage reports using Slather
+
+## Troubleshooting
+
+### Common Issues
+
+**CoreSimulator out of date error:**
+```bash
+make init  # This runs xcodebuild -runFirstLaunch to fix the issue
+```
+
+**Missing iOS SDK:**
+```bash
+xcodebuild -downloadPlatform iOS
+```
+
+**Build failures:**
+- Ensure you have the latest Xcode version
+- Clean build folder: `⌘+Shift+K` in Xcode
+- Reset package cache: `File > Packages > Reset Package Caches`
+
+**Sentry authentication issues:**
+- Verify your auth token has the correct permissions
+- Check that your org/project slugs in `.env` match your Sentry setup
+- Run `sentry-cli login` again if needed
+
+### Project Structure
+
+```
+EmpowerPlant/
+├── AppDelegate.swift          # Sentry configuration
+├── Views/                     # UI Controllers
+├── Models/                    # Core Data models
+├── Helpers/                   # Utility classes
+└── Resources/                 # Assets and data files
+```
+
+## Creating Releases
+
+### Prerequisites
+- Ensure `Info.plist` has the correct version number
+- Commit changes to the `master` branch (recommended)
+
+### Release Process
+
+1. **Go to GitHub Actions:**
+   - Navigate to the repo's [Actions](https://github.com/sentry-demos/ios/actions) page
+   - Find the [Release workflow](https://github.com/sentry-demos/ios/actions/workflows/release.yml)
+
+2. **Trigger the release:**
+   - Click "Run workflow" dropdown
+   - Enter the version number (e.g., `0.0.43`)
+   - Click "Run workflow" to start the build
+
+3. **What happens:**
+   - Builds the iOS app with the specified version
+   - Uploads debug symbols to Sentry
+   - Creates a GitHub release with the app binary
+   - Uses configured secrets for authentication
+
+**Note:** TDA (Test Data Automation) must be restarted to pick up new versions.
+
+See [sample release](https://github.com/sentry-demos/ios/releases/tag/0.0.1) for reference.
 
 ## TDA
 
