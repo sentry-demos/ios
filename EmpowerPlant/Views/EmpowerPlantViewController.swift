@@ -107,7 +107,10 @@ class EmpowerPlantViewController: UIViewController {
         }
     }
     
-    func readDirectory(path: String) {
+    func readDirectory(path: String, depth: Int = 0) {
+        // Prevent infinite recursion by limiting depth
+        guard depth < 3 else { return }
+        
         let fm = FileManager.default
         
         do {
@@ -115,8 +118,11 @@ class EmpowerPlantViewController: UIViewController {
             
             for item in items {
                 var isDirectory: ObjCBool = false
-                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    readDirectory(path: item)
+                let fullPath = (path as NSString).appendingPathComponent(item)
+                if fm.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
+                    if isDirectory.boolValue {
+                        readDirectory(path: fullPath, depth: depth + 1)
+                    }
                 } else {
                     return
                 }
