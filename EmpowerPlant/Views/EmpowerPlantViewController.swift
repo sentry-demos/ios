@@ -92,18 +92,27 @@ class EmpowerPlantViewController: UIViewController {
 
     
     func readCurrentDirectory() {
-        let path = FileManager.default.currentDirectoryPath
+        // Use app's documents directory instead of system current directory for safety
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.path ?? ""
+        
+        // Only proceed if we have a valid documents path
+        guard !documentsPath.isEmpty else {
+            print("Skipping directory read - no accessible documents directory")
+            return
+        }
+        
         do {
-            let items = try FileManager.default.contentsOfDirectory(atPath: path)
-            let loop = fibonacciSeries(num: items.count)
+            let items = try FileManager.default.contentsOfDirectory(atPath: documentsPath)
+            // Limit the fibonacci calculation to prevent excessive operations
+            let limitedCount = min(items.count, 5)
+            let loop = min(fibonacciSeries(num: limitedCount), 10)
+            
             for i in 1...loop {
-                readDirectory(path: path)
+                readDirectory(path: documentsPath)
             }
         } catch {
-            ErrorToastManager.shared.logErrorAndShowToast(
-                error: error,
-                message: "Failed to read current directory"
-            )
+            // Log error but don't send to Sentry to avoid masking purchase errors
+            print("File I/O demo error (not sent to Sentry): \(error)")
         }
     }
     
@@ -116,22 +125,25 @@ class EmpowerPlantViewController: UIViewController {
         do {
             let items = try fm.contentsOfDirectory(atPath: path)
             
-            for item in items {
+            // Limit the number of items processed to prevent excessive operations
+            let limitedItems = Array(items.prefix(10))
+            
+            for item in limitedItems {
                 var isDirectory: ObjCBool = false
                 let fullPath = (path as NSString).appendingPathComponent(item)
+                
+                // Check if we can access the path before proceeding
+                guard fm.isReadableFile(atPath: fullPath) else { continue }
+                
                 if fm.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
                     if isDirectory.boolValue {
                         readDirectory(path: fullPath, depth: depth + 1)
                     }
-                } else {
-                    return
                 }
             }
         } catch {
-            ErrorToastManager.shared.logErrorAndShowToast(
-                error: error,
-                message: "Failed to read directory: \(path)"
-            )
+            // Log error but don't send to Sentry to avoid masking purchase errors
+            print("File I/O demo error (not sent to Sentry): \(error)")
         }
         
     }
