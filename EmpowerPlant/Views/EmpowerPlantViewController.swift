@@ -404,8 +404,9 @@ class EmpowerPlantViewController: UIViewController {
                     )
                 }
             } else if let error = error {
-                ErrorToastManager.shared.logErrorAndShowToast(
-                    error: error,
+                // Log error but don't send to Sentry to avoid masking purchase errors
+                print("Products fetch error (not sent to Sentry): \(error)")
+                ErrorToastManager.shared.showErrorToast(
                     message: "Failed to fetch products from server"
                 )
             }
