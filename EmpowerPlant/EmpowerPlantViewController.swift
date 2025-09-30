@@ -115,8 +115,9 @@ class EmpowerPlantViewController: UIViewController {
             
             for item in items {
                 var isDirectory: ObjCBool = false
-                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    readDirectory(path: item)
+                let fullPath = (path as NSString).appendingPathComponent(item)
+                if fm.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
+                    readDirectory(path: fullPath)
                 } else {
                     return
                 }
