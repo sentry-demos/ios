@@ -119,7 +119,7 @@ class EmpowerPlantViewController: UIViewController {
         }
     }
     
-func readDirectory(path: String, depth: Int = 0) {
+    func readDirectory(path: String, depth: Int = 0) {
         // Limit recursion to prevent deep system traversal
         guard depth < 3 else { return }
         let fm = FileManager.default
