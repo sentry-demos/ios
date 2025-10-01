@@ -49,7 +49,7 @@ class EmpowerPlantViewController: UIViewController {
         
         getAllProductsFromServer()
         getAllProductsFromDb()
-        readCurrentDirectory()
+        // readCurrentDirectory() Disabled to avoid scanning outside app sandbox
         performLongFileOperation()
         processProducts()
         checkRelease()
@@ -66,11 +66,23 @@ class EmpowerPlantViewController: UIViewController {
     }
     
     func performLongFileOperation() {
-        let longString = String(repeating: UUID().uuidString, count: 5_000_000)
-        let data = longString.data(using: .utf8)!
-        let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
-        try! data.write(to: filePath)
-        try! FileManager.default.removeItem(at: filePath)
+        // Synchronous file I/O on the main thread to demonstrate Sentry's File I/O tracking
+        // Use a bundled resource to avoid permissions and external paths
+        if let sourceURL = Bundle.main.url(forResource: "mobydick", withExtension: "txt") {
+            do {
+                // Read large file synchronously (main thread)
+                let data = try Data(contentsOf: sourceURL)
+                // Write it to Documents and then delete, still on main thread
+                if let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                    let dest = documents.appendingPathComponent("mobydick_copy_\(UUID().uuidString).txt")
+                    try data.write(to: dest)
+                    try FileManager.default.removeItem(at: dest)
+                }
+            } catch {
+                // Non-fatal: we only need to exercise file I/O for performance demo
+                print("File I/O demo error: \(error)")
+            }
+        }
     }
 
     func processProducts() {
@@ -107,16 +119,21 @@ class EmpowerPlantViewController: UIViewController {
         }
     }
     
-    func readDirectory(path: String) {
+func readDirectory(path: String, depth: Int = 0) {
+        // Limit recursion to prevent deep system traversal
+        guard depth < 3 else { return }
         let fm = FileManager.default
-        
+
         do {
             let items = try fm.contentsOfDirectory(atPath: path)
-            
+
             for item in items {
                 var isDirectory: ObjCBool = false
-                if fm.fileExists(atPath: item, isDirectory: &isDirectory) {
-                    readDirectory(path: item)
+                let fullPath = (path as NSString).appendingPathComponent(item)
+                if fm.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
+                    if isDirectory.boolValue {
+                        readDirectory(path: fullPath, depth: depth + 1)
+                    }
                 } else {
                     return
                 }
