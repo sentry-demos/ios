@@ -89,7 +89,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
-        let url = URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!
+        let url = URL(string: "https://flask.empower-plant.com/checkout")!
 
 
         var request = URLRequest(url: url)

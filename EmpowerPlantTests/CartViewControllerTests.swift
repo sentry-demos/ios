@@ -37,7 +37,7 @@ final class CartViewControllerTests: XCTestCase {
 
         // Prepare mock response
         let mockResponse = HTTPURLResponse(
-            url: URL(string: "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/checkout")!,
+            url: URL(string: "https://flask.empower-plant.com/checkout")!,
             statusCode: 200,
             httpVersion: nil,
             headerFields: nil

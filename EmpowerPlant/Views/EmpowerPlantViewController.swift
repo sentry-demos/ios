@@ -339,7 +339,7 @@ class EmpowerPlantViewController: UIViewController {
         logger.info("Fetching products from server")
 
         let startTime = Date()
-        let urlStr = "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com/products-join"
+        let urlStr = "https://flask.empower-plant.com/products-join"
         let url = URL(string: urlStr)!
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
