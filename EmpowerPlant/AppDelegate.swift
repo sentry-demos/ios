@@ -51,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
-                "https://application-monitoring-flask-dot-sales-engineering-sf.appspot.com"
+                "https://flask.empower-plant.com"
             ]
             
             // Enable Mobile Session Replay
