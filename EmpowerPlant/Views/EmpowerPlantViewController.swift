@@ -320,6 +320,8 @@ class EmpowerPlantViewController: UIViewController {
     func getAllProductsFromDb() {
         do {
             self.products = try context.fetch(Product.fetchRequest())
+            // Filter out "Plant Mood5"
+            self.products = self.products.filter { $0.title != "Plant Mood5" }
             // for product in self.products {
             //     print(product.productId, product.title, product.productDescriptionFull)
             // }
