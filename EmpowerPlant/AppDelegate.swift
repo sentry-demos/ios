@@ -70,18 +70,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enable Logs
             options.experimental.enableLogs = true
-            
-            options.beforeSend = { event in
-                if let reqUrl = event.request?.url,
-                   let host = URL(string: reqUrl)?.host,
-                   let serverIP = resolveIPAddress(of: host) {
-
-                    var extra = event.extra ?? [:]
-                    extra["server_ip"] = serverIP
-                    event.extra = extra
-                }
-                return event
-            }
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
