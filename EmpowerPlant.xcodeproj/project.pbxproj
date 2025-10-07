@@ -156,7 +156,7 @@
 				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
 				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
 			);
-			path = Views;
+			name = Views;
 			sourceTree = "<group>";
 		};
 		F4ED5FEE2E74971E006B47D6 /* Models */ = {
@@ -165,7 +165,7 @@
 				D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */,
 				D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */,
 			);
-			path = Models;
+			name = Models;
 			sourceTree = "<group>";
 		};
 		F4ED5FEF2E749733006B47D6 /* Helpers */ = {
@@ -175,7 +175,7 @@
 				843BD60E2AD08CE900B0098F /* Utils.swift */,
 				8B21663B29D3F8C80009C890 /* RandomErrors.swift */,
 			);
-			path = Helpers;
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
