@@ -32,8 +32,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             #endif
 
             options.tracesSampleRate = 1.0
-            options.profilesSampleRate = 1.0
-            options.enableAppLaunchProfiling = true
+            
+            // Enable UI Profiling (new API introduced in SDK 8.49.0)
+            options.configureProfiling = { 
+                $0.sessionSampleRate = 1.0
+            }
+            
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
