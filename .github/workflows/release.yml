@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install sentry-cli
-        run: curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.21.2 bash
+        run: curl -sL https://sentry.io/get-cli/ | sh
       - name: Run Deploy Script
         run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
         shell: sh
