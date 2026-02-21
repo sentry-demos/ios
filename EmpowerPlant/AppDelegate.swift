@@ -51,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "https://flask.empower-plant.com",
                 "localhost"
             ]
-            options.enablePropagateTraceParent = true
+            options.enablePropagateTraceparent = true
             
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
