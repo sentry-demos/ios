@@ -74,11 +74,11 @@ class ListAppViewController: UIViewController {
             ], key: "ecommerce_context")
         }
         
-        let userFeedback = UserFeedback(eventId: eventId)
-        userFeedback.comments = "I was trying to purchase some plants but the checkout process failed. The payment button didn't respond and I'm not sure if my order went through. This is frustrating as I really wanted to buy the Plant Mood and Botana Voice products."
-        userFeedback.email = "customer@example.com"
-        userFeedback.name = "Plant Enthusiast"
-        SentrySDK.capture(userFeedback: userFeedback)
+        SentrySDK.capture(feedback: SentryFeedback(
+            message: "I was trying to purchase some plants but the checkout process failed...",
+            name: "Plant Enthusiast",
+            email: "customer@example.com"
+        ))
     }
     
     @IBAction func captureError(_ sender: Any) {

@@ -148,13 +148,12 @@ class ErrorToastManager {
             let comments = alert.textFields?[2].text ?? ""
             
             if !comments.isEmpty {
-                let userFeedback = UserFeedback(eventId: eventId)
-                userFeedback.name = name.isEmpty ? "Anonymous User" : name
-                userFeedback.email = email.isEmpty ? "anonymous@example.com" : email
-                userFeedback.comments = comments
-                
-                SentrySDK.capture(userFeedback: userFeedback)
-                
+                SentrySDK.capture(feedback: SentryFeedback(
+                    message: comments,
+                    name: name.isEmpty ? "Anonymous User" : name,
+                    email: email.isEmpty ? "anonymous@example.com" : email
+                ))
+
                 // Show success message
                 self.showInfoToast(message: "Thank you for your feedback! We'll use it to improve the app.")
             }
