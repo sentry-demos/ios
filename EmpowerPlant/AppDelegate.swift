@@ -48,8 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
-                "https://flask.empower-plant.com"
+                "https://flask.empower-plant.com",
+                "localhost"
             ]
+            options.enablePropagateTraceParent = true
             
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
