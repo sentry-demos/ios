@@ -32,17 +32,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             #endif
 
             options.tracesSampleRate = 1.0
-            options.profilesSampleRate = 1.0
-            options.enableAppLaunchProfiling = true
+            options.configureProfiling = { $0.sessionSampleRate = 1 }
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
-            options.enablePerformanceV2 = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             
-            // Enable AppHang V2 configurations
-            options.enableAppHangTrackingV2 = true
+            // Enable AppHang configurations
             options.appHangTimeoutInterval = 2.0
             options.enableReportNonFullyBlockingAppHangs = true
             
@@ -51,8 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
-                "https://flask.empower-plant.com"
+                "https://flask.empower-plant.com",
+                "localhost"
             ]
+            options.enablePropagateTraceparent = true
             
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
@@ -68,8 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
             
-            // Enable Logs
-            options.experimental.enableLogs = true
+            // Enable Logs (enabled by default in v9)
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
