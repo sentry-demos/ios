@@ -68,6 +68,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             // Enable Logs (enabled by default in v9)
+
+            // Strip user IP address from ecommerce/payment errors to avoid exposing PII.
+            // Also apply custom fingerprinting per SE identifier and version to isolate issues
+            // per engineer/deployment, mirroring the Android demo app's grouping behavior.
+            let se = ProcessInfo.processInfo.environment["USER"] ?? "tda"
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+            options.beforeSend = { event in
+                if event.exceptions?.first?.type == "EmpowerPlant.EcommerceError" {
+                    event.user?.ipAddress = nil
+                }
+                if se == "tda" {
+                    event.fingerprint = ["{{ default }}", se, version]
+                } else if !se.isEmpty {
+                    event.fingerprint = ["{{ default }}", se]
+                }
+                return event
+            }
         }
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
