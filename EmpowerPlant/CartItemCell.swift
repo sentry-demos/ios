@@ -43,11 +43,12 @@ class CartItemCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             productNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            productNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            productNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            productNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
             productNameLabel.trailingAnchor.constraint(equalTo: quantityLabel.leadingAnchor, constant: -12),
 
             quantityLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            quantityLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            quantityLabel.centerYAnchor.constraint(equalTo: productNameLabel.centerYAnchor),
             quantityLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 60),
         ])
     }
