@@ -69,6 +69,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             // Enable Logs (enabled by default in v9)
         }
+        EmpowerPlantTheme.applyNavBarAppearance()
+
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
             scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")

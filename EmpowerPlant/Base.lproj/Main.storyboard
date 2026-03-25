@@ -22,7 +22,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Empower Plants" id="Zxx-KE-qjy">
                         <barButtonItem key="backBarButtonItem" title="Empower Plants" id="53r-4t-Q7n">
-                            <color key="tintColor" name="AccentColor"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
@@ -46,7 +46,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="My Cart" id="HBc-3M-t3f">
                         <barButtonItem key="backBarButtonItem" title="Empower Plants" id="SPv-hU-fem">
-                            <color key="tintColor" name="AccentColor"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </barButtonItem>
                     </navigationItem>
                 </viewController>
@@ -275,7 +275,7 @@
                     <navigationItem key="navigationItem" id="r5d-gZ-zyX">
                         <nil key="title"/>
                         <barButtonItem key="backBarButtonItem" title="Empower Plants" id="Yiv-HT-IE1">
-                            <color key="tintColor" name="AccentColor"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
@@ -296,9 +296,9 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="ZRT-xt-jev">
                         <rect key="frame" x="0.0" y="48" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="tintColor" name="AccentColor"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <textAttributes key="largeTitleTextAttributes">
-                            <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>

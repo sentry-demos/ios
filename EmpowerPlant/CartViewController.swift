@@ -22,9 +22,25 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     let tableView: UITableView = {
         let table = UITableView()
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.register(CartItemCell.self, forCellReuseIdentifier: CartItemCell.reuseIdentifier)
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
+    }()
+
+    private let totalFooter: UIView = {
+        let v = UIView()
+        v.backgroundColor = EmpowerPlantTheme.cardBackground
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+
+    private let totalLabel: UILabel = {
+        let l = UILabel()
+        l.font = .systemFont(ofSize: 20, weight: .bold)
+        l.textColor = EmpowerPlantTheme.textHeader
+        l.textAlignment = .right
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
     }()
     
     // Used for mocking in unit test
@@ -40,35 +56,63 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Cart Screen"
+        title = "Cart"
 
+        // Table view
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        
+
+        // Total footer
+        totalFooter.addSubview(totalLabel)
+        self.view.addSubview(totalFooter)
+
+        // Add a top border to the footer
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        totalFooter.addSubview(separator)
+
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.bottomAnchor.constraint(equalTo: totalFooter.topAnchor),
+
+            totalFooter.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            totalFooter.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            totalFooter.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            totalFooter.heightAnchor.constraint(equalToConstant: 60),
+
+            totalLabel.trailingAnchor.constraint(equalTo: totalFooter.trailingAnchor, constant: -20),
+            totalLabel.centerYAnchor.constraint(equalTo: totalFooter.centerYAnchor),
+
+            separator.topAnchor.constraint(equalTo: totalFooter.topAnchor),
+            separator.leadingAnchor.constraint(equalTo: totalFooter.leadingAnchor),
+            separator.trailingAnchor.constraint(equalTo: totalFooter.trailingAnchor),
+            separator.heightAnchor.constraint(equalToConstant: 0.5),
         ])
+
+        totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
 
         configureNavigationItems()
         checkRelease()
 
-        // TODO: make this 'total' appear in a UI element
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
         SentrySDK.reportFullyDisplayed()
     }
 
     private func configureNavigationItems() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Purchase",
-            style: .plain,
-            target: self,
-            action: #selector(purchase)
-        )
-        self.navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Purchase"
+        let purchaseButton = UIButton(type: .system)
+        purchaseButton.setTitle("  Purchase  ", for: .normal)
+        purchaseButton.setTitleColor(.white, for: .normal)
+        purchaseButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        purchaseButton.backgroundColor = EmpowerPlantTheme.buttonBackground
+        purchaseButton.layer.cornerRadius = 4
+        purchaseButton.addTarget(self, action: #selector(purchase), for: .touchUpInside)
+        purchaseButton.accessibilityIdentifier = "Purchase"
+
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: purchaseButton)
     }
 
     @objc
@@ -221,38 +265,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //  'product' here has all available attributes here, if needed in the future (e.g. UI development)
-        // let product = products[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
 
-        var items: [Int] = [
-            ShoppingCart.instance.quantities.plantMood,
-            ShoppingCart.instance.quantities.botanaVoice,
-            ShoppingCart.instance.quantities.plantStroller,
-            ShoppingCart.instance.quantities.plantNodes,
+        let quantities: [(String, Int)] = [
+            ("Plant Mood", ShoppingCart.instance.quantities.plantMood),
+            ("Botana Voice", ShoppingCart.instance.quantities.botanaVoice),
+            ("Plant Stroller", ShoppingCart.instance.quantities.plantStroller),
+            ("Plant Nodes", ShoppingCart.instance.quantities.plantNodes),
         ]
 
-        var text = ""
-        var quantity = items[indexPath.row]
-
-        switch indexPath.row {
-        case 0:
-            text = "Plant Mood: " + String(quantity)
-            break
-        case 1:
-            text = "Botana Voice: " + String(quantity)
-            break
-        case 2:
-            text = "Plant Stroller: " + String(quantity)
-            break
-        case 3:
-            text = "Plant Nodes: " + String(quantity)
-            break
-        default:
-            print("indexPath.row was not 0,1,2,3")
-        }
-
-        cell.textLabel?.text = text
+        let item = quantities[indexPath.row]
+        cell.configure(name: item.0, quantity: item.1)
 
         return cell
     }

@@ -28,6 +28,9 @@
 		D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73D127D83321006650AF /* ListAppViewController.swift */; };
 		D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19EBE6E2805ED52007022DC /* ShoppingCart.swift */; };
 		D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ERRORTOAST002 /* ErrorToastManager.swift */; };
+		F4A1B0022E8A000100C1D2E3 /* EmpowerPlantTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */; };
+		F4A1B0042E8A000200C1D2E3 /* ProductTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */; };
+		F4A1B0062E8A000300C1D2E3 /* CartItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +74,9 @@
 		D17C73D127D83321006650AF /* ListAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppViewController.swift; sourceTree = "<group>"; };
 		D19EBE6E2805ED52007022DC /* ShoppingCart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCart.swift; sourceTree = "<group>"; };
 		D1ERRORTOAST002 /* ErrorToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorToastManager.swift; sourceTree = "<group>"; };
+		F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantTheme.swift; sourceTree = "<group>"; };
+		F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductTableViewCell.swift; sourceTree = "<group>"; };
+		F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +138,9 @@
 				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
 				D17C73B827D8291D006650AF /* Main.storyboard */,
 				D17C73C027D8291D006650AF /* Info.plist */,
+				F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */,
+				F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */,
+				F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */,
 			);
 			path = EmpowerPlant;
 			sourceTree = "<group>";
@@ -334,6 +343,9 @@
 				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
 				D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */,
 				D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */,
+				F4A1B0022E8A000100C1D2E3 /* EmpowerPlantTheme.swift in Sources */,
+				F4A1B0042E8A000200C1D2E3 /* ProductTableViewCell.swift in Sources */,
+				F4A1B0062E8A000300C1D2E3 /* CartItemCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
