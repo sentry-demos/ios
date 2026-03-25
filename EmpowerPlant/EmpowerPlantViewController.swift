@@ -15,7 +15,9 @@ class EmpowerPlantViewController: UIViewController {
     
     let tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.register(ProductTableViewCell.self, forCellReuseIdentifier: ProductTableViewCell.reuseIdentifier)
+        table.separatorStyle = .none
+        table.backgroundColor = EmpowerPlantTheme.tableBackground
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
@@ -30,6 +32,7 @@ class EmpowerPlantViewController: UIViewController {
         self.view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.rowHeight = 120
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
@@ -442,9 +445,18 @@ extension EmpowerPlantViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = products[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        //  'model' has all available attributes here, if needed in the future (e.g. UI development)
-        cell.textLabel?.text = model.title
+        let cell = tableView.dequeueReusableCell(withIdentifier: ProductTableViewCell.reuseIdentifier, for: indexPath) as! ProductTableViewCell
+        cell.configure(name: model.title, price: model.price, imageURL: model.imgCropped ?? model.img)
+        cell.onAddToCart = { [weak self] in
+            guard let self = self else { return }
+            let logger = SentrySDK.logger
+            logger.info("Product selected and added to cart", attributes: [
+                "productId": model.productId ?? "unknown",
+                "productTitle": model.title ?? "unknown",
+                "selectedIndex": indexPath.row
+            ])
+            ShoppingCart.addProduct(product: model)
+        }
         return cell
     }
     
@@ -455,17 +467,7 @@ extension EmpowerPlantViewController: UITableViewDataSource {
 
 // MARK: UITableViewDelegate
 extension EmpowerPlantViewController: UITableViewDelegate {
-    // Code that executes on Click'ing table row, adds the product item to shopping cart
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let product = products[indexPath.row]
-        let logger = SentrySDK.logger
-        
-        logger.info("Product selected and added to cart", attributes: [
-            "productId": product.productId ?? "unknown",
-            "productTitle": product.title ?? "unknown",
-            "selectedIndex": indexPath.row
-        ])
-        
-        ShoppingCart.addProduct(product: product)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }

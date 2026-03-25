@@ -75,7 +75,13 @@ class ErrorToastManager {
         view.configureTheme(.error)
         view.configureContent(title: "Checkout Error", body: message)
         view.configureDropShadow()
-        
+
+        // Apply purple theme to match the app's color scheme
+        view.backgroundColor = EmpowerPlantTheme.buttonPressed  // deep purple #562E7D
+        view.button?.backgroundColor = EmpowerPlantTheme.buttonBackground
+        view.button?.setTitleColor(.white, for: .normal)
+        view.button?.layer.cornerRadius = 4
+
         // Set up interactive elements with feedback option
         view.button?.setTitle("Provide Feedback", for: .normal)
         view.buttonTapHandler = { _ in

@@ -87,6 +87,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return event
             }
         }
+        EmpowerPlantTheme.applyNavBarAppearance()
+
         SentrySDK.configureScope{ scope in
             scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
             scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")
