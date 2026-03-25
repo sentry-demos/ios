@@ -76,6 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
             options.beforeSend = { event in
                 if event.exceptions?.first?.type == "EmpowerPlant.EcommerceError" {
+                    if event.user == nil { event.user = User() }
                     event.user?.ipAddress = nil
                 }
                 if se == "tda" {
