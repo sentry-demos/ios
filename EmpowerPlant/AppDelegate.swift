@@ -72,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Strip user IP address from ecommerce/payment errors to avoid exposing PII.
             // Also apply custom fingerprinting per SE identifier and version to isolate issues
             // per engineer/deployment, mirroring the Android demo app's grouping behavior.
-            let se = ProcessInfo.processInfo.environment["USER"] ?? "tda"
+            let se = ProcessInfo.processInfo.environment["USER"] ?? "tda-or-not-set"
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
             options.beforeSend = { event in
                 if event.exceptions?.first?.type == "EmpowerPlant.EcommerceError" {
