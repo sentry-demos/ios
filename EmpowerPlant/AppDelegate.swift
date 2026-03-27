@@ -32,7 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             #endif
 
             options.tracesSampleRate = 1.0
-            options.configureProfiling = { $0.sessionSampleRate = 1 }
+            options.configureProfiling = {
+                $0.sessionSampleRate = 1
+                $0.lifecycle = .trace
+            }
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
