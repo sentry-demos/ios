@@ -124,7 +124,10 @@ class ProductTableViewCell: UITableViewCell {
     // MARK: - Configuration
 
     func configure(name: String?, price: String?, imageURL: String?) {
-        nameLabel.text = name ?? "Unknown"
+        let safeName = name ?? "Unknown"
+        nameLabel.text = safeName
+        accessibilityIdentifier = "ProductCell_\(safeName)"
+        addToCartButton.accessibilityIdentifier = "AddToCart_\(safeName)"
 
         if let priceStr = price, let priceInt = Int(priceStr) {
             priceLabel.text = "$\(priceInt)"
