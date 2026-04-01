@@ -58,6 +58,7 @@ class CartItemCell: UITableViewCell {
     func configure(name: String, quantity: Int) {
         productNameLabel.text = name
         quantityLabel.text = "Qty: \(quantity)"
+        accessibilityIdentifier = "CartItem_\(name)"
     }
 
     // MARK: - Reuse
