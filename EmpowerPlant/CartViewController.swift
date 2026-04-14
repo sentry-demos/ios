@@ -105,10 +105,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     private func configureNavigationItems() {
         let purchaseButton = UIButton(type: .system)
         purchaseButton.setTitle("  Purchase  ", for: .normal)
-        purchaseButton.setTitleColor(.white, for: .normal)
-        purchaseButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-        purchaseButton.backgroundColor = EmpowerPlantTheme.buttonBackground
-        purchaseButton.layer.cornerRadius = 4
+        if #unavailable(iOS 26.0) {
+            purchaseButton.setTitleColor(.white, for: .normal)
+            purchaseButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            purchaseButton.backgroundColor = EmpowerPlantTheme.buttonBackground
+            purchaseButton.layer.cornerRadius = 4
+        }
         purchaseButton.addTarget(self, action: #selector(purchase), for: .touchUpInside)
         purchaseButton.accessibilityIdentifier = "Purchase"
 

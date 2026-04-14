@@ -6,3 +6,4 @@ build/
 release-build.log
 EmpowerPlant_release.zip
 slather/
+.sentryclirc
