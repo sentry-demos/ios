@@ -314,7 +314,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "exit 0\n./upload-symbols.sh\n";
+			shellScript = "./upload-symbols.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
