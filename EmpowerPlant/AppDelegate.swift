@@ -70,7 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
             
-            // Enable Logs (enabled by default in v9)
+            // Enable Logs
+            options.enableLogs = true
 
             // Strip user IP address from ecommerce/payment errors to avoid exposing PII.
             // Also apply custom fingerprinting per SE identifier and version to isolate issues
