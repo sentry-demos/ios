@@ -15,10 +15,27 @@ jobs:
       - name: Setup Sentry CLI
         uses: mathieu-bour/setup-sentry-cli@v1.3.0
         with:
-          version: 2.21.2
+          version: latest
           token: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Run Deploy Script
         run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
         shell: sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload to Sentry Size Analysis
+        run: |
+          xcodebuild archive \
+            -project EmpowerPlant.xcodeproj \
+            -scheme EmpowerPlant \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath build/EmpowerPlant.xcarchive \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
+          sentry-cli build upload build/EmpowerPlant.xcarchive \
+            --org ${{ secrets.SENTRY_ORG }} \
+            --project ${{ secrets.SENTRY_PROJECT }} \
+            --build-configuration Release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
