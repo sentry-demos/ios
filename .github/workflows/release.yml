@@ -36,6 +36,8 @@ jobs:
           sentry-cli build upload build/EmpowerPlant.xcarchive \
             --org ${{ secrets.SENTRY_ORG }} \
             --project ${{ secrets.SENTRY_PROJECT }} \
-            --build-configuration Release
+            --build-configuration Release \
+            --head-sha ${{ github.sha }} \
+            --head-ref ${{ github.ref_name }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
