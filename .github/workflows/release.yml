@@ -38,6 +38,8 @@ jobs:
             --project ${{ secrets.SENTRY_PROJECT }} \
             --build-configuration Release \
             --head-sha ${{ github.sha }} \
-            --head-ref "${{ github.ref_name }}"
+            --head-ref "${{ github.ref_name }}" \
+            --vcs-provider github \
+            --head-repo-name ${{ github.repository }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
