@@ -24,15 +24,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to Sentry Size Analysis
         run: |
-          xcodebuild archive \
-            -project EmpowerPlant.xcodeproj \
-            -scheme EmpowerPlant \
-            -configuration Release \
-            -destination "generic/platform=iOS" \
-            -archivePath build/EmpowerPlant.xcarchive \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            -quiet
           sentry-cli build upload build/EmpowerPlant.xcarchive \
             --org ${{ secrets.SENTRY_ORG }} \
             --project ${{ secrets.SENTRY_PROJECT }} \
