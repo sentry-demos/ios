@@ -27,3 +27,48 @@ jobs:
         token: 214d9137-2c5a-4eaf-9327-c6031f13795a
         fail_ci_if_error: true
         verbose: true
+
+    - name: Setup Sentry CLI
+      uses: mathieu-bour/setup-sentry-cli@v1.3.0
+      with:
+        version: 3.3.5
+        token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+    - name: Upload to Sentry Size Analysis
+      run: |
+        xcodebuild archive \
+          -project EmpowerPlant.xcodeproj \
+          -scheme EmpowerPlant \
+          -configuration Release \
+          -destination "generic/platform=iOS" \
+          -archivePath build/EmpowerPlant.xcarchive \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          -quiet
+
+        HEAD_REF="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+        UPLOAD_ARGS=(
+          --org "$SENTRY_ORG"
+          --project "$SENTRY_PROJECT"
+          --build-configuration Release
+          --head-sha "$GITHUB_SHA"
+          --head-ref "$HEAD_REF"
+          --vcs-provider github
+          --head-repo-name "$GITHUB_REPOSITORY"
+        )
+
+        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+          UPLOAD_ARGS+=(
+            --base-sha "$PR_BASE_SHA"
+            --base-ref "$GITHUB_BASE_REF"
+            --pr-number "$PR_NUMBER"
+          )
+        fi
+
+        sentry-cli build upload build/EmpowerPlant.xcarchive "${UPLOAD_ARGS[@]}"
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}

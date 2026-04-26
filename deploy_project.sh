@@ -13,11 +13,23 @@ SENTRY_ORG_INPUT=${2}
 SENTRY_PROJECT_INPUT=${3}
 SENTRY_AUTH_TOKEN_INPUT=${4}
 
-# Build the release bundle
-echo "Building the release bundle..."
+# Build the simulator bundle (for Saucelabs / GitHub release zip)
+echo "Building the simulator bundle..."
 SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=$SENTRY_PROJECT_INPUT SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN_INPUT xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Release -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 16" -quiet clean build
 zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
 ZIP_PATH="./EmpowerPlant_release.zip"
+
+# Build the XCArchive (for Sentry Size Analysis upload)
+echo "Building XCArchive for Sentry Size Analysis..."
+xcodebuild archive \
+  -project EmpowerPlant.xcodeproj \
+  -scheme EmpowerPlant \
+  -configuration Release \
+  -destination "generic/platform=iOS" \
+  -archivePath build/EmpowerPlant.xcarchive \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  -quiet
 
 # Check if gh is installed
 if ! command -v gh &> /dev/null; then
