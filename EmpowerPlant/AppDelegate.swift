@@ -41,6 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableSwizzling = enableSwizzling
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
+            options.experimental.enableStandaloneAppStartTracing = true
             
             // Enable AppHang configurations
             options.appHangTimeoutInterval = 2.0
@@ -59,6 +60,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
+            options.experimental.enableReplayNetworkDetailsCapturing = true
+            options.sessionReplay.networkDetailAllowUrls = [
+                "https://flask.empower-plant.com",
+                "https://storage.googleapis.com",
+                "localhost"
+            ]
+            options.sessionReplay.networkCaptureBodies = true
             
             //Enable User Feedback Widget
             options.configureUserFeedback = { config in
