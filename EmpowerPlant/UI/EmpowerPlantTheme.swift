@@ -1,3 +1,4 @@
+import SentrySwift
 import UIKit
 
 // MARK: - UIColor Hex Initializer
