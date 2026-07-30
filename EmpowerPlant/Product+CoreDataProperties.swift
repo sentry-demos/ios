@@ -1,17 +1,7 @@
-//
-//  Product+CoreDataProperties.swift
-//  
-//
-//  Created by William Capozzoli on 3/28/22.
-//
-//
-
 import Foundation
 import CoreData
 
-
 extension Product {
-
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
         let fr = NSFetchRequest<Product>(entityName: "Product")
         fr.sortDescriptors = [.init(key: "title", ascending: true)]
