@@ -24,6 +24,7 @@ setup: install-dependencies install-pre-commit
 .PHONY: install-dependencies
 install-dependencies:
 	brew bundle
+	bundle install
 
 ## Install the pre-commit hooks.
 #
