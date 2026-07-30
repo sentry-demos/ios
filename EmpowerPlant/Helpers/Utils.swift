@@ -8,14 +8,14 @@ enum DBError: Error {
 }
 
 public func wipeDB() {
-    let logger = SentrySDK.logger
-    logger.warn("Database wipe operation started")
+    SentrySDK.logger.debug("wipeDB called")
+    SentrySDK.logger.warn("Database wipe operation started")
 
     guard
         let url = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.persistentStoreCoordinator
             .persistentStores.first?.url
     else {
-        logger.error("Failed to locate database file for wiping")
+        SentrySDK.logger.error("Failed to locate database file for wiping")
 
         ErrorToastManager.shared.logErrorAndShowToast(
             error: DBError.noPersistentStore,
@@ -26,13 +26,13 @@ public func wipeDB() {
 
     do {
         try FileManager.default.removeItem(at: url)
-        logger.info(
+        SentrySDK.logger.info(
             "Database successfully wiped",
             attributes: [
                 "databasePath": url.absoluteString
             ])
     } catch {
-        logger.error(
+        SentrySDK.logger.error(
             "Failed to wipe database file",
             attributes: [
                 "error": error.localizedDescription,
@@ -48,11 +48,10 @@ public func wipeDB() {
 
 /// Add a delay based on current version.
 public func checkRelease() {
-    let logger = SentrySDK.logger
+    SentrySDK.logger.debug("checkRelease called")
 
     guard let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
-        logger.warn("Failed to read bundle version, not adding version-based delay")
-        print("failed to read bundle version, not sleeping")
+        SentrySDK.logger.warn("Failed to read bundle version, not adding version-based delay")
         return
     }
 
@@ -61,12 +60,18 @@ public func checkRelease() {
     let versionSum = versionString.components(separatedBy: ".").compactMap { Int($0) }.reduce(0, +)
 
     if versionSum % 2 == 0 {
-        logger.info(
+        SentrySDK.logger.info(
             "version sum is even, adding 1s sleep",
             attributes: [
                 "version": versionString,
                 "delaySeconds": 1,
             ])
         sleep(1)  // sleep takes seconds, not ms
+    } else {
+        SentrySDK.logger.debug(
+            "version sum is odd, no delay added",
+            attributes: [
+                "version": versionString
+            ])
     }
 }
