@@ -1,5 +1,5 @@
 import CoreData
-import Sentry
+import SentrySwift
 import UIKit
 
 @main
@@ -54,7 +54,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
-            options.experimental.enableReplayNetworkDetailsCapturing = true
             options.sessionReplay.networkDetailAllowUrls = [
                 "https://flask.empower-plant.com",
                 "https://storage.googleapis.com",
