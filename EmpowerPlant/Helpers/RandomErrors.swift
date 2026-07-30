@@ -1,4 +1,5 @@
 import Foundation
+import SentrySwift
 
 enum SampleError: Error, LocalizedError {
     case bestDeveloper
