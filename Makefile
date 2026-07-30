@@ -116,7 +116,7 @@ test-ios-app:
 		-derivedDataPath build \
 		-destination 'platform=iOS Simulator,OS=$(SIMULATOR_OS),name=$(DEVICE_NAME)' $(if $(ONLY_TESTING),-only-testing:$(ONLY_TESTING)) \
 		test | tee raw-test-ios-app.log | xcbeautify --preserve-unbeautified
-	slather coverage --configuration Test --verbose
+	bundle exec slather coverage --configuration Test --verbose
 
 # ============================================================================
 # FORMATTING
