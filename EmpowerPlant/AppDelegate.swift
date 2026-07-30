@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  EmpowerPlant
-//
-//  Created by William Capozzoli on 3/8/22.
-//
-
 import UIKit
 import Sentry
 import CoreData

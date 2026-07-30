@@ -1,10 +1,3 @@
-//
-//  ShoppingCart.swift
-//  EmpowerPlant
-//
-//  Created by William Capozzoli on 4/12/22.
-//
-
 import Foundation
 import Sentry
 

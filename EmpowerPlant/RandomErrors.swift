@@ -1,9 +1,3 @@
-//
-//  RandomErrors.swift
-//  EmpowerPlant
-//
-//  Created by Karan Pujji on 2/20/23.
-//
 import Foundation
 
 enum SampleError: Error, LocalizedError {
@@ -24,7 +18,6 @@ enum SampleError: Error, LocalizedError {
 }
 
 class RandomErrorGenerator {
-    
     static func generate() throws {
         let random = Int.random(in: 0...2)
         switch random {
