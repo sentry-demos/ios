@@ -1,8 +1,9 @@
-import UIKit
 import Sentry
+import UIKit
 
 protocol URLSessionProtocol {
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
+        -> URLSessionDataTaskProtocol
 }
 
 protocol URLSessionDataTaskProtocol {
@@ -10,8 +11,8 @@ protocol URLSessionDataTaskProtocol {
 }
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    //private let session: URLSessionProtocol
+
+    // private let session: URLSessionProtocol
 
     let tableView: UITableView = {
         let table = UITableView()
@@ -35,18 +36,18 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
-    
+
     // Used for mocking in unit test
     init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
-        //self.session = session
+        // self.session = session
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
-        //fatalError("init(coder:) has not been implemented")
+        // fatalError("init(coder:) has not been implemented")
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Cart"
@@ -113,23 +114,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc
     func purchase() {
         let logger = SentrySDK.logger
-        logger.info("Purchase initiated", attributes: [
-            "cartTotal": ShoppingCart.instance.total,
-            "itemCount": ShoppingCart.instance.items.count
-        ])
-        
+        logger.info(
+            "Purchase initiated",
+            attributes: [
+                "cartTotal": ShoppingCart.instance.total,
+                "itemCount": ShoppingCart.instance.items.count,
+            ])
+
         // Simulate potential app hang scenario for AppHang V2 demonstration
         // This creates a brief delay that could trigger hang detection if it exceeds threshold
         DispatchQueue.main.async {
             // Simulate processing delay that might cause UI to appear unresponsive
-            Thread.sleep(forTimeInterval: 0.5) // 500ms delay - under 2s threshold but shows interaction
+            Thread.sleep(forTimeInterval: 0.5)  // 500ms delay - under 2s threshold but shows interaction
         }
 
-        
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
         let url = URL(string: "https://flask.empower-plant.com/checkout")!
-
 
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -143,7 +144,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         enum PurchaseError: Error, LocalizedError {
             case insufficientInventory
-            
+
             var errorDescription: String? {
                 switch self {
                 case .insufficientInventory:
@@ -152,34 +153,39 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) { _, response, _ in
             let logger = SentrySDK.logger
             // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
             self.performCheckoutFileIO()
 
-            
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     let err = PurchaseError.insufficientInventory
-                    logger.error("Purchase failed with server error", attributes: [
-                        "statusCode": 500,
-                        "errorType": "insufficient_inventory"
-                    ])
-                    ErrorToastManager.shared.logErrorAndShowToast( //Flagship!
+                    logger.error(
+                        "Purchase failed with server error",
+                        attributes: [
+                            "statusCode": 500,
+                            "errorType": "insufficient_inventory",
+                        ])
+                    ErrorToastManager.shared.logErrorAndShowToast(  // Flagship!
                         error: err,
                         message: "Purchase failed: Insufficient inventory available (HTTP 500)",
                         showFeedbackOption: true  // Enable User Feedback for checkout errors
                     )
                 } else if (httpResponse.statusCode) == 200 {
-                    logger.info("Purchase completed successfully", attributes: [
-                        "statusCode": 200,
-                        "cartTotal": ShoppingCart.instance.total
-                    ])
+                    logger.info(
+                        "Purchase completed successfully",
+                        attributes: [
+                            "statusCode": 200,
+                            "cartTotal": ShoppingCart.instance.total,
+                        ])
                 } else {
-                    logger.warn("Purchase completed with unexpected status", attributes: [
-                        "statusCode": httpResponse.statusCode
-                    ])
+                    logger.warn(
+                        "Purchase completed with unexpected status",
+                        attributes: [
+                            "statusCode": httpResponse.statusCode
+                        ])
                 }
             }
 
@@ -187,37 +193,37 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // if let error = error {
             //    print("> HTTP Request Failed \(error)")
             //    SentrySDK.capture(error: error)
-            //}
+            // }
 
             // getting met whether it's a 200 or 500 - there's always a 'data' object here
             // if let data = data {
             //     print("> no error, do nothing", data)
-            //}
+            // }
         }
 
         task.resume()
     }
-    
+
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
     private func performCheckoutFileIO() {
         // Create temporary file to demonstrate file I/O tracking
         let tempDir = FileManager.default.temporaryDirectory
         let checkoutLogFile = tempDir.appendingPathComponent("checkout_log_\(UUID().uuidString).txt")
-        
+
         let checkoutData = """
-        Checkout initiated at: \(Date())
-        Cart total: \(ShoppingCart.instance.total)
-        Items count: \(ShoppingCart.instance.items.count)
-        User interaction: Purchase button tapped
-        """.data(using: .utf8)!
-        
+            Checkout initiated at: \(Date())
+            Cart total: \(ShoppingCart.instance.total)
+            Items count: \(ShoppingCart.instance.items.count)
+            User interaction: Purchase button tapped
+            """.data(using: .utf8)!
+
         do {
             try checkoutData.write(to: checkoutLogFile)
-            
+
             // Simulate reading the file back (common in checkout processes)
             let readData = try Data(contentsOf: checkoutLogFile)
             print("Checkout log written and read: \(readData.count) bytes")
-            
+
             // Clean up the temporary file
             try FileManager.default.removeItem(at: checkoutLogFile)
         } catch {
@@ -233,7 +239,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         // TODO: items
 
         let json: [String: Any] = [
-            "form": ["email":"will@example.com"], // TODO: email update + check if all tx's+errors have email
+            "form": ["email": "will@example.com"],  // TODO: email update + check if all tx's+errors have email
             "cart": [
                 "total": ShoppingCart.instance.total,
                 "quantities": [
@@ -243,11 +249,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                     "6": ShoppingCart.instance.quantities.plantNodes,
                 ],
                 "items": [
-                    ["id":"4", "title":"Plant Nodes"]
+                    ["id": "4", "title": "Plant Nodes"]
                     // ["id":"5", "title":"Plant Stroller"]
-                ]
+                ],
             ],
-            "validate_inventory": "true"
+            "validate_inventory": "true",
         ]
 
         return json
@@ -256,11 +262,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO: could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
         // or continue showing all products, even if quantity is 0. the screen looks more full this way
-        return 4 // products.count
+        return 4  // products.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
+        let cell =
+            tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
 
         let quantities: [(String, Int)] = [
             ("Plant Mood", ShoppingCart.instance.quantities.plantMood),
@@ -274,7 +281,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         return cell
     }
-
 
     /*
     // MARK: - Navigation
