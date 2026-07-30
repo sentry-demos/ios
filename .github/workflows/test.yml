@@ -19,9 +19,6 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Setup Environment
-        run: make setup-env
-
       - name: Install Dependencies
         run: make install-dependencies
 
