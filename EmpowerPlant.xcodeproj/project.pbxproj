@@ -3,34 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		843BD60F2AD08CE900B0098F /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BD60E2AD08CE900B0098F /* Utils.swift */; };
-		843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */ = {isa = PBXBuildFile; fileRef = 843BD6262AD7798C00B0098F /* jwt-deep-field.png */; };
-		846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 846BEA1B2ABE611A0032F77F /* mobydick.txt */; };
 		846D3E742E25921A00D4E7E3 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = 846D3E732E25921A00D4E7E3 /* SwiftMessages */; };
 		848716A32AD8C3CD00756467 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 848716A22AD8C3CD00756467 /* BigInt */; };
 		848716B72ADFAA2000756467 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 848716B62ADFAA2000756467 /* Sentry */; };
-		8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21663B29D3F8C80009C890 /* RandomErrors.swift */; };
-		8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */; };
-		D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */; };
-		D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */; };
-		D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */; };
-		D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B227D8291D006650AF /* AppDelegate.swift */; };
-		D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73B427D8291D006650AF /* SceneDelegate.swift */; };
-		D17C73BA27D8291D006650AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73B827D8291D006650AF /* Main.storyboard */; };
-		D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BB27D8291D006650AF /* Assets.xcassets */; };
-		D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */; };
-		D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */; };
-		D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73CE27D82ED1006650AF /* CartViewController.swift */; };
-		D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17C73D127D83321006650AF /* ListAppViewController.swift */; };
-		D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19EBE6E2805ED52007022DC /* ShoppingCart.swift */; };
-		D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ERRORTOAST002 /* ErrorToastManager.swift */; };
-		F4A1B0022E8A000100C1D2E3 /* EmpowerPlantTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */; };
-		F4A1B0042E8A000200C1D2E3 /* ProductTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */; };
-		F4A1B0062E8A000300C1D2E3 /* CartItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,10 +24,7 @@
 
 /* Begin PBXFileReference section */
 		840B7EF12BBF3C70008B8120 /* .slather.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .slather.yml; sourceTree = "<group>"; };
-		843BD60E2AD08CE900B0098F /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		843BD6262AD7798C00B0098F /* jwt-deep-field.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "jwt-deep-field.png"; sourceTree = "<group>"; };
 		846BEA1A2ABE46880032F77F /* upload-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-symbols.sh"; sourceTree = "<group>"; };
-		846BEA1B2ABE611A0032F77F /* mobydick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mobydick.txt; sourceTree = "<group>"; };
 		8474F0482ACCE2D800F21E06 /* deploy_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = deploy_project.sh; sourceTree = "<group>"; };
 		8474F04D2ACE54F300F21E06 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		848A45262BBFC79E006AAAEC /* .codecov.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .codecov.yml; sourceTree = "<group>"; };
@@ -58,26 +34,27 @@
 		84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmpowerPlant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EmpowerPlantTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A2641E2AA926A300A62A88 /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
-		8B21663B29D3F8C80009C890 /* RandomErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomErrors.swift; sourceTree = "<group>"; };
-		8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewControllerTests.swift; sourceTree = "<group>"; };
-		D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+CoreDataClass.swift"; sourceTree = "<group>"; };
-		D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		D17C73B227D8291D006650AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D17C73B427D8291D006650AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		D17C73B927D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D17C73BB27D8291D006650AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D17C73BE27D8291D006650AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		D17C73C027D8291D006650AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantViewController.swift; sourceTree = "<group>"; };
-		D17C73CE27D82ED1006650AF /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
-		D17C73D127D83321006650AF /* ListAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppViewController.swift; sourceTree = "<group>"; };
-		D19EBE6E2805ED52007022DC /* ShoppingCart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCart.swift; sourceTree = "<group>"; };
-		D1ERRORTOAST002 /* ErrorToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorToastManager.swift; sourceTree = "<group>"; };
-		F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmpowerPlantTheme.swift; sourceTree = "<group>"; };
-		F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductTableViewCell.swift; sourceTree = "<group>"; };
-		F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D4A8B4C4301B570B00D82415 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D17C73AE27D8291D006650AF /* EmpowerPlant */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D4A8B498301B55A000D82415 /* UI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = UI; sourceTree = "<group>"; };
+		D4A8B4A4301B55AB00D82415 /* Resources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (D4A8B4C4301B570B00D82415 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Resources; sourceTree = "<group>"; };
+		D4A8B4AD301B55D300D82415 /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
+		D4A8B4B3301B55EA00D82415 /* Helpers */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Helpers; sourceTree = "<group>"; };
+		D4A8B4BA301B560B00D82415 /* Main */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Main; sourceTree = "<group>"; };
+		D4A8B4BF301B56B400D82415 /* EmpowerPlantTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = EmpowerPlantTests; sourceTree = "<group>"; };
+		D4A8B4C2301B570600D82415 /* Logic */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Logic; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8BA3AB292A201FE900BE1EA8 /* Frameworks */ = {
@@ -100,14 +77,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */ = {
-			isa = PBXGroup;
-			children = (
-				8BA3AB372A20212C00BE1EA8 /* CartViewControllerTests.swift */,
-			);
-			path = EmpowerPlantTests;
-			sourceTree = "<group>";
-		};
 		D17C73A627D8291D006650AF = {
 			isa = PBXGroup;
 			children = (
@@ -121,7 +90,7 @@
 				848A45262BBFC79E006AAAEC /* .codecov.yml */,
 				84A2641B2AA915D800A62A88 /* README.md */,
 				D17C73B127D8291D006650AF /* EmpowerPlant */,
-				8BA3AB2D2A201FE900BE1EA8 /* EmpowerPlantTests */,
+				D4A8B4BF301B56B400D82415 /* EmpowerPlantTests */,
 				84A2641C2AA9165A00A62A88 /* EmpowerPlant.app */,
 				84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */,
 			);
@@ -130,61 +99,14 @@
 		D17C73B127D8291D006650AF /* EmpowerPlant */ = {
 			isa = PBXGroup;
 			children = (
-				F4ED5FEF2E749733006B47D6 /* Helpers */,
-				F4ED5FEE2E74971E006B47D6 /* Models */,
-				F4ED5FED2E749717006B47D6 /* Views */,
-				F4ED5FEC2E7496A6006B47D6 /* Resources */,
-				D17C73B227D8291D006650AF /* AppDelegate.swift */,
-				D17C73B427D8291D006650AF /* SceneDelegate.swift */,
-				D17C73B827D8291D006650AF /* Main.storyboard */,
-				D17C73C027D8291D006650AF /* Info.plist */,
-				F4A1B0012E8A000100C1D2E3 /* EmpowerPlantTheme.swift */,
-				F4A1B0032E8A000200C1D2E3 /* ProductTableViewCell.swift */,
-				F4A1B0052E8A000300C1D2E3 /* CartItemCell.swift */,
+				D4A8B4B3301B55EA00D82415 /* Helpers */,
+				D4A8B4AD301B55D300D82415 /* Models */,
+				D4A8B498301B55A000D82415 /* UI */,
+				D4A8B4A4301B55AB00D82415 /* Resources */,
+				D4A8B4BA301B560B00D82415 /* Main */,
+				D4A8B4C2301B570600D82415 /* Logic */,
 			);
 			path = EmpowerPlant;
-			sourceTree = "<group>";
-		};
-		F4ED5FEC2E7496A6006B47D6 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */,
-				846BEA1B2ABE611A0032F77F /* mobydick.txt */,
-				D17C73BB27D8291D006650AF /* Assets.xcassets */,
-				D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */,
-				843BD6262AD7798C00B0098F /* jwt-deep-field.png */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		F4ED5FED2E749717006B47D6 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				D17C73D127D83321006650AF /* ListAppViewController.swift */,
-				D17C73CB27D82EB8006650AF /* EmpowerPlantViewController.swift */,
-				D19EBE6E2805ED52007022DC /* ShoppingCart.swift */,
-				D17C73CE27D82ED1006650AF /* CartViewController.swift */,
-			);
-			name = Views;
-			sourceTree = "<group>";
-		};
-		F4ED5FEE2E74971E006B47D6 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				D15EDF13282BF80400FC13D6 /* Product+CoreDataClass.swift */,
-				D15EDF11282BF7FB00FC13D6 /* Product+CoreDataProperties.swift */,
-			);
-			name = Models;
-			sourceTree = "<group>";
-		};
-		F4ED5FEF2E749733006B47D6 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				D1ERRORTOAST002 /* ErrorToastManager.swift */,
-				843BD60E2AD08CE900B0098F /* Utils.swift */,
-				8B21663B29D3F8C80009C890 /* RandomErrors.swift */,
-			);
-			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -203,6 +125,9 @@
 			dependencies = (
 				8BA3AB312A201FE900BE1EA8 /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				D4A8B4BF301B56B400D82415 /* EmpowerPlantTests */,
+			);
 			name = EmpowerPlantTests;
 			productName = EmpowerPlantTests;
 			productReference = 84A2641D2AA9165A00A62A88 /* EmpowerPlantTests.xctest */;
@@ -220,6 +145,14 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D4A8B498301B55A000D82415 /* UI */,
+				D4A8B4A4301B55AB00D82415 /* Resources */,
+				D4A8B4AD301B55D300D82415 /* Models */,
+				D4A8B4B3301B55EA00D82415 /* Helpers */,
+				D4A8B4BA301B560B00D82415 /* Main */,
+				D4A8B4C2301B570600D82415 /* Logic */,
 			);
 			name = EmpowerPlant;
 			packageProductDependencies = (
@@ -285,11 +218,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				846BEA1C2ABE611A0032F77F /* mobydick.txt in Resources */,
-				D17C73BF27D8291D006650AF /* LaunchScreen.storyboard in Resources */,
-				D17C73BC27D8291D006650AF /* Assets.xcassets in Resources */,
-				843BD6272AD7798C00B0098F /* jwt-deep-field.png in Resources */,
-				D17C73BA27D8291D006650AF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,7 +251,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8BA3AB382A20212C00BE1EA8 /* CartViewControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,21 +258,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D17C73CC27D82EB8006650AF /* EmpowerPlantViewController.swift in Sources */,
-				D17C73D227D83321006650AF /* ListAppViewController.swift in Sources */,
-				D15EDF14282BF80400FC13D6 /* Product+CoreDataClass.swift in Sources */,
-				D15FCDA927E00F0D00258BF3 /* Model.xcdatamodeld in Sources */,
-				D17C73CF27D82ED1006650AF /* CartViewController.swift in Sources */,
-				8B21663C29D3F8C80009C890 /* RandomErrors.swift in Sources */,
-				D19EBE6F2805ED52007022DC /* ShoppingCart.swift in Sources */,
-				843BD60F2AD08CE900B0098F /* Utils.swift in Sources */,
-				D17C73B327D8291D006650AF /* AppDelegate.swift in Sources */,
-				D17C73B527D8291D006650AF /* SceneDelegate.swift in Sources */,
-				D1ERRORTOAST001 /* ErrorToastManager.swift in Sources */,
-				D15EDF12282BF7FB00FC13D6 /* Product+CoreDataProperties.swift in Sources */,
-				F4A1B0022E8A000100C1D2E3 /* EmpowerPlantTheme.swift in Sources */,
-				F4A1B0042E8A000200C1D2E3 /* ProductTableViewCell.swift in Sources */,
-				F4A1B0062E8A000300C1D2E3 /* CartItemCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,25 +270,6 @@
 			targetProxy = 8BA3AB302A201FE900BE1EA8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		D17C73B827D8291D006650AF /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D17C73B927D8291D006650AF /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		D17C73BD27D8291D006650AF /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D17C73BE27D8291D006650AF /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		848A45232BBFC6FE006AAAEC /* Test */ = {
@@ -449,7 +342,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 97JCY7859U;
-				INFOPLIST_FILE = EmpowerPlant/Info.plist;
+				INFOPLIST_FILE = EmpowerPlant/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -645,7 +538,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 97JCY7859U;
-				INFOPLIST_FILE = EmpowerPlant/Info.plist;
+				INFOPLIST_FILE = EmpowerPlant/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -665,7 +558,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 97JCY7859U;
-				INFOPLIST_FILE = EmpowerPlant/Info.plist;
+				INFOPLIST_FILE = EmpowerPlant/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -757,19 +650,6 @@
 			productName = Sentry;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		D15FCDA727E00F0D00258BF3 /* Model.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */,
-			);
-			currentVersion = D15FCDA827E00F0D00258BF3 /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = D17C73A727D8291D006650AF /* Project object */;
 }
