@@ -1,3 +1,6 @@
+brew 'dprint'
 brew 'gh'
+brew 'pre-commit'
+brew 'swiftlint'
 tap 'getsentry/tools'
 brew 'getsentry/tools/sentry-cli'

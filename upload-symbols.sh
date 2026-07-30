@@ -2,7 +2,7 @@
 
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
 
-if [ $CONFIGURATION == 'Test' ]; then
+if [ "$CONFIGURATION" = 'Test' ]; then
     echo "Will not upload debug symbols for test build."
     exit 0
 fi
@@ -14,6 +14,7 @@ if which sentry-cli >/dev/null; then
         echo "Using SENTRY_ORG and SENTRY_PROJECT environment variables."
     elif [ -f .env ] && grep -q "^SENTRY_ORG=" .env && grep -q "^SENTRY_PROJECT=" .env; then
         echo "Using SENTRY_ORG and SENTRY_PROJECT from .env file."
+        # shellcheck disable=SC2046
         export $(grep -v '^#' .env | sed '/^\s*$/d' | xargs)
     else
         echo "error: no SENTRY_ORG and SENTRY_PROJECT defined"
@@ -25,11 +26,13 @@ if which sentry-cli >/dev/null; then
         echo "Using SENTRY_AUTH_TOKEN environment variable."
     else
         if [ -f ~/.sentryclirc ]; then
-            export SENTRY_AUTH_TOKEN=$(grep -oE "token=(.*)$" ~/.sentryclirc | sed s/'token='//)
+            SENTRY_AUTH_TOKEN="$(grep -oE "token=(.*)$" ~/.sentryclirc | sed s/'token='//)"
+            export SENTRY_AUTH_TOKEN
             echo "Using SENTRY_AUTH_TOKEN from .sentryclirc."
         fi
         if [ -f ~/.zshrc ] && grep -q "export SENTRY_AUTH_TOKEN" ~/.zshrc; then
-            grep -m 1 "export SENTRY_AUTH_TOKEN" ~/.zshrc > /tmp/ios.sentry-build.tmp && source /tmp/ios.sentry-build.tmp && rm /tmp/ios.sentry-build.tmp
+            # shellcheck source=/dev/null
+            grep -m 1 "export SENTRY_AUTH_TOKEN" ~/.zshrc > /tmp/ios.sentry-build.tmp && . /tmp/ios.sentry-build.tmp && rm /tmp/ios.sentry-build.tmp
             echo "Using SENTRY_AUTH_TOKEN from .zshrc."
         fi
     fi
@@ -38,7 +41,7 @@ if which sentry-cli >/dev/null; then
         exit 1
     fi
 
-    sentry-cli upload-dif --force-foreground --include-sources -o $SENTRY_ORG -p $SENTRY_PROJECT --auth-token $SENTRY_AUTH_TOKEN "$DWARF_DSYM_FOLDER_PATH"
+    sentry-cli upload-dif --force-foreground --include-sources -o "$SENTRY_ORG" -p "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" "$DWARF_DSYM_FOLDER_PATH"
 
     # Upload simulator system library symbols for CFNetwork and libdispatch.
     # Sentry's server-side symbolication only has device symbols; simulator
@@ -83,7 +86,7 @@ for rt in rt_data.get('runtimes', []):
                 [ -f "$lib" ] && UPLOAD_PATHS="$UPLOAD_PATHS \"$lib\""
             done
             if [ -n "$UPLOAD_PATHS" ]; then
-                eval sentry-cli upload-dif --force-foreground -o $SENTRY_ORG -p $SENTRY_PROJECT --auth-token $SENTRY_AUTH_TOKEN $UPLOAD_PATHS
+                eval sentry-cli upload-dif --force-foreground -o "$SENTRY_ORG" -p "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" "$UPLOAD_PATHS"
             fi
         else
             echo "warning: could not determine simulator runtime root for device $TARGET_DEVICE_IDENTIFIER, skipping system symbol upload"

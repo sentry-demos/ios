@@ -4,7 +4,7 @@ enum SampleError: Error, LocalizedError {
     case bestDeveloper
     case happyCustomer
     case awesomeCentaur
-    
+
     var errorDescription: String? {
         switch self {
         case .bestDeveloper:
