@@ -78,9 +78,9 @@ build-ios-app:
 #   make test-ui ONLY_TESTING=UITests/UITests/testFeedbackButtonExistsOnListsView
 ONLY_TESTING ?=
 
-## Run all iOS UI test suites
+## Run all test suites
 #
-# Runs all UI tests for all primary iOS targets.
+# Runs all tests for all primary targets.
 .PHONY: test
 test: test-ios
 
@@ -106,6 +106,7 @@ test-ios-app:
 		-scheme EmpowerPlant \
 		-destination 'platform=iOS Simulator,OS=$(SIMULATOR_OS),name=$(DEVICE_NAME)' $(if $(ONLY_TESTING),-only-testing:$(ONLY_TESTING)) \
 		test | tee raw-test-ios-app.log | xcbeautify --preserve-unbeautified
+	slather coverage --configuration Test --verbose
 
 # ============================================================================
 # FORMATTING
