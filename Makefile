@@ -16,7 +16,14 @@
 # Sets up a fresh machine for development by chaining the install tasks.
 # Safe to re-run if you need to reinitialize dependencies or hooks.
 .PHONY: setup
-setup: install-dependencies install-pre-commit
+setup: setup-env install-dependencies install-pre-commit
+
+## Setup the .env file with Sentry organization and project slugs.
+#
+# Creates a .env file with placeholders for Sentry organization and project slugs.
+.PHONY: setup-env
+setup-env:
+	stat .env 2>/dev/null || echo "SENTRY_ORG=<your org slug>\nSENTRY_PROJECT=<your project slug>" > .env
 
 ## Install the project dependencies using Homebrew.
 #
