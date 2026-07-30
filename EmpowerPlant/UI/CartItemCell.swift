@@ -28,17 +28,20 @@ class CartItemCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        SentrySDK.logger.debug("CartItemCell initialized")
         selectionStyle = .none
         setupViews()
     }
 
     required init?(coder: NSCoder) {
+        SentrySDK.logger.fatal("CartItemCell init(coder:) is not implemented")
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Layout
 
     private func setupViews() {
+        SentrySDK.logger.debug("CartItemCell setupViews called")
         contentView.addSubview(productNameLabel)
         contentView.addSubview(quantityLabel)
 
@@ -57,6 +60,12 @@ class CartItemCell: UITableViewCell {
     // MARK: - Configuration
 
     func configure(name: String, quantity: Int) {
+        SentrySDK.logger.debug(
+            "CartItemCell configured",
+            attributes: [
+                "name": name,
+                "quantity": quantity,
+            ])
         productNameLabel.text = name
         quantityLabel.text = "Qty: \(quantity)"
         accessibilityIdentifier = "CartItem_\(name)"
@@ -66,6 +75,7 @@ class CartItemCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        SentrySDK.logger.debug("CartItemCell prepareForReuse called")
         productNameLabel.text = nil
         quantityLabel.text = nil
     }

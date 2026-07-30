@@ -7,6 +7,7 @@ class ShoppingCart {
     static let instance = ShoppingCart()
 
     private init() {
+        SentrySDK.logger.debug("ShoppingCart singleton initialized")
     }
 
     var items = [Product]()
@@ -15,11 +16,10 @@ class ShoppingCart {
 
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
-        let logger = SentrySDK.logger
 
         if !self.instance.items.contains(product) {
             self.instance.items.append(product)
-            logger.debug(
+            SentrySDK.logger.debug(
                 "New product added to cart",
                 attributes: [
                     "productId": product.productId ?? "unknown",
@@ -52,28 +52,33 @@ class ShoppingCart {
             self.instance.quantities.plantNodes += 1
             updateTotal(product: product)
         default:
-            logger.warn(
+            SentrySDK.logger.warn(
                 "Unknown product ID in shopping cart",
                 attributes: [
                     "productId": productId,
                     "expectedIds": "3, 4, 5, 6",
                 ])
-            print("product id not found in ShoppingCart switch statement")
         }
 
-        logger.info(
+        SentrySDK.logger.info(
             "Product quantity updated in cart",
             attributes: [
                 "productId": productId,
                 "newTotal": self.instance.total,
                 "cartItemCount": self.instance.items.count,
             ])
-        print("> TOTAL", self.instance.total)
     }
 
     static func updateTotal(product: Product) {
         let price = Int(product.price!)
         self.instance.total = self.instance.total + price!
+        SentrySDK.logger.debug(
+            "Cart total updated",
+            attributes: [
+                "productId": product.productId ?? "unknown",
+                "addedPrice": price ?? 0,
+                "newTotal": self.instance.total,
+            ])
     }
 }
 
@@ -92,6 +97,11 @@ class Quantities: NSObject {
             return _name
         }
         set(newVal) {
+            SentrySDK.logger.debug(
+                "Quantities.name updated",
+                attributes: [
+                    "newValue": newVal
+                ])
             _name = newVal
         }
     }
@@ -102,6 +112,11 @@ class Quantities: NSObject {
             return _plantMood
         }
         set(newVal) {
+            SentrySDK.logger.debug(
+                "Quantities.plantMood updated",
+                attributes: [
+                    "newValue": newVal
+                ])
             _plantMood = newVal
         }
     }
@@ -112,6 +127,11 @@ class Quantities: NSObject {
             return _botanaVoice
         }
         set(newVal) {
+            SentrySDK.logger.debug(
+                "Quantities.botanaVoice updated",
+                attributes: [
+                    "newValue": newVal
+                ])
             _botanaVoice = newVal
         }
     }
@@ -122,6 +142,11 @@ class Quantities: NSObject {
             return _plantStroller
         }
         set(newVal) {
+            SentrySDK.logger.debug(
+                "Quantities.plantStroller updated",
+                attributes: [
+                    "newValue": newVal
+                ])
             _plantStroller = newVal
         }
     }
@@ -132,6 +157,11 @@ class Quantities: NSObject {
             return _plantNodes
         }
         set(newVal) {
+            SentrySDK.logger.debug(
+                "Quantities.plantNodes updated",
+                attributes: [
+                    "newValue": newVal
+                ])
             _plantNodes = newVal
         }
     }
