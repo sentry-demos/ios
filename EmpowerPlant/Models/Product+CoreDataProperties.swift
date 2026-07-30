@@ -4,6 +4,7 @@ import SentrySwift
 
 extension Product {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
+        SentrySDK.logger.debug("Product fetch request created")
         let fr = NSFetchRequest<Product>(entityName: "Product")
         fr.sortDescriptors = [.init(key: "title", ascending: true)]
         return fr

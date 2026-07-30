@@ -40,16 +40,19 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     // Used for mocking in unit test
     init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
         // self.session = session
+        SentrySDK.logger.debug("CartViewController initialized with session")
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         // fatalError("init(coder:) has not been implemented")
+        SentrySDK.logger.debug("CartViewController initialized with coder")
         super.init(nibName: nil, bundle: nil)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        SentrySDK.logger.debug("CartViewController viewDidLoad")
         title = "Cart"
 
         // Table view
@@ -92,11 +95,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         configureNavigationItems()
         checkRelease()
 
-        print("CartViewController | TOTAL", ShoppingCart.instance.total)
+        SentrySDK.logger.debug(
+            "CartViewController loaded with cart total",
+            attributes: [
+                "cartTotal": ShoppingCart.instance.total,
+                "cartItemCount": ShoppingCart.instance.items.count,
+            ])
         SentrySDK.reportFullyDisplayed()
     }
 
     private func configureNavigationItems() {
+        SentrySDK.logger.debug("CartViewController configuring navigation items")
         let purchaseButton = UIButton(type: .system)
         purchaseButton.setTitle("  Purchase  ", for: .normal)
         if #unavailable(iOS 26.0) {
@@ -113,8 +122,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
-        let logger = SentrySDK.logger
-        logger.info(
+        SentrySDK.logger.debug("purchase called")
+        SentrySDK.logger.info(
             "Purchase initiated",
             attributes: [
                 "cartTotal": ShoppingCart.instance.total,
@@ -140,6 +149,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             withJSONObject: setJson(),
             options: []
         )
+        if bodyData == nil {
+            SentrySDK.logger.warn("Failed to serialize checkout request body to JSON")
+        }
         request.httpBody = bodyData
 
         enum PurchaseError: Error, LocalizedError {
@@ -154,7 +166,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         let task = URLSession.shared.dataTask(with: request) { _, response, _ in
-            let logger = SentrySDK.logger
+            SentrySDK.logger.debug("Checkout network response received")
             // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
             self.performCheckoutFileIO()
 
@@ -162,7 +174,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
                     let err = PurchaseError.insufficientInventory
-                    logger.error(
+                    SentrySDK.logger.error(
                         "Purchase failed with server error",
                         attributes: [
                             "statusCode": 500,
@@ -174,19 +186,21 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                         showFeedbackOption: true  // Enable User Feedback for checkout errors
                     )
                 } else if (httpResponse.statusCode) == 200 {
-                    logger.info(
+                    SentrySDK.logger.info(
                         "Purchase completed successfully",
                         attributes: [
                             "statusCode": 200,
                             "cartTotal": ShoppingCart.instance.total,
                         ])
                 } else {
-                    logger.warn(
+                    SentrySDK.logger.warn(
                         "Purchase completed with unexpected status",
                         attributes: [
                             "statusCode": httpResponse.statusCode
                         ])
                 }
+            } else {
+                SentrySDK.logger.warn("Checkout response was not an HTTP response")
             }
 
             // not getting met
@@ -206,6 +220,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
     private func performCheckoutFileIO() {
+        SentrySDK.logger.debug("performCheckoutFileIO called")
         // Create temporary file to demonstrate file I/O tracking
         let tempDir = FileManager.default.temporaryDirectory
         let checkoutLogFile = tempDir.appendingPathComponent("checkout_log_\(UUID().uuidString).txt")
@@ -222,17 +237,26 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
             // Simulate reading the file back (common in checkout processes)
             let readData = try Data(contentsOf: checkoutLogFile)
-            print("Checkout log written and read: \(readData.count) bytes")
+            SentrySDK.logger.debug(
+                "Checkout log written and read",
+                attributes: [
+                    "bytesRead": readData.count
+                ])
 
             // Clean up the temporary file
             try FileManager.default.removeItem(at: checkoutLogFile)
         } catch {
-            print("File I/O error during checkout: \(error)")
+            SentrySDK.logger.error(
+                "File I/O error during checkout",
+                attributes: [
+                    "error": error.localizedDescription
+                ])
         }
     }
 
     // total, quantities, items
     func setJson() -> [String: Any] {
+        SentrySDK.logger.debug("setJson called")
 
         // total DONE
         // quantities DONE below
@@ -262,10 +286,22 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO: could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
         // or continue showing all products, even if quantity is 0. the screen looks more full this way
+        SentrySDK.logger.debug(
+            "Cart tableView numberOfRowsInSection",
+            attributes: [
+                "section": section,
+                "rowCount": 4,
+            ])
         return 4  // products.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        SentrySDK.logger.debug(
+            "Cart tableView cellForRowAt",
+            attributes: [
+                "row": indexPath.row,
+                "section": indexPath.section,
+            ])
         let cell =
             tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
 

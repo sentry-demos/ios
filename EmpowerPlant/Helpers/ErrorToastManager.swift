@@ -20,12 +20,25 @@ class ErrorToastManager {
         scopeCallback: ((Scope) -> Void)? = nil,
         showFeedbackOption: Bool = false
     ) {
-        print("[EmpowerPlant] [Error]: \(error)")
+        SentrySDK.logger.debug(
+            "logErrorAndShowToast called",
+            attributes: [
+                "hasCustomMessage": message != nil,
+                "hasScopeCallback": scopeCallback != nil,
+                "showFeedbackOption": showFeedbackOption,
+            ])
+        SentrySDK.logger.error(
+            "Error captured for toast display",
+            attributes: [
+                "error": String(describing: error)
+            ])
 
         let eventId: SentryId
         if let scopeCallback = scopeCallback {
+            SentrySDK.logger.debug("Capturing error with custom scope callback")
             eventId = SentrySDK.capture(error: error, block: scopeCallback)  // Flagship
         } else {
+            SentrySDK.logger.debug("Capturing error with default scope")
             eventId = SentrySDK.capture(error: error)
         }
 
@@ -33,8 +46,10 @@ class ErrorToastManager {
         let displayMessage = message ?? error.localizedDescription
         Task { @MainActor in
             if showFeedbackOption {
+                SentrySDK.logger.debug("Showing error toast with feedback option")
                 self.showErrorToastWithFeedback(message: displayMessage, eventId: eventId)
             } else {
+                SentrySDK.logger.debug("Showing standard error toast")
                 self.showErrorToast(message: displayMessage)
             }
         }
@@ -44,6 +59,11 @@ class ErrorToastManager {
     /// - Parameter message: The message to display
     @MainActor
     func showErrorToast(message: String) {
+        SentrySDK.logger.debug(
+            "showErrorToast called",
+            attributes: [
+                "message": message
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.error)
         view.configureContent(title: "Error", body: message)
@@ -71,6 +91,12 @@ class ErrorToastManager {
     ///   - eventId: The Sentry event ID to associate with feedback
     @MainActor
     func showErrorToastWithFeedback(message: String, eventId: SentryId) {
+        SentrySDK.logger.debug(
+            "showErrorToastWithFeedback called",
+            attributes: [
+                "message": message,
+                "eventId": eventId.sentryIdString,
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.error)
         view.configureContent(title: "Checkout Error", body: message)
@@ -103,6 +129,11 @@ class ErrorToastManager {
     /// - Parameter eventId: The Sentry event ID to associate with feedback
     @MainActor
     private func showFeedbackPrompt(for eventId: SentryId) {
+        SentrySDK.logger.debug(
+            "showFeedbackPrompt called",
+            attributes: [
+                "eventId": eventId.sentryIdString
+            ])
         let alert = UIAlertController(
             title: "Help Us Improve",
             message: "We'd love to hear about your experience. Would you like to provide feedback about this issue?",
@@ -123,6 +154,8 @@ class ErrorToastManager {
                 presentingVC = presented
             }
             presentingVC.present(alert, animated: true)
+        } else {
+            SentrySDK.logger.warn("Unable to present feedback prompt, no root view controller found")
         }
     }
 
@@ -130,6 +163,11 @@ class ErrorToastManager {
     /// - Parameter eventId: The Sentry event ID to associate with feedback
     @MainActor
     private func collectUserFeedback(for eventId: SentryId) {
+        SentrySDK.logger.debug(
+            "collectUserFeedback called",
+            attributes: [
+                "eventId": eventId.sentryIdString
+            ])
         let alert = UIAlertController(
             title: "Provide Feedback",
             message: "Please tell us what happened and how we can improve your experience.",
@@ -156,6 +194,14 @@ class ErrorToastManager {
                 let comments = alert.textFields?[2].text ?? ""
 
                 if !comments.isEmpty {
+                    SentrySDK.logger.info(
+                        "Submitting user feedback",
+                        attributes: [
+                            "eventId": eventId.sentryIdString,
+                            "hasName": !name.isEmpty,
+                            "hasEmail": !email.isEmpty,
+                            "commentLength": comments.count,
+                        ])
                     SentrySDK.capture(
                         feedback: SentryFeedback(
                             message: comments,
@@ -165,6 +211,8 @@ class ErrorToastManager {
 
                     // Show success message
                     self.showInfoToast(message: "Thank you for your feedback! We'll use it to improve the app.")
+                } else {
+                    SentrySDK.logger.debug("User feedback not submitted, comments were empty")
                 }
             })
 
@@ -177,6 +225,8 @@ class ErrorToastManager {
                 presentingVC = presented
             }
             presentingVC.present(alert, animated: true)
+        } else {
+            SentrySDK.logger.warn("Unable to present feedback collection alert, no root view controller found")
         }
     }
 
@@ -184,6 +234,11 @@ class ErrorToastManager {
     /// - Parameter message: The message to display
     @MainActor
     func showWarningToast(message: String) {
+        SentrySDK.logger.debug(
+            "showWarningToast called",
+            attributes: [
+                "message": message
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.warning)
         view.configureContent(title: "Warning", body: message)
@@ -207,6 +262,11 @@ class ErrorToastManager {
     /// - Parameter message: The message to display
     @MainActor
     func showInfoToast(message: String) {
+        SentrySDK.logger.debug(
+            "showInfoToast called",
+            attributes: [
+                "message": message
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.info)
         view.configureContent(title: "Info", body: message)
