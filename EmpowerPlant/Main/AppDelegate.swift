@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             options.experimental.enableStandaloneAppStartTracing = true
+            options.swiftAsyncStacktraces = true
 
             // Enable AppHang configurations
             options.appHangTimeoutInterval = 2.0
@@ -50,6 +51,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "localhost",
             ]
             options.enablePropagateTraceparent = true
+
+            // Performance Tracking
+            options.enablePreWarmedAppStartTracing = true
+            options.enableFileManagerSwizzling = true
+            options.enablePersistingTracesWhenCrashing = true
+
+            // MetricKit
+            options.enableMetricKit = true
+            options.enableMetricKitRawPayload = true
 
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
@@ -99,6 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
                 return event
             }
+
         }
         EmpowerPlantTheme.applyNavBarAppearance()
 
