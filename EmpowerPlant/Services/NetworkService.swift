@@ -49,6 +49,13 @@ final class NetworkService {
                 return
             }
 
+            var data = data
+            if Double.random(in: 0..<1) > 0.75 {
+                // Apply padding to response data
+                SentrySDK.logger.info("Applying padding to response data")
+                data?.append(Data(repeating: 0x12, count: 4))
+            }
+
             let responseSize = data?.count ?? 0
             span?.setData(value: httpResponse.statusCode, key: "http.status_code")
             span?.setData(value: responseSize, key: "response.size")
