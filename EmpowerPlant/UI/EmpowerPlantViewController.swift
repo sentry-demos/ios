@@ -3,6 +3,18 @@ import UIKit
 
 class EmpowerPlantViewController: UIViewController {
 
+    private let productsService: ProductsServicing
+
+    init(productsService: ProductsServicing = Dependencies.productsService) {
+        self.productsService = productsService
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        productsService = Dependencies.productsService
+        super.init(coder: coder)
+    }
+
     // CoreData database
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
@@ -468,112 +480,65 @@ class EmpowerPlantViewController: UIViewController {
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
         SentrySDK.logger.debug("getAllProductsFromServer called")
-        SentrySDK.logger.info("Fetching products from server")
 
-        let startTime = Date()
-        let urlStr = "https://flask.empower-plant.com/products-join"
-        let url = URL(string: urlStr)!
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        struct ProductMap: Decodable {
-            let id: Int
-            let title: String
-            let description: String
-            let descriptionfull: String
-            let img: String
-            let imgcropped: String
-            let price: Int
-            // reviews: [{id: 4, productid: 4, rating: 4, customerid: null, description: null, created: String},...]
-        }
-
-        let task = URLSession.shared.dataTask(with: url) { data, _, error in
-            let endTime = Date()
-            let duration = endTime.timeIntervalSince(startTime)
-
-            SentrySDK.logger.debug(
-                "Products API request completed",
-                attributes: [
-                    "duration": duration,
-                    "hasData": data != nil,
-                ])
-
-            if let data = data {
-                if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
-                    SentrySDK.logger.info(
-                        "Products successfully decoded from server",
-                        attributes: [
-                            "productCount": productsResponse.count,
-                            "duration": duration,
-                        ])
-                    if self.products.count == 0 {
-                        SentrySDK.logger.debug("Local product cache empty, writing server products to database")
-                        var operations = [BlockOperation]()
-                        let saveOp = BlockOperation {
-                            do {
-                                try self.context.save()
-                                self.getAllProductsFromDb()
-                            } catch {
-                                ErrorToastManager.shared.logErrorAndShowToast(
-                                    error: error,
-                                    message: "Failed to save products from server to database"
-                                )
-                            }
-                        }
-                        for product in productsResponse {
-                            // Writes to CoreData database
-                            let addOp = BlockOperation {
-                                self.createProduct(
-                                    productId: String(product.id), title: product.title,
-                                    productDescription: product.description,
-                                    productDescriptionFull: product.descriptionfull, img: product.img,
-                                    imgCropped: product.imgcropped, price: String(product.price))
-                            }
-                            operations.append(addOp)
-                            saveOp.addDependency(addOp)
-                        }
-                        if operations.count > 0 {
-                            SentrySDK.logger.debug(
-                                "Scheduling product write operations",
-                                attributes: [
-                                    "operationCount": operations.count
-                                ])
-                            operations.append(saveOp)
-                            OperationQueue.main.addOperations(operations, waitUntilFinished: false)
-                        }
-                    } else {
+        productsService.fetchProducts { [weak self] result in
+            switch result {
+            case .success(let productsResponse):
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    guard self.products.isEmpty else {
                         SentrySDK.logger.debug(
                             "Skipping server product import, local cache already populated",
-                            attributes: [
-                                "cachedProductCount": self.products.count
-                            ])
+                            attributes: ["cachedProductCount": self.products.count]
+                        )
+                        return
                     }
-                } else {
-                    SentrySDK.logger.error(
-                        "Failed to decode products from server response",
-                        attributes: [
-                            "responseBytes": data.count
-                        ])
-                    ErrorToastManager.shared.showErrorToast(
-                        message: "Invalid response from server when fetching products"
+
+                    SentrySDK.logger.debug(
+                        "Local product cache empty, writing server products to database",
+                        attributes: ["productCount": productsResponse.count]
                     )
+                    var operations = [BlockOperation]()
+                    let saveOp = BlockOperation {
+                        do {
+                            try self.context.save()
+                            self.getAllProductsFromDb()
+                        } catch {
+                            ErrorToastManager.shared.logErrorAndShowToast(
+                                error: error,
+                                message: "Failed to save products from server to database"
+                            )
+                        }
+                    }
+
+                    for product in productsResponse {
+                        let addOp = BlockOperation {
+                            self.createProduct(
+                                productId: String(product.id), title: product.title,
+                                productDescription: product.description,
+                                productDescriptionFull: product.descriptionfull, img: product.img,
+                                imgCropped: product.imgcropped, price: String(product.price))
+                        }
+                        operations.append(addOp)
+                        saveOp.addDependency(addOp)
+                    }
+
+                    if !operations.isEmpty {
+                        SentrySDK.logger.debug(
+                            "Scheduling product write operations",
+                            attributes: ["operationCount": operations.count]
+                        )
+                        operations.append(saveOp)
+                        OperationQueue.main.addOperations(operations, waitUntilFinished: false)
+                    }
                 }
-            } else if let error = error {
-                SentrySDK.logger.error(
-                    "Failed to fetch products from server",
-                    attributes: [
-                        "error": error.localizedDescription
-                    ])
+            case .failure(let error):
                 ErrorToastManager.shared.logErrorAndShowToast(
                     error: error,
                     message: "Failed to fetch products from server"
                 )
-            } else {
-                SentrySDK.logger.warn("Products request completed with no data and no error")
             }
         }
-
-        task.resume()
     }
 
     @objc
