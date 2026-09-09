@@ -10,13 +10,23 @@ on:
 jobs:
   build:
     runs-on: macos-15
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Slather
-        run: gem install slather
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Install Dependencies
+        run: make install-dependencies
+
+      - name: Setup Sentry CLI
+        uses: mathieu-bour/setup-sentry-cli@v1.3.0
+        with:
+          version: 3.3.5
+          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build and Test
         run: make test
@@ -27,12 +37,6 @@ jobs:
           token: 214d9137-2c5a-4eaf-9327-c6031f13795a
           fail_ci_if_error: true
           verbose: true
-
-      - name: Setup Sentry CLI
-        uses: mathieu-bour/setup-sentry-cli@v1.3.0
-        with:
-          version: 3.3.5
-          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Upload to Sentry Size Analysis
         run: |
