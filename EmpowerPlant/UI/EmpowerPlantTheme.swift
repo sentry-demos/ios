@@ -22,12 +22,12 @@ extension UIColor {
 
 /// Centralized color palette matching the Android demo app's design.
 enum EmpowerPlantTheme {
-    static let primary        = UIColor(hex: "#3F51B5")  // Indigo
-    static let primaryDark    = UIColor(hex: "#303F9F")  // Darker indigo
-    static let accent         = UIColor(hex: "#FF4081")  // Pink
-    static let buttonBackground = UIColor(hex: "#6C5FC7") // Purple
-    static let buttonPressed  = UIColor(hex: "#562E7D")  // Deep purple
-    static let textHeader     = UIColor(hex: "#361A67")  // Dark purple for titles
+    static let primary = UIColor(hex: "#3F51B5")  // Indigo
+    static let primaryDark = UIColor(hex: "#303F9F")  // Darker indigo
+    static let accent = UIColor(hex: "#FF4081")  // Pink
+    static let buttonBackground = UIColor(hex: "#6C5FC7")  // Purple
+    static let buttonPressed = UIColor(hex: "#562E7D")  // Deep purple
+    static let textHeader = UIColor(hex: "#361A67")  // Dark purple for titles
     static let cardBackground = UIColor.white
     static let tableBackground = UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1.0)
 

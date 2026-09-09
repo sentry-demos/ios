@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 @objc(Product)
 public class Product: NSManagedObject {
@@ -7,7 +7,6 @@ public class Product: NSManagedObject {
         self.init()
     }
 }
-
 
 // TODO: Deprecate this soon
 // This was all the boilerplate needed for mapping the HTTP Response directly into a Product CoreData Class,
@@ -18,7 +17,7 @@ public class Product: NSManagedObject {
 //            case longdescription
 //            case parent
 //        }
-        
+
 //        enum CodingKeys: CodingKey {
 //            case title
 //        }
@@ -36,12 +35,12 @@ public class Product: NSManagedObject {
 //
 //        self.init(entity: entity, insertInto: context)
 
-//enum ManagedObjectError: Error {
+// enum ManagedObjectError: Error {
 //    case decodeContextError
 //    case decodeEntityError
-//}
+// }
 //
-//extension CodingUserInfoKey {
+// extension CodingUserInfoKey {
 //    static let context = CodingUserInfoKey(rawValue: "context")
-//}
+// }
 //

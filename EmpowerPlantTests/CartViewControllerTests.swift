@@ -6,8 +6,8 @@
 //
 
 import XCTest
-@testable import EmpowerPlant
 
+@testable import EmpowerPlant
 
 class MockURLSessionDataTask: URLSessionDataTaskProtocol {
     func resume() {
@@ -47,7 +47,7 @@ final class CartViewControllerTests: XCTestCase {
         cvc.purchase()
 
         expectation.fulfill()
-        
+
         // // Then
         // DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
         //     // Add assertions here to validate the behavior of the purchase function

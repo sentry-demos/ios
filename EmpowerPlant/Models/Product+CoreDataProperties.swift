@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 extension Product {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
@@ -7,8 +7,8 @@ extension Product {
         fr.sortDescriptors = [.init(key: "title", ascending: true)]
         return fr
     }
-    
-//    @NSManaged public var text: String?
+
+    //    @NSManaged public var text: String?
     @NSManaged public var title: String?
     @NSManaged public var productDescription: String?
     @NSManaged public var productDescriptionFull: String?

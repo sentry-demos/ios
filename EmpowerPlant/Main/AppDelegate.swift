@@ -1,20 +1,21 @@
-import UIKit
-import Sentry
 import CoreData
+import Sentry
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
 
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         // the Sentry default is to enable swizzling. we'll use that as our default as well. we check for the launch arg to disable swizzling; if it's provided, then we'll disable swizzling. if it's absent, then swizzling will be enabled.
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
-        
+
         SentrySDK.start { options in
             options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
-            
+
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
                 // in debug builds, we default to enabling debug mode. the launch arg --no-debug-mode-in-debug-build is a way to override that and turn it off, like if you don't want to see the logs in the xcode console.
@@ -35,21 +36,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             options.experimental.enableStandaloneAppStartTracing = true
-            
+
             // Enable AppHang configurations
             options.appHangTimeoutInterval = 2.0
             options.enableReportNonFullyBlockingAppHangs = true
-            
+
             // Enable Mobile Session Health configurations
             options.enableUserInteractionTracing = true
-            
+
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
                 "https://flask.empower-plant.com",
-                "localhost"
+                "localhost",
             ]
             options.enablePropagateTraceparent = true
-            
+
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
@@ -57,11 +58,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.sessionReplay.networkDetailAllowUrls = [
                 "https://flask.empower-plant.com",
                 "https://storage.googleapis.com",
-                "localhost"
+                "localhost",
             ]
             options.sessionReplay.networkCaptureBodies = true
-            
-            //Enable User Feedback Widget
+
+            // Enable User Feedback Widget
             options.configureUserFeedback = { config in
                 config.onSubmitSuccess = { data in
                     print("Feedback submitted successfully: \(data)")
@@ -70,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     print("Failed to submit feedback: \(error)")
                 }
             }
-            
+
             // Enable Logs
             options.enableLogs = true
 
@@ -94,29 +95,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         EmpowerPlantTheme.applyNavBarAppearance()
 
-        SentrySDK.configureScope{ scope in
-            scope.setTag(value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
+        SentrySDK.configureScope { scope in
+            scope.setTag(
+                value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
             scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
         }
-        
+
         let logger = SentrySDK.logger
-        logger.info("Sentry SDK initialized", attributes: [
-            "enableSwizzling": enableSwizzling,
-            "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown"
-        ])
-        
+        logger.info(
+            "Sentry SDK initialized",
+            attributes: [
+                "enableSwizzling": enableSwizzling,
+                "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
+            ])
+
         if ProcessInfo.processInfo.arguments.contains("--wipe-db") {
             logger.warn("Database wipe requested via launch argument")
             wipeDB()
         }
-        
+
         return true
     }
 
     // MARK: UISceneSession Lifecycle
 
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(
+        _ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
@@ -127,67 +134,71 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-    
+
     lazy var persistentContainer: NSPersistentContainer = {
-            /*
-             The persistent container for the application. This implementation
-             creates and returns a container, having loaded the store for the
-             application to it. This property is optional since there are legitimate
-             error conditions that could cause the creation of the store to fail.
-             */
-            let container = NSPersistentContainer(name: "Model")
-            container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-                let logger = SentrySDK.logger
-                if let error = error as NSError? {
-                    // Replace this implementation with code to handle the error appropriately.
-                    // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                    
-                    /*
-                     Typical reasons for an error here include:
-                     * The parent directory does not exist, cannot be created, or disallows writing.
-                     * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                     * The device is out of space.
-                     * The store could not be migrated to the current model version.
-                     Check the error message to determine what the actual problem was.
-                     */
-                    
-                    logger.fatal("Core Data persistent store failed to load", attributes: [
+        /*
+         The persistent container for the application. This implementation
+         creates and returns a container, having loaded the store for the
+         application to it. This property is optional since there are legitimate
+         error conditions that could cause the creation of the store to fail.
+         */
+        let container = NSPersistentContainer(name: "Model")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            let logger = SentrySDK.logger
+            if let error = error as NSError? {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+
+                /*
+                 Typical reasons for an error here include:
+                 * The parent directory does not exist, cannot be created, or disallows writing.
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
+
+                logger.fatal(
+                    "Core Data persistent store failed to load",
+                    attributes: [
                         "error": error.localizedDescription,
                         "errorCode": error.code,
+                        "storeDescription": storeDescription.description,
+                    ])
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            } else {
+                logger.info(
+                    "Core Data persistent store loaded successfully",
+                    attributes: [
                         "storeDescription": storeDescription.description
                     ])
-                    fatalError("Unresolved error \(error), \(error.userInfo)")
-                } else {
-                    logger.info("Core Data persistent store loaded successfully", attributes: [
-                        "storeDescription": storeDescription.description
-                    ])
-                }
-            })
-            return container
-        }()
-        
-        // MARK: - Core Data Saving support
-        
-        func saveContext () {
-            let logger = SentrySDK.logger
-            let context = persistentContainer.viewContext
-            if context.hasChanges {
-                logger.debug("Attempting to save Core Data context changes")
-                do {
-                    try context.save()
-                    logger.info("Core Data context saved successfully")
-                } catch {
-                    logger.error("Failed to save Core Data context", attributes: [
+            }
+        })
+        return container
+    }()
+
+    // MARK: - Core Data Saving support
+
+    func saveContext() {
+        let logger = SentrySDK.logger
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            logger.debug("Attempting to save Core Data context changes")
+            do {
+                try context.save()
+                logger.info("Core Data context saved successfully")
+            } catch {
+                logger.error(
+                    "Failed to save Core Data context",
+                    attributes: [
                         "error": error.localizedDescription
                     ])
-                    ErrorToastManager.shared.logErrorAndShowToast(
-                        error: error,
-                        message: "Failed to save context changes"
-                    )
-                }
+                ErrorToastManager.shared.logErrorAndShowToast(
+                    error: error,
+                    message: "Failed to save context changes"
+                )
             }
         }
-
+    }
 
 }
-

@@ -8,7 +8,6 @@ error_exit() {
     exit 1
 }
 
-VERSION_INPUT=${1}
 SENTRY_ORG_INPUT=${2}
 SENTRY_PROJECT_INPUT=${3}
 SENTRY_AUTH_TOKEN_INPUT=${4}
@@ -48,7 +47,7 @@ else
     fi
     # Split the version and increment the last digit
     IFS='.' read -ra VERSION_PARTS <<< "$LATEST_RELEASE"
-    LAST_DIGIT_INCREMENTED=$(( ${VERSION_PARTS[2]} + 1 ))
+    LAST_DIGIT_INCREMENTED=$(( VERSION_PARTS[2] + 1 ))
     TAG="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$LAST_DIGIT_INCREMENTED"
 fi
 
@@ -56,7 +55,6 @@ TITLE="$TAG"
 NOTES="Generated automatically by ios/deploy_project.sh"
 
 # Create the GitHub release with the attached iOS build zip
-gh release create $TAG $ZIP_PATH -t "$TITLE" -n "$NOTES" || error_exit "Failed to create GitHub release."
+gh release create "$TAG" "$ZIP_PATH" -t "$TITLE" -n "$NOTES" || error_exit "Failed to create GitHub release."
 
 echo "Release created successfully with version $TAG!"
-

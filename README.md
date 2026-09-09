@@ -71,11 +71,13 @@ An iOS app integrating Sentry to demo its various product features. See [Empower
 ## Testing
 
 Run the test suite:
+
 ```bash
 make test
 ```
 
 This will:
+
 - Run unit tests on the latest iOS Simulator
 - Generate code coverage reports using Slather
 
@@ -84,21 +86,25 @@ This will:
 ### Common Issues
 
 **CoreSimulator out of date error:**
+
 ```bash
 make init  # This runs xcodebuild -runFirstLaunch to fix the issue
 ```
 
 **Missing iOS SDK:**
+
 ```bash
 xcodebuild -downloadPlatform iOS
 ```
 
 **Build failures:**
+
 - Ensure you have the latest Xcode version
 - Clean build folder: `⌘+Shift+K` in Xcode
 - Reset package cache: `File > Packages > Reset Package Caches`
 
 **Sentry authentication issues:**
+
 - Verify your auth token has the correct permissions
 - Check that your org/project slugs in `.env` match your Sentry setup
 - Run `sentry-cli login` again if needed
@@ -117,6 +123,7 @@ EmpowerPlant/
 ## Creating Releases
 
 ### Prerequisites
+
 - Ensure `Info.plist` has the correct version number
 - Commit changes to the `master` branch (recommended)
 
