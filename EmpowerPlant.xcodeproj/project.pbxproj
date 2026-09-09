@@ -54,6 +54,7 @@
 		D4A8B4BA301B560B00D82415 /* Main */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Main; sourceTree = "<group>"; };
 		D4A8B4BF301B56B400D82415 /* EmpowerPlantTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = EmpowerPlantTests; sourceTree = "<group>"; };
 		D4A8B4C2301B570600D82415 /* Logic */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Logic; sourceTree = "<group>"; };
+		D4A8B4D0301B570600D82415 /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +107,7 @@
 				D4A8B4A4301B55AB00D82415 /* Resources */,
 				D4A8B4BA301B560B00D82415 /* Main */,
 				D4A8B4C2301B570600D82415 /* Logic */,
+				D4A8B4D0301B570600D82415 /* Services */,
 			);
 			path = EmpowerPlant;
 			sourceTree = "<group>";
@@ -162,6 +164,7 @@
 				D4A8B4B3301B55EA00D82415 /* Helpers */,
 				D4A8B4BA301B560B00D82415 /* Main */,
 				D4A8B4C2301B570600D82415 /* Logic */,
+				D4A8B4D0301B570600D82415 /* Services */,
 			);
 			name = EmpowerPlant;
 			packageProductDependencies = (
