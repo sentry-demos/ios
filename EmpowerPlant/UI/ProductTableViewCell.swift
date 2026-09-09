@@ -70,6 +70,7 @@ class ProductTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        SentrySDK.logger.debug("ProductTableViewCell initialized")
         selectionStyle = .none
         backgroundColor = .clear
         contentView.backgroundColor = .clear
@@ -77,12 +78,14 @@ class ProductTableViewCell: UITableViewCell {
     }
 
     required init?(coder: NSCoder) {
+        SentrySDK.logger.fatal("ProductTableViewCell init(coder:) is not implemented")
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Layout
 
     private func setupViews() {
+        SentrySDK.logger.debug("ProductTableViewCell setupViews called")
         contentView.addSubview(cardView)
         cardView.addSubview(productImageView)
         cardView.addSubview(nameLabel)
@@ -125,6 +128,13 @@ class ProductTableViewCell: UITableViewCell {
     // MARK: - Configuration
 
     func configure(name: String?, price: String?, imageURL: String?) {
+        SentrySDK.logger.debug(
+            "ProductTableViewCell configured",
+            attributes: [
+                "name": name ?? "nil",
+                "price": price ?? "nil",
+                "hasImageURL": imageURL != nil,
+            ])
         let safeName = name ?? "Unknown"
         nameLabel.text = safeName
         accessibilityIdentifier = "ProductCell_\(safeName)"
@@ -133,6 +143,11 @@ class ProductTableViewCell: UITableViewCell {
         if let priceStr = price, let priceInt = Int(priceStr) {
             priceLabel.text = "$\(priceInt)"
         } else {
+            SentrySDK.logger.debug(
+                "Product price was not a valid integer, displaying raw value",
+                attributes: [
+                    "price": price ?? "nil"
+                ])
             priceLabel.text = price.map { "$\($0)" } ?? ""
         }
 
@@ -145,18 +160,45 @@ class ProductTableViewCell: UITableViewCell {
         imageTask?.cancel()
         productImageView.image = UIImage(systemName: "leaf.fill")
 
-        guard let urlString = urlString, !urlString.isEmpty else { return }
+        guard let urlString = urlString, !urlString.isEmpty else {
+            SentrySDK.logger.debug("Product image URL missing, using placeholder image")
+            return
+        }
 
         // Check cache
         if let cached = Self.imageCache.object(forKey: urlString as NSString) {
+            SentrySDK.logger.debug(
+                "Product image loaded from cache",
+                attributes: [
+                    "url": urlString
+                ])
             productImageView.image = cached
             return
         }
 
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: urlString) else {
+            SentrySDK.logger.warn(
+                "Product image URL is invalid",
+                attributes: [
+                    "url": urlString
+                ])
+            return
+        }
 
+        SentrySDK.logger.debug(
+            "Product image download started",
+            attributes: [
+                "url": urlString
+            ])
         imageTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
+            guard let data = data, let image = UIImage(data: data) else {
+                SentrySDK.logger.warn(
+                    "Product image download failed or data was not a valid image",
+                    attributes: [
+                        "url": urlString
+                    ])
+                return
+            }
             Self.imageCache.setObject(image, forKey: urlString as NSString)
             DispatchQueue.main.async {
                 // Only set if the cell hasn't been reused for a different item
@@ -170,6 +212,7 @@ class ProductTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        SentrySDK.logger.debug("ProductTableViewCell prepareForReuse called")
         imageTask?.cancel()
         imageTask = nil
         productImageView.image = UIImage(systemName: "leaf.fill")
@@ -182,6 +225,7 @@ class ProductTableViewCell: UITableViewCell {
     // MARK: - Actions
 
     @objc private func addToCartTapped() {
+        SentrySDK.logger.debug("ProductTableViewCell addToCartTapped")
         onAddToCart?()
 
         // Brief visual feedback
