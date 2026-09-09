@@ -1,14 +1,5 @@
-//
-//  Utils.swift
-//  EmpowerPlant
-//
-//  Created by Andrew McKnight on 10/6/23.
-//
-
 import UIKit
-
 import Sentry
-
 
 public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
 
@@ -48,7 +39,7 @@ public func wipeDB() {
     }
 }
 
-/** Add a delay based on current version. */
+/// Add a delay based on current version.
 public func checkRelease() {
     let logger = SentrySDK.logger
     

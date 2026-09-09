@@ -1,17 +1,9 @@
-//
-//  ListAppViewController.swift
-//  EmpowerPlant
-//
-//  Created by William Capozzoli on 3/8/22.
-//
-
 import BigInt
 import Sentry
 import UIKit
 
 class ListAppViewController: UIViewController {
 
-    
     @IBOutlet weak var dsnTextField: UITextField!
     @IBOutlet weak var anrFullyBlockingButton: UIButton!
     @IBOutlet weak var anrFillingRunLoopButton: UIButton!
