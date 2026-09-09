@@ -5,6 +5,11 @@ import UIKit
 
 extension UIColor {
     convenience init(hex: String) {
+        SentrySDK.logger.debug(
+            "UIColor initialized from hex string",
+            attributes: [
+                "hex": hex
+            ])
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 
@@ -34,6 +39,7 @@ enum EmpowerPlantTheme {
 
     /// Applies the purple/indigo navigation bar theme globally.
     static func applyNavBarAppearance() {
+        SentrySDK.logger.debug("Applying navigation bar appearance theme")
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = primaryDark

@@ -20,6 +20,7 @@ class EmpowerPlantViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        SentrySDK.logger.debug("EmpowerPlantViewController viewDidLoad")
         title = "Empower Plants"
 
         self.view.addSubview(tableView)
@@ -51,40 +52,59 @@ class EmpowerPlantViewController: UIViewController {
         checkRelease()
 
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
+            SentrySDK.logger.debug("Received modified DB notification, refreshing products from database")
             self.getAllProductsFromDb()
         }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        SentrySDK.logger.debug("EmpowerPlantViewController viewDidAppear")
         SentrySDK.reportFullyDisplayed()
     }
 
     func performLongFileOperation() {
+        SentrySDK.logger.debug("performLongFileOperation called")
         // Synchronous file I/O on the main thread to demonstrate Sentry's File I/O tracking
         // Use a bundled resource to avoid permissions and external paths
         if let sourceURL = Bundle.main.url(forResource: "mobydick", withExtension: "txt") {
             do {
                 // Read large file synchronously (main thread)
                 let data = try Data(contentsOf: sourceURL)
+                SentrySDK.logger.debug(
+                    "Read bundled resource for file I/O demo",
+                    attributes: [
+                        "bytesRead": data.count
+                    ])
                 // Write it to Documents and then delete, still on main thread
                 if let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                     let dest = documents.appendingPathComponent("mobydick_copy_\(UUID().uuidString).txt")
                     try data.write(to: dest)
                     try FileManager.default.removeItem(at: dest)
+                    SentrySDK.logger.debug("File I/O demo write and delete completed")
+                } else {
+                    SentrySDK.logger.warn("Documents directory not found for file I/O demo")
                 }
             } catch {
                 // Non-fatal: we only need to exercise file I/O for performance demo
-                print("File I/O demo error: \(error)")
+                SentrySDK.logger.error(
+                    "File I/O demo error",
+                    attributes: [
+                        "error": error.localizedDescription
+                    ])
             }
+        } else {
+            SentrySDK.logger.warn("Bundled resource mobydick.txt not found for file I/O demo")
         }
     }
 
     func processProducts() {
+        SentrySDK.logger.debug("processProducts called")
         let span = SentrySDK.span?.startChild(operation: "product_processing")
         _ = getIterator(42)
         sleep(50 / 1000)
         span?.finish()
+        SentrySDK.logger.debug("processProducts finished")
     }
 
     func getIterator(_ n: Int) -> Int {
@@ -98,14 +118,27 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     func readCurrentDirectory() {
+        SentrySDK.logger.debug("readCurrentDirectory called")
         let path = FileManager.default.currentDirectoryPath
         do {
             let items = try FileManager.default.contentsOfDirectory(atPath: path)
+            SentrySDK.logger.debug(
+                "Read current directory contents",
+                attributes: [
+                    "path": path,
+                    "itemCount": items.count,
+                ])
             let loop = fibonacciSeries(num: items.count)
             for i in 1...loop {
                 readDirectory(path: path)
             }
         } catch {
+            SentrySDK.logger.error(
+                "Failed to read current directory",
+                attributes: [
+                    "path": path,
+                    "error": error.localizedDescription,
+                ])
             ErrorToastManager.shared.logErrorAndShowToast(
                 error: error,
                 message: "Failed to read current directory"
@@ -114,8 +147,22 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     func readDirectory(path: String, depth: Int = 0) {
+        SentrySDK.logger.debug(
+            "readDirectory called",
+            attributes: [
+                "path": path,
+                "depth": depth,
+            ])
         // Limit recursion to prevent deep system traversal
-        guard depth < 3 else { return }
+        guard depth < 3 else {
+            SentrySDK.logger.debug(
+                "readDirectory recursion depth limit reached",
+                attributes: [
+                    "path": path,
+                    "depth": depth,
+                ])
+            return
+        }
         let fm = FileManager.default
 
         do {
@@ -129,10 +176,21 @@ class EmpowerPlantViewController: UIViewController {
                         readDirectory(path: fullPath, depth: depth + 1)
                     }
                 } else {
+                    SentrySDK.logger.debug(
+                        "Path no longer exists during directory traversal",
+                        attributes: [
+                            "path": fullPath
+                        ])
                     return
                 }
             }
         } catch {
+            SentrySDK.logger.error(
+                "Failed to read directory",
+                attributes: [
+                    "path": path,
+                    "error": error.localizedDescription,
+                ])
             ErrorToastManager.shared.logErrorAndShowToast(
                 error: error,
                 message: "Failed to read directory: \(path)"
@@ -142,6 +200,11 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     func fibonacciSeries(num: Int) -> Int {
+        SentrySDK.logger.debug(
+            "fibonacciSeries called",
+            attributes: [
+                "num": num
+            ])
         // The value of 0th and 1st number of the fibonacci series are 0 and 1
         var n1 = 0
         var n2 = 1
@@ -163,6 +226,7 @@ class EmpowerPlantViewController: UIViewController {
 
     @objc
     func addToDb() {
+        SentrySDK.logger.debug("addToDb called")
         let alert = UIAlertController(
             title: "New Product",
             message: "Enter new product title",
@@ -174,8 +238,14 @@ class EmpowerPlantViewController: UIViewController {
                 title: "Submit", style: .cancel,
                 handler: { [weak self] _ in
                     guard let field = alert.textFields?.first, let text = field.text, !text.isEmpty else {
+                        SentrySDK.logger.debug("addToDb submission ignored, title was empty")
                         return
                     }
+                    SentrySDK.logger.info(
+                        "Creating product from addToDb alert",
+                        attributes: [
+                            "title": text
+                        ])
                     self?.createProduct(
                         productId: "123", title: text, productDescription: "product.description",
                         productDescriptionFull: "product.description.full", img: "img", imgCropped: "img.cropped",
@@ -187,7 +257,6 @@ class EmpowerPlantViewController: UIViewController {
         // ALSO WORKED
         // alert.addTextField()
         // let submitButton = UIAlertAction(title:"Add", style: .default) { (action) in
-        //     print("here")
         //     let textfield = alert.textFields![0]
         // }
         // alert.addAction(submitButton)
@@ -197,7 +266,11 @@ class EmpowerPlantViewController: UIViewController {
     // Don't deprecate, this function is useful for development and testing
     @objc
     func clearDb() {
-        print("> clearDb")
+        SentrySDK.logger.info(
+            "clearDb called",
+            attributes: [
+                "productCount": self.products.count
+            ])
         // self.products was already set by viewDidLoad()
         // self.products = try context.fetch(Product.fetchRequest())
         for product in self.products {
@@ -207,6 +280,7 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     private func configureNavigationItems() {
+        SentrySDK.logger.debug("EmpowerPlantViewController configuring navigation items")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "cart"),
             style: .plain,
@@ -227,17 +301,20 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     @objc func dbActions() {
+        SentrySDK.logger.debug("dbActions called")
         let actionSheet = UIAlertController(title: "Database actions", message: nil, preferredStyle: .actionSheet)
         actionSheet.addAction(
             UIAlertAction(
                 title: "Generate items", style: .default,
                 handler: { _ in
+                    SentrySDK.logger.debug("dbActions: Generate items selected")
                     self.generateDBItems()
                 }))
         actionSheet.addAction(
             UIAlertAction(
                 title: "Clear DB", style: .default,
                 handler: { _ in
+                    SentrySDK.logger.debug("dbActions: Clear DB selected")
                     wipeDB()
                     NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
                 }))
@@ -246,6 +323,7 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     func generateDBItems() {
+        SentrySDK.logger.debug("generateDBItems called")
         let defaultTotalItems = 100_000
         let alert = UIAlertController(title: "Add items", message: nil, preferredStyle: .alert)
 
@@ -259,10 +337,18 @@ class EmpowerPlantViewController: UIViewController {
             UIAlertAction(title: "OK", style: .default) { _ in
                 var totalItems = (numberOfItemsTextField?.text as? NSString)?.integerValue ?? defaultTotalItems
                 if totalItems == 0 {
+                    SentrySDK.logger.debug("generateDBItems: input was zero or invalid, using default item count")
                     totalItems = defaultTotalItems
                 }
                 var itemsPerBatch = 1_000
                 let batches = totalItems / itemsPerBatch
+                SentrySDK.logger.info(
+                    "Generating DB items",
+                    attributes: [
+                        "totalItems": totalItems,
+                        "itemsPerBatch": itemsPerBatch,
+                        "batches": batches,
+                    ])
 
                 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
                 DispatchQueue.global(qos: .utility).async {
@@ -285,6 +371,12 @@ class EmpowerPlantViewController: UIViewController {
                                 try context.save()
                                 NotificationCenter.default.post(name: modifiedDBNotificationName, object: nil)
                             } catch {
+                                SentrySDK.logger.error(
+                                    "Failed to save generated products to database",
+                                    attributes: [
+                                        "error": error.localizedDescription,
+                                        "batch": i,
+                                    ])
                                 ErrorToastManager.shared.logErrorAndShowToast(
                                     error: error,
                                     message: "Failed to save generated products to database"
@@ -305,6 +397,13 @@ class EmpowerPlantViewController: UIViewController {
         productId: String, title: String, productDescription: String, productDescriptionFull: String, img: String,
         imgCropped: String, price: String
     ) {
+        SentrySDK.logger.debug(
+            "createProduct called",
+            attributes: [
+                "productId": productId,
+                "title": title,
+                "price": price,
+            ])
         let newProduct = Product(context: context)
 
         newProduct.productId = productId  // 'id' was a reserved word in swift
@@ -318,10 +417,22 @@ class EmpowerPlantViewController: UIViewController {
 
     // Don't deprecate this until major release of this demo
     func deleteProduct(product: Product) {
+        SentrySDK.logger.debug(
+            "deleteProduct called",
+            attributes: [
+                "productId": product.productId ?? "unknown",
+                "title": product.title ?? "unknown",
+            ])
         context.delete(product)
         do {
             try context.save()
         } catch {
+            SentrySDK.logger.error(
+                "Failed to delete product from database",
+                attributes: [
+                    "error": error.localizedDescription,
+                    "productId": product.productId ?? "unknown",
+                ])
             ErrorToastManager.shared.logErrorAndShowToast(
                 error: error,
                 message: "Failed to delete product from database"
@@ -330,15 +441,23 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     func getAllProductsFromDb() {
+        SentrySDK.logger.debug("getAllProductsFromDb called")
         do {
             self.products = try context.fetch(Product.fetchRequest())
             // Filter out "Plant Mood5"
             self.products = self.products.filter { $0.title != "Plant Mood5" }
-            // for product in self.products {
-            //     print(product.productId, product.title, product.productDescriptionFull)
-            // }
+            SentrySDK.logger.debug(
+                "Products fetched from database",
+                attributes: [
+                    "productCount": self.products.count
+                ])
             refreshTable()
         } catch {
+            SentrySDK.logger.error(
+                "Failed to fetch products from database",
+                attributes: [
+                    "error": error.localizedDescription
+                ])
             ErrorToastManager.shared.logErrorAndShowToast(
                 error: error,
                 message: "Failed to fetch products from database"
@@ -348,8 +467,8 @@ class EmpowerPlantViewController: UIViewController {
 
     // Also writes them into database if database is empty
     func getAllProductsFromServer() {
-        let logger = SentrySDK.logger
-        logger.info("Fetching products from server")
+        SentrySDK.logger.debug("getAllProductsFromServer called")
+        SentrySDK.logger.info("Fetching products from server")
 
         let startTime = Date()
         let urlStr = "https://flask.empower-plant.com/products-join"
@@ -372,7 +491,7 @@ class EmpowerPlantViewController: UIViewController {
             let endTime = Date()
             let duration = endTime.timeIntervalSince(startTime)
 
-            logger.debug(
+            SentrySDK.logger.debug(
                 "Products API request completed",
                 attributes: [
                     "duration": duration,
@@ -381,13 +500,14 @@ class EmpowerPlantViewController: UIViewController {
 
             if let data = data {
                 if let productsResponse = try? JSONDecoder().decode([ProductMap].self, from: data) {
-                    logger.info(
+                    SentrySDK.logger.info(
                         "Products successfully decoded from server",
                         attributes: [
                             "productCount": productsResponse.count,
                             "duration": duration,
                         ])
                     if self.products.count == 0 {
+                        SentrySDK.logger.debug("Local product cache empty, writing server products to database")
                         var operations = [BlockOperation]()
                         let saveOp = BlockOperation {
                             do {
@@ -413,20 +533,43 @@ class EmpowerPlantViewController: UIViewController {
                             saveOp.addDependency(addOp)
                         }
                         if operations.count > 0 {
+                            SentrySDK.logger.debug(
+                                "Scheduling product write operations",
+                                attributes: [
+                                    "operationCount": operations.count
+                                ])
                             operations.append(saveOp)
                             OperationQueue.main.addOperations(operations, waitUntilFinished: false)
                         }
+                    } else {
+                        SentrySDK.logger.debug(
+                            "Skipping server product import, local cache already populated",
+                            attributes: [
+                                "cachedProductCount": self.products.count
+                            ])
                     }
                 } else {
+                    SentrySDK.logger.error(
+                        "Failed to decode products from server response",
+                        attributes: [
+                            "responseBytes": data.count
+                        ])
                     ErrorToastManager.shared.showErrorToast(
                         message: "Invalid response from server when fetching products"
                     )
                 }
             } else if let error = error {
+                SentrySDK.logger.error(
+                    "Failed to fetch products from server",
+                    attributes: [
+                        "error": error.localizedDescription
+                    ])
                 ErrorToastManager.shared.logErrorAndShowToast(
                     error: error,
                     message: "Failed to fetch products from server"
                 )
+            } else {
+                SentrySDK.logger.warn("Products request completed with no data and no error")
             }
         }
 
@@ -435,16 +578,19 @@ class EmpowerPlantViewController: UIViewController {
 
     @objc
     func goToCart() {
+        SentrySDK.logger.debug("goToCart called")
         self.performSegue(withIdentifier: "goToCart", sender: self)
     }
 
     @objc
     func goToListApp() {
+        SentrySDK.logger.debug("goToListApp called")
         self.performSegue(withIdentifier: "goToListApp", sender: self)
     }
 
     @objc
     func refreshTable() {
+        SentrySDK.logger.debug("refreshTable called")
         // ???: why is this executing so many times on load?
         // !!!: because it is called from createProduct, which is called for each item in the response from the network request to get products from server. In general, it's better to use UITableView.insertRow(...) instead of UITableView.reloadData() when simply adding things to the table.
         DispatchQueue.main.async {
@@ -456,10 +602,22 @@ class EmpowerPlantViewController: UIViewController {
 // MARK: UITableViewDataSource
 extension EmpowerPlantViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        SentrySDK.logger.debug(
+            "Products tableView numberOfRowsInSection",
+            attributes: [
+                "section": section,
+                "rowCount": products.count,
+            ])
         return products.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        SentrySDK.logger.debug(
+            "Products tableView cellForRowAt",
+            attributes: [
+                "row": indexPath.row,
+                "section": indexPath.section,
+            ])
         let model = products[indexPath.row]
         let cell =
             tableView.dequeueReusableCell(withIdentifier: ProductTableViewCell.reuseIdentifier, for: indexPath)
@@ -467,8 +625,7 @@ extension EmpowerPlantViewController: UITableViewDataSource {
         cell.configure(name: model.title, price: model.price, imageURL: model.imgCropped ?? model.img)
         cell.onAddToCart = { [weak self] in
             guard let self = self else { return }
-            let logger = SentrySDK.logger
-            logger.info(
+            SentrySDK.logger.info(
                 "Product selected and added to cart",
                 attributes: [
                     "productId": model.productId ?? "unknown",
@@ -481,6 +638,12 @@ extension EmpowerPlantViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        SentrySDK.logger.debug(
+            "Products tableView titleForHeaderInSection",
+            attributes: [
+                "section": section,
+                "productCount": products.count,
+            ])
         return "\(products.count) items"
     }
 }
@@ -488,6 +651,12 @@ extension EmpowerPlantViewController: UITableViewDataSource {
 // MARK: UITableViewDelegate
 extension EmpowerPlantViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        SentrySDK.logger.debug(
+            "Products tableView didSelectRowAt",
+            attributes: [
+                "row": indexPath.row,
+                "section": indexPath.section,
+            ])
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

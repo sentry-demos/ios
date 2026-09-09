@@ -14,11 +14,13 @@ class ListAppViewController: UIViewController {
     // private let diskWriteException = DiskWriteException()
     override func viewDidLoad() {
         super.viewDidLoad()
+        SentrySDK.logger.debug("ListAppViewController viewDidLoad")
         title = "Actions"
         activityIndicator.isHidden = true
     }
 
     @IBAction func addBreadcrumb(_ sender: Any) {
+        SentrySDK.logger.debug("addBreadcrumb tapped")
         let crumb = Breadcrumb(level: SentryLevel.info, category: "Debug")
         crumb.message = "tapped addBreadcrumb"
         crumb.type = "user"
@@ -26,20 +28,27 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func captureMessage(_ sender: Any) {
+        SentrySDK.logger.debug("captureMessage tapped")
         let eventId = SentrySDK.capture(message: "Yeah captured a message")
-        // Returns eventId in case of successfull processed event
-        // otherwise nil
-        print("\(String(describing: eventId))")
+        SentrySDK.logger.info(
+            "Message captured",
+            attributes: [
+                "eventId": eventId.sentryIdString
+            ])
     }
 
     @IBAction func uiClickTransaction(_ sender: Any) {
+        SentrySDK.logger.debug("uiClickTransaction tapped")
         dispatchQueue.async {
             if let path = Bundle.main.path(forResource: "LoremIpsum", ofType: "txt") {
                 _ = FileManager.default.contents(atPath: path)
+            } else {
+                SentrySDK.logger.warn("LoremIpsum.txt not found in bundle for uiClickTransaction")
             }
         }
 
         guard let imgUrl = URL(string: "https://sentry-brand.storage.googleapis.com/sentry-logo-black.png") else {
+            SentrySDK.logger.warn("Failed to construct image URL for uiClickTransaction")
             return
         }
         let session = URLSession(configuration: URLSessionConfiguration.default)
@@ -48,6 +57,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func captureUserFeedback(_ sender: Any) {
+        SentrySDK.logger.debug("captureUserFeedback tapped")
         // Create a realistic ecommerce-related error
         let error = NSError(
             domain: "EmpowerPlant.EcommerceError", code: 1001,
@@ -75,13 +85,24 @@ class ListAppViewController: UIViewController {
                 name: "Plant Enthusiast",
                 email: "customer@example.com"
             ))
+        SentrySDK.logger.info(
+            "User feedback captured",
+            attributes: [
+                "eventId": eventId.sentryIdString
+            ])
     }
 
     @IBAction func captureError(_ sender: Any) {
+        SentrySDK.logger.debug("captureError tapped")
 
         do {
             try RandomErrorGenerator.generate()
         } catch {
+            SentrySDK.logger.error(
+                "Random error captured",
+                attributes: [
+                    "error": error.localizedDescription
+                ])
             ErrorToastManager.shared.logErrorAndShowToast(
                 error: error,
                 message: "A random error occurred while testing the app"
@@ -96,6 +117,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func captureNSException(_ sender: Any) {
+        SentrySDK.logger.debug("captureNSException tapped")
         let exception = NSException(
             name: NSExceptionName("My Custom exeption"), reason: "User clicked the button", userInfo: nil)
         let scope = Scope()
@@ -105,10 +127,12 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func captureFatalError(_ sender: Any) {
+        SentrySDK.logger.fatal("captureFatalError tapped, triggering fatalError")
         fatalError("You've encountered a fatal error. Bummer. 😬")
     }
 
     @IBAction func captureTransaction(_ sender: Any) {
+        SentrySDK.logger.debug("captureTransaction tapped")
         let transaction = SentrySDK.startTransaction(name: "Some Transaction", operation: "Some Operation")
         /*
         //Below Breaks
@@ -132,35 +156,45 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func crash(_ sender: Any) {
+        SentrySDK.logger.warn("crash tapped, triggering SDK crash")
         SentrySDK.crash()
     }
 
     // swiftlint:disable force_unwrapping
     @IBAction func unwrapCrash(_ sender: Any) {
+        SentrySDK.logger.warn("unwrapCrash tapped, force unwrapping nil")
         let a: String! = nil
         let b: String = a!
-        print(b)
+        SentrySDK.logger.debug(
+            "unwrapCrash did not crash",
+            attributes: [
+                "value": b
+            ])
     }
     // swiftlint:enable force_unwrapping
     @IBAction func asyncCrash(_ sender: Any) {
+        SentrySDK.logger.warn("asyncCrash tapped")
         DispatchQueue.main.async {
             self.asyncCrash1()
         }
     }
 
     func asyncCrash1() {
+        SentrySDK.logger.debug("asyncCrash1 called")
         DispatchQueue.main.async {
             self.asyncCrash2()
         }
     }
 
     func asyncCrash2() {
+        SentrySDK.logger.debug("asyncCrash2 called")
         DispatchQueue.main.async {
             SentrySDK.crash()
         }
     }
 
     @IBAction func oomCrash(_ sender: Any) {
+        SentrySDK.logger.warn("oomCrash tapped, starting memory exhaustion loop")
         DispatchQueue.main.async {
             let megaByte = 1_024 * 1_024
             let memoryPageSize = NSPageSize()
@@ -177,6 +211,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func diskWriteException(_ sender: Any) {
+        SentrySDK.logger.debug("diskWriteException tapped")
         // diskWriteException.continuouslyWriteToDisk()
 
         // As we are writing to disk continuously we would keep adding spans to this UIEventTransaction.
@@ -184,6 +219,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func highCPULoad(_ sender: Any) {
+        SentrySDK.logger.warn("highCPULoad tapped, starting infinite PI calculation loop")
         dispatchQueue.async {
             while true {
                 _ = self.calcPi()
@@ -192,6 +228,7 @@ class ListAppViewController: UIViewController {
     }
 
     private func calcPi() -> Double {
+        SentrySDK.logger.debug("calcPi called")
         var denominator = 1.0
         var pi = 0.0
 
@@ -209,6 +246,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func anrFullyBlocking(_ sender: Any) {
+        SentrySDK.logger.warn("anrFullyBlocking tapped, blocking main thread")
         let buttonTitle = self.anrFullyBlockingButton.currentTitle
         var i = 0
 
@@ -223,6 +261,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func anrFillingRunLoop(_ sender: Any) {
+        SentrySDK.logger.warn("anrFillingRunLoop tapped, filling run loop with work")
         let buttonTitle = self.anrFillingRunLoopButton.currentTitle
         var i = 0
 
@@ -243,16 +282,23 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func dsnChanged(_ sender: UITextField) {
+        SentrySDK.logger.debug("dsnChanged called")
         let options = Options()
         options.dsn = sender.text
 
         if let dsn = options.dsn {
+            SentrySDK.logger.info(
+                "DSN changed and is valid",
+                attributes: [
+                    "dsn": dsn
+                ])
             sender.backgroundColor = UIColor.systemGreen
 
             dispatchQueue.async {
                 // DSNStorage.shared.saveDSN(dsn: dsn)
             }
         } else {
+            SentrySDK.logger.warn("DSN changed but is invalid")
             sender.backgroundColor = UIColor.systemRed
 
             dispatchQueue.async {
@@ -262,12 +308,14 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func close(_ sender: Any) {
+        SentrySDK.logger.info("close tapped, closing Sentry SDK")
         SentrySDK.close()
     }
 
     @IBOutlet weak var imageView: UIImageView!
     @available(iOS 15.0, *)
     @IBAction func imageOnMain(_ sender: Any) {
+        SentrySDK.logger.debug("imageOnMain tapped")
         imageView.isHidden = false
         let span = SentrySDK.startTransaction(name: "test", operation: "image-on-main")
         imageView.image = UIImage(named: "jwt-deep-field.png")
@@ -276,6 +324,7 @@ class ListAppViewController: UIViewController {
 
     @IBOutlet weak var progressIndicator: UIProgressView!
     @IBAction func jsonMainThread(_ sender: Any) {
+        SentrySDK.logger.warn("jsonMainThread tapped, building large JSON on main thread")
         // build up a huge JSON structure
         progressIndicator.isHidden = false
         DispatchQueue.global(qos: .utility).async {
@@ -298,6 +347,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func regexOnMainThread(_ sender: Any) {
+        SentrySDK.logger.warn("regexOnMainThread tapped, running regex over large text on main thread")
         let string = try! String(contentsOf: Bundle.main.url(forResource: "mobydick", withExtension: "txt")!)
         let regex = try! NSRegularExpression(pattern: "([Tt]he)?.*([Ww]hale)")
         let span = SentrySDK.startTransaction(name: "test", operation: "regex-on-main")
@@ -306,6 +356,7 @@ class ListAppViewController: UIViewController {
     }
 
     @IBAction func fileIoOnMainThread(_ sender: Any) {
+        SentrySDK.logger.warn("fileIoOnMainThread tapped, writing large file on main thread")
         progressIndicator.isHidden = false
         DispatchQueue.global(qos: .utility).async {
             let longString = String(repeating: UUID().uuidString, count: 5_000_000)
@@ -331,6 +382,7 @@ class ListAppViewController: UIViewController {
     }
 
     func factorialIterative(int x: BigInt) -> BigInt {
+        SentrySDK.logger.debug("factorialIterative called")
         var i: BigInt = x
         var result: BigInt = 1
         while i > 0 {
@@ -343,6 +395,7 @@ class ListAppViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
     @IBAction func simulateDroppedFrame(_ sender: Any) {
+        SentrySDK.logger.debug("simulateDroppedFrame tapped")
         activityIndicator.startAnimating()
         activityIndicator.isHidden = false
         let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
