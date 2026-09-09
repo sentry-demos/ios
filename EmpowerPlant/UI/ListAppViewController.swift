@@ -19,6 +19,14 @@ class ListAppViewController: UIViewController {
         activityIndicator.isHidden = true
     }
 
+    /// Workaround for https://github.com/getsentry/sentry-cocoa/issues/5660
+    /// Buffered logs live in memory only, so flush them to the transport before
+    /// crashing. The envelope lands in the on-disk cache even if sending fails,
+    /// so it is delivered on the next launch together with the crash event.
+    private func flushLogsBeforeCrash() {
+        SentrySDK.flush(timeout: 5)
+    }
+
     @IBAction func addBreadcrumb(_ sender: Any) {
         SentrySDK.logger.debug("addBreadcrumb tapped")
         let crumb = Breadcrumb(level: SentryLevel.info, category: "Debug")
@@ -128,6 +136,7 @@ class ListAppViewController: UIViewController {
 
     @IBAction func captureFatalError(_ sender: Any) {
         SentrySDK.logger.fatal("captureFatalError tapped, triggering fatalError")
+        flushLogsBeforeCrash()
         fatalError("You've encountered a fatal error. Bummer. 😬")
     }
 
@@ -157,12 +166,14 @@ class ListAppViewController: UIViewController {
 
     @IBAction func crash(_ sender: Any) {
         SentrySDK.logger.warn("crash tapped, triggering SDK crash")
+        flushLogsBeforeCrash()
         SentrySDK.crash()
     }
 
     // swiftlint:disable force_unwrapping
     @IBAction func unwrapCrash(_ sender: Any) {
         SentrySDK.logger.warn("unwrapCrash tapped, force unwrapping nil")
+        flushLogsBeforeCrash()
         let a: String! = nil
         let b: String = a!
         SentrySDK.logger.debug(
@@ -189,12 +200,15 @@ class ListAppViewController: UIViewController {
     func asyncCrash2() {
         SentrySDK.logger.debug("asyncCrash2 called")
         DispatchQueue.main.async {
+            self.flushLogsBeforeCrash()
             SentrySDK.crash()
         }
     }
 
     @IBAction func oomCrash(_ sender: Any) {
         SentrySDK.logger.warn("oomCrash tapped, starting memory exhaustion loop")
+        // Jetsam kills are undetectable, so this is the last chance to ship the logs.
+        flushLogsBeforeCrash()
         DispatchQueue.main.async {
             let megaByte = 1_024 * 1_024
             let memoryPageSize = NSPageSize()
