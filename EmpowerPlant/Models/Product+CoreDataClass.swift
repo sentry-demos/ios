@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import SentrySwift
 
 @objc(Product)
 public class Product: NSManagedObject {

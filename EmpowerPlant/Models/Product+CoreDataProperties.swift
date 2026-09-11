@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import SentrySwift
 
 extension Product {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {

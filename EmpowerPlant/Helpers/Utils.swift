@@ -1,4 +1,4 @@
-import Sentry
+import SentrySwift
 import UIKit
 
 public let modifiedDBNotificationName = Notification.Name("io.sentry.empowerplants.newly-generated-db-items-available")
