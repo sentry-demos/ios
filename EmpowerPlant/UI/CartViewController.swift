@@ -1,18 +1,9 @@
 import SentrySwift
 import UIKit
 
-protocol URLSessionProtocol {
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
-        -> URLSessionDataTaskProtocol
-}
-
-protocol URLSessionDataTaskProtocol {
-    func resume()
-}
-
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    // private let session: URLSessionProtocol
+    private let checkoutService: CheckoutServicing
 
     let tableView: UITableView = {
         let table = UITableView()
@@ -37,17 +28,16 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return l
     }()
 
-    // Used for mocking in unit test
-    init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
-        // self.session = session
-        SentrySDK.logger.debug("CartViewController initialized with session")
+    init(checkoutService: CheckoutServicing = Dependencies.checkoutService) {
+        self.checkoutService = checkoutService
+        SentrySDK.logger.debug("CartViewController initialized with checkout service")
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        // fatalError("init(coder:) has not been implemented")
+        checkoutService = Dependencies.checkoutService
         SentrySDK.logger.debug("CartViewController initialized with coder")
-        super.init(nibName: nil, bundle: nil)
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {
@@ -137,85 +127,28 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             Thread.sleep(forTimeInterval: 0.5)  // 500ms delay - under 2s threshold but shows interaction
         }
 
-        // use localhost for development against dev-backend
-        // let url = URL(string: "http://127.0.0.1:8080/checkout")!
-        let url = URL(string: "https://flask.empower-plant.com/checkout")!
-
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-
-        let bodyData = try? JSONSerialization.data(
-            withJSONObject: setJson(),
-            options: []
-        )
-        if bodyData == nil {
-            SentrySDK.logger.warn("Failed to serialize checkout request body to JSON")
-        }
-        request.httpBody = bodyData
-
-        enum PurchaseError: Error, LocalizedError {
-            case insufficientInventory
-
-            var errorDescription: String? {
-                switch self {
-                case .insufficientInventory:
-                    return "Insufficient inventory available"
-                }
-            }
-        }
-
-        let task = URLSession.shared.dataTask(with: request) { _, response, _ in
-            SentrySDK.logger.debug("Checkout network response received")
-            // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
+        checkoutService.purchase(cart: setJson()) { [weak self] result in
+            guard let self else { return }
             self.performCheckoutFileIO()
 
-            // This handler is responsible for Flagship Error
-            if let httpResponse = response as? HTTPURLResponse {
-                if (httpResponse.statusCode) == 500 {
-                    let err = PurchaseError.insufficientInventory
-                    SentrySDK.logger.error(
-                        "Purchase failed with server error",
-                        attributes: [
-                            "statusCode": 500,
-                            "errorType": "insufficient_inventory",
-                        ])
-                    ErrorToastManager.shared.logErrorAndShowToast(  // Flagship!
-                        error: err,
-                        message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                        showFeedbackOption: true  // Enable User Feedback for checkout errors
-                    )
-                } else if (httpResponse.statusCode) == 200 {
-                    SentrySDK.logger.info(
-                        "Purchase completed successfully",
-                        attributes: [
-                            "statusCode": 200,
-                            "cartTotal": ShoppingCart.instance.total,
-                        ])
-                } else {
-                    SentrySDK.logger.warn(
-                        "Purchase completed with unexpected status",
-                        attributes: [
-                            "statusCode": httpResponse.statusCode
-                        ])
-                }
-            } else {
-                SentrySDK.logger.warn("Checkout response was not an HTTP response")
+            switch result {
+            case .success:
+                SentrySDK.logger.info(
+                    "Purchase completed successfully",
+                    attributes: ["cartTotal": ShoppingCart.instance.total]
+                )
+            case .failure(let error):
+                SentrySDK.logger.error(
+                    "Purchase failed with server error",
+                    attributes: ["error": error.localizedDescription]
+                )
+                ErrorToastManager.shared.logErrorAndShowToast(
+                    error: error,
+                    message: "Purchase failed: \(error.localizedDescription)",
+                    showFeedbackOption: true
+                )
             }
-
-            // not getting met
-            // if let error = error {
-            //    print("> HTTP Request Failed \(error)")
-            //    SentrySDK.capture(error: error)
-            // }
-
-            // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            // if let data = data {
-            //     print("> no error, do nothing", data)
-            // }
         }
-
-        task.resume()
     }
 
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
