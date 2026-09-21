@@ -35,11 +35,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableSwizzling = enableSwizzling
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
-            options.experimental.enableStandaloneAppStartTracing = true
+            options.enableStandaloneAppStartTracing = true
+            options.experimental.enableUIViewControllerInitSwizzling = enableSwizzling
+            options.swiftAsyncStacktraces = true
 
-            // Enable AppHang configurations
-            options.appHangTimeoutInterval = 2.0
-            options.enableReportNonFullyBlockingAppHangs = true
+            // Use MetricKit for hangs instead of the deprecated polling-based tracker.
+            options.enableAppHangTracking = false
+            options.appHangTimeoutInterval = 2.0  // Still used for watchdog termination classification.
 
             // Enable Mobile Session Health configurations
             options.enableUserInteractionTracing = true
@@ -50,6 +52,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "localhost",
             ]
             options.enablePropagateTraceparent = true
+
+            // Performance Tracking
+            options.enablePreWarmedAppStartTracing = true
+            options.enableFileManagerSwizzling = true
+            options.enablePersistingTracesWhenCrashing = true
+
+            // MetricKit
+            options.enableMetricKit = true
+            options.enableMetricKitRawPayload = true
 
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
@@ -63,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             // Enable User Feedback Widget
             options.configureUserFeedback = { config in
+                config.useShakeGesture = true
+                config.configureForm = { form in
+                    form.enableScreenshot = true
+                }
                 config.onSubmitSuccess = { data in
                     SentrySDK.logger.info(
                         "User feedback submitted successfully",
@@ -78,9 +93,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         ])
                 }
             }
-
-            // Enable Logs
-            options.enableLogs = true
 
             // Strip user IP address from ecommerce/payment errors to avoid exposing PII.
             // Also apply custom fingerprinting per SE identifier and version to isolate issues
@@ -99,6 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
                 return event
             }
+
         }
         EmpowerPlantTheme.applyNavBarAppearance()
 
