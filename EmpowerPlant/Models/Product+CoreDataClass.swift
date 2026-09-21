@@ -5,6 +5,7 @@ import SentrySwift
 @objc(Product)
 public class Product: NSManagedObject {
     required convenience public init(from decoder: Decoder) throws {
+        SentrySDK.logger.debug("Product decoded")
         self.init()
     }
 }
@@ -23,12 +24,10 @@ public class Product: NSManagedObject {
 //            case title
 //        }
 //        guard let context = decoder.userInfo[CodingUserInfoKey.context!] as? NSManagedObjectContext else {
-//            print("failed contextget");
 //            throw ManagedObjectError.decodeContextError
 //
 //        }
 //        guard let entity = NSEntityDescription.entity(forEntityName: "Product", in: context) else {
-//            print("failed entity init");
 //            throw ManagedObjectError.decodeEntityError
 //
 //        }
