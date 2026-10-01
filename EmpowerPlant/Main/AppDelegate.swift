@@ -14,7 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
 
         SentrySDK.start { options in
-            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            // previousDemoDSN: restore the demo project by assigning this string to options.dsn.
+            let previousDemoDSN = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            options.dsn = "https://a9e3c927433fc5a2ef7c87bd5938cb72@o4510868817379328.ingest.us.sentry.io/4512181895495680"
 
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
@@ -29,6 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.configureProfiling = {
                 $0.sessionSampleRate = 1
                 $0.lifecycle = .trace
+                // Profiles the next cold start and attaches that profile to app.launch.
+                $0.profileAppStarts = true
             }
             options.attachScreenshot = true
             options.attachViewHierarchy = true
@@ -40,6 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Enable AppHang configurations
             options.appHangTimeoutInterval = 2.0
             options.enableReportNonFullyBlockingAppHangs = true
+            // MXHangDiagnostic, MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
+            // Delivered on a physical device running iOS 15 or later.
+            options.enableMetricKit = true
 
             // Enable Mobile Session Health configurations
             options.enableUserInteractionTracing = true

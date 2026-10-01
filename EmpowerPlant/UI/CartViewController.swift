@@ -1,3 +1,4 @@
+import Darwin
 import SentrySwift
 import UIKit
 
@@ -113,6 +114,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase() {
+        let checkoutSpan = beginCheckoutSpan()
         let logger = SentrySDK.logger
         logger.info(
             "Purchase initiated",
@@ -120,6 +122,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 "cartTotal": ShoppingCart.instance.total,
                 "itemCount": ShoppingCart.instance.items.count,
             ])
+        recordCheckoutMetrics()
 
         // Simulate potential app hang scenario for AppHang V2 demonstration
         // This creates a brief delay that could trigger hang detection if it exceeds threshold
@@ -154,6 +157,18 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         let task = URLSession.shared.dataTask(with: request) { _, response, _ in
+            SentrySDK.configureScope { scope in
+                scope.span = checkoutSpan
+            }
+            defer {
+                checkoutSpan.finish()
+                SentrySDK.configureScope { scope in
+                    if scope.span?.spanId.sentrySpanIdString == checkoutSpan.spanId.sentrySpanIdString {
+                        scope.span = nil
+                    }
+                }
+            }
+
             let logger = SentrySDK.logger
             // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
             self.performCheckoutFileIO()
@@ -202,6 +217,55 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 
         task.resume()
+    }
+
+    /// Keeps purchase logs, checkout metrics, and the Flask request on one trace.
+    private func beginCheckoutSpan() -> Span {
+        if let parent = SentrySDK.span {
+            let child = parent.startChild(operation: "checkout", description: "checkout")
+            SentrySDK.configureScope { scope in
+                scope.span = child
+            }
+            return child
+        }
+        return SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
+    }
+
+    /// Application metrics. CPU, heap, frames, and energy stay on the profiler payload.
+    private func recordCheckoutMetrics() {
+        let itemCount = ShoppingCart.instance.items.count
+        SentrySDK.metrics.count(
+            key: "checkout.attempted",
+            value: 1,
+            attributes: ["item_count": itemCount]
+        )
+        SentrySDK.metrics.gauge(
+            key: "checkout.cart_size",
+            value: Double(itemCount)
+        )
+        if let footprint = Self.memoryFootprintBytes() {
+            SentrySDK.metrics.gauge(
+                key: "memory.usage",
+                value: footprint,
+                unit: .byte
+            )
+        }
+    }
+
+    /// phys_footprint from task_info(TASK_VM_INFO), the same reading the profiler stores as heap.
+    private static func memoryFootprintBytes() -> Double? {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(TASK_VM_INFO_COUNT)
+        let result = withUnsafeMutablePointer(to: &info) { pointer -> kern_return_t in
+            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { rebound in
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), rebound, &count)
+            }
+        }
+        guard result == KERN_SUCCESS else { return nil }
+        if count >= TASK_VM_INFO_REV1_COUNT {
+            return Double(info.phys_footprint)
+        }
+        return Double(info.resident_size)
     }
 
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
