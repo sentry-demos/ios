@@ -58,7 +58,7 @@ class ProductTableViewCell: UITableViewCell {
     private let addToCartButton: UIButton = {
         let b = UIButton(type: .system)
         b.setTitle("Add to Cart", for: .normal)
-        b.setTitleColor(.white, for: .normal)
+        b.setTitleColor(.black, for: .normal)
         b.titleLabel?.font = .systemFont(ofSize: 13, weight: .bold)
         b.backgroundColor = EmpowerPlantTheme.buttonBackground
         b.layer.cornerRadius = 4

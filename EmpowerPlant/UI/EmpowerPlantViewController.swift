@@ -74,7 +74,11 @@ class EmpowerPlantViewController: UIViewController {
             ShopClick.play()
             self?.goToCart()
         }
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cartButton)
+        let cartItem = UIBarButtonItem(customView: cartButton)
+        if #available(iOS 26.0, *) {
+            cartItem.hidesSharedBackground = true
+        }
+        navigationItem.rightBarButtonItem = cartItem
         refreshCartBadge()
     }
 

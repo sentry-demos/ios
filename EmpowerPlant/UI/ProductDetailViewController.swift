@@ -306,7 +306,7 @@ final class ProductDetailViewController: UIViewController {
     private func filledButton(title: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
         button.backgroundColor = EmpowerPlantTheme.buttonBackground
         button.layer.cornerRadius = 8

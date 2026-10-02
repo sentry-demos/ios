@@ -78,8 +78,8 @@ class ErrorToastManager {
 
         // Shop green, same as the navigation bar and buttons.
         view.backgroundColor = EmpowerPlantTheme.buttonPressed
-        view.button?.backgroundColor = EmpowerPlantTheme.buttonBackground
-        view.button?.setTitleColor(.white, for: .normal)
+        view.button?.backgroundColor = .white
+        view.button?.setTitleColor(.black, for: .normal)
         view.button?.layer.cornerRadius = 4
 
         // Set up interactive elements with feedback option

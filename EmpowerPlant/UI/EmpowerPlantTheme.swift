@@ -21,28 +21,28 @@ extension UIColor {
 
 // MARK: - EmpowerPlant Theme
 
-/// Shop chrome uses the React Native demo green (`#002626`).
+/// Shop chrome uses the Empower Plant leaf green from the React Native logo and the Android launcher.
 enum EmpowerPlantTheme {
-    static let primary = UIColor(hex: "#002626")
-    static let primaryDark = UIColor(hex: "#002626")
+    static let primary = UIColor(hex: "#9BA547")
+    static let primaryDark = UIColor(hex: "#9BA547")
     static let accent = UIColor(hex: "#FF4081")  // Pink
-    static let buttonBackground = UIColor(hex: "#002626")
-    static let buttonPressed = UIColor(hex: "#002626")
-    static let textHeader = UIColor(hex: "#002626")
+    static let buttonBackground = UIColor(hex: "#9BA547")
+    static let buttonPressed = UIColor(hex: "#9BA547")
+    static let textHeader = UIColor(hex: "#9BA547")
     static let cardBackground = UIColor.white
     static let tableBackground = UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1.0)
 
-    /// Applies the shop green navigation bar globally.
+    /// Light green bar. Titles and icons stay dark so they remain readable.
     static func applyNavBarAppearance() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = primaryDark
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
 
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
-        UINavigationBar.appearance().tintColor = .white
+        UINavigationBar.appearance().tintColor = .black
     }
 }

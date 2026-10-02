@@ -110,7 +110,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let checkoutButton = UIButton(type: .system)
         checkoutButton.setTitle("  Checkout  ", for: .normal)
         if #unavailable(iOS 26.0) {
-            checkoutButton.setTitleColor(.white, for: .normal)
+            checkoutButton.setTitleColor(.black, for: .normal)
             checkoutButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
             checkoutButton.backgroundColor = EmpowerPlantTheme.buttonBackground
             checkoutButton.layer.cornerRadius = 4
@@ -127,6 +127,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationController?.pushViewController(CheckoutViewController(cart: self), animated: true)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
+        tableView.reloadData()
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ShopPrivacy.unmaskNavigationButtons(of: self)
@@ -140,7 +146,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     @objc
-    func purchase(openFeedbackOnFailure: Bool = false) {
+    func purchase(onFailure: (@MainActor () -> Void)? = nil) {
         let checkoutSpan = beginCheckoutSpan()
         let logger = SentrySDK.logger
         let cartItems = ShoppingCart.instance.items
@@ -232,9 +238,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                         },
                         showFeedbackOption: true
                     )
-                    if openFeedbackOnFailure {
+                    if let onFailure {
                         Task { @MainActor in
-                            ShopFeedback.presentCheckoutForm()
+                            onFailure()
                         }
                     }
                 } else if (httpResponse.statusCode) == 200 {
@@ -391,26 +397,27 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // TODO: could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
-        // or continue showing all products, even if quantity is 0. the screen looks more full this way
-        return 4  // products.count
+        cartLines().count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =
             tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
 
-        let quantities: [(String, Int)] = [
+        let item = cartLines()[indexPath.row]
+        cell.configure(name: item.0, quantity: item.1)
+
+        return cell
+    }
+
+    /// Plants the shopper added. Zero-quantity catalog rows stay off this list.
+    private func cartLines() -> [(String, Int)] {
+        [
             ("Plant Mood", ShoppingCart.instance.quantities.plantMood),
             ("Botana Voice", ShoppingCart.instance.quantities.botanaVoice),
             ("Plant Stroller", ShoppingCart.instance.quantities.plantStroller),
             ("Plant Nodes", ShoppingCart.instance.quantities.plantNodes),
-        ]
-
-        let item = quantities[indexPath.row]
-        cell.configure(name: item.0, quantity: item.1)
-
-        return cell
+        ].filter { $0.1 > 0 }
     }
 
     /*

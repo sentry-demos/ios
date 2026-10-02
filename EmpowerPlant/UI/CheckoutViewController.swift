@@ -22,6 +22,24 @@ final class CheckoutViewController: UIViewController {
     }()
 
     private let promoField = UITextField()
+    private let feedbackCorner: UIButton = {
+        var config = UIButton.Configuration.filled()
+        config.title = "Feedback"
+        config.cornerStyle = .capsule
+        config.baseBackgroundColor = EmpowerPlantTheme.buttonBackground
+        config.baseForegroundColor = .black
+        config.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 10)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = .systemFont(ofSize: 13, weight: .semibold)
+            return outgoing
+        }
+        let button = UIButton(configuration: config)
+        button.isHidden = true
+        button.accessibilityIdentifier = "CheckoutFeedback"
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     private let promoError: UILabel = {
         let label = UILabel()
         label.text = "Unknown error applying promo code"
@@ -46,12 +64,14 @@ final class CheckoutViewController: UIViewController {
         title = "Checkout"
         view.backgroundColor = EmpowerPlantTheme.tableBackground
         layoutForm()
+        layoutFeedbackCorner()
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ShopPrivacy.unmaskNavigationButtons(of: self)
         ShopPrivacy.unmask(promoError)
+        ShopPrivacy.unmask(feedbackCorner)
     }
 
     override func viewDidLayoutSubviews() {
@@ -149,7 +169,24 @@ final class CheckoutViewController: UIViewController {
 
     @objc private func placeOrder() {
         ShopClick.play()
-        cart?.purchase(openFeedbackOnFailure: true)
+        cart?.purchase { [weak self] in
+            self?.feedbackCorner.isHidden = false
+        }
+    }
+
+    @objc private func showCheckoutFeedback() {
+        ShopClick.play()
+        ShopFeedback.presentCheckoutForm()
+    }
+
+    private func layoutFeedbackCorner() {
+        feedbackCorner.addTarget(self, action: #selector(showCheckoutFeedback), for: .touchUpInside)
+        view.addSubview(feedbackCorner)
+        NSLayoutConstraint.activate([
+            feedbackCorner.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            feedbackCorner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        ])
+        ShopPrivacy.unmask(feedbackCorner)
     }
 
     private func textField(placeholder: String, text: String) -> UITextField {
@@ -172,7 +209,7 @@ final class CheckoutViewController: UIViewController {
     private func filledButton(title: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
         button.backgroundColor = EmpowerPlantTheme.buttonBackground
         button.layer.cornerRadius = 8
