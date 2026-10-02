@@ -86,7 +86,12 @@ class ErrorToastManager {
         view.button?.setTitle("Provide Feedback", for: .normal)
         view.buttonTapHandler = { _ in
             SwiftMessages.hide()
-            self.showFeedbackPrompt(for: eventId)
+            // Cocoa 9.24's managed form has no associatedEventId parameter.
+            // `eventId` is the checkout error this toast was opened from.
+            _ = eventId
+            DispatchQueue.main.async {
+                SentrySDK.feedback.show()
+            }
         }
 
         // Configure presentation style
@@ -97,87 +102,6 @@ class ErrorToastManager {
         config.interactiveHide = true
 
         SwiftMessages.show(config: config, view: view)
-    }
-
-    /// Shows a simple feedback prompt
-    /// - Parameter eventId: The Sentry event ID to associate with feedback
-    @MainActor
-    private func showFeedbackPrompt(for eventId: SentryId) {
-        let alert = UIAlertController(
-            title: "Help Us Improve",
-            message: "We'd love to hear about your experience. Would you like to provide feedback about this issue?",
-            preferredStyle: .alert
-        )
-
-        alert.addAction(
-            UIAlertAction(title: "Yes, Provide Feedback", style: .default) { _ in
-                self.collectUserFeedback(for: eventId)
-            })
-
-        alert.addAction(UIAlertAction(title: "Not Now", style: .cancel))
-
-        // Present from the current top view controller
-        if let topVC = UIApplication.shared.windows.first?.rootViewController {
-            var presentingVC = topVC
-            while let presented = presentingVC.presentedViewController {
-                presentingVC = presented
-            }
-            presentingVC.present(alert, animated: true)
-        }
-    }
-
-    /// Collects user feedback and submits to Sentry
-    /// - Parameter eventId: The Sentry event ID to associate with feedback
-    @MainActor
-    private func collectUserFeedback(for eventId: SentryId) {
-        let alert = UIAlertController(
-            title: "Provide Feedback",
-            message: "Please tell us what happened and how we can improve your experience.",
-            preferredStyle: .alert
-        )
-
-        alert.addTextField { textField in
-            textField.placeholder = "Your name (optional)"
-        }
-
-        alert.addTextField { textField in
-            textField.placeholder = "Your email (optional)"
-        }
-
-        alert.addTextField { textField in
-            textField.placeholder = "Describe the issue..."
-            textField.autocorrectionType = .yes
-        }
-
-        alert.addAction(
-            UIAlertAction(title: "Submit Feedback", style: .default) { _ in
-                let name = alert.textFields?[0].text ?? ""
-                let email = alert.textFields?[1].text ?? ""
-                let comments = alert.textFields?[2].text ?? ""
-
-                if !comments.isEmpty {
-                    SentrySDK.capture(
-                        feedback: SentryFeedback(
-                            message: comments,
-                            name: name.isEmpty ? "Anonymous User" : name,
-                            email: email.isEmpty ? "anonymous@example.com" : email
-                        ))
-
-                    // Show success message
-                    self.showInfoToast(message: "Thank you for your feedback! We'll use it to improve the app.")
-                }
-            })
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-
-        // Present from the current top view controller
-        if let topVC = UIApplication.shared.windows.first?.rootViewController {
-            var presentingVC = topVC
-            while let presented = presentingVC.presentedViewController {
-                presentingVC = presented
-            }
-            presentingVC.present(alert, animated: true)
-        }
     }
 
     /// Shows a warning toast message

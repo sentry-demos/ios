@@ -39,10 +39,16 @@ class EmpowerPlantViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        ShopPrivacy.unmaskNavigationButtons(of: self)
         SentrySDK.configureScope { scope in
             scope.setTag(value: "product_list", key: "screen")
         }
         SentrySDK.reportFullyDisplayed()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        ShopPrivacy.unmaskNavigationButtons(of: self)
     }
 
     private func configureNavigationItems() {

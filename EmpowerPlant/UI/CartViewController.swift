@@ -97,6 +97,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ])
 
         totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
+        ShopPrivacy.unmask(totalLabel)
 
         configureNavigationItems()
         checkRelease()
@@ -116,8 +117,21 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         purchaseButton.addTarget(self, action: #selector(purchase), for: .touchUpInside)
         purchaseButton.accessibilityIdentifier = "Purchase"
+        ShopPrivacy.unmask(purchaseButton)
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: purchaseButton)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        ShopPrivacy.unmaskNavigationButtons(of: self)
+        ShopPrivacy.unmask(totalLabel)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        ShopPrivacy.unmaskNavigationButtons(of: self)
+        ShopPrivacy.unmask(totalLabel)
     }
 
     @objc

@@ -52,8 +52,14 @@ final class ProductDetailViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        ShopPrivacy.unmaskNavigationButtons(of: self)
         recordProductView()
         SentrySDK.reportFullyDisplayed()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        ShopPrivacy.unmaskNavigationButtons(of: self)
     }
 
     private func layoutStorefront() {
