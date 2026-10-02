@@ -89,16 +89,16 @@ class ErrorToastManager {
             // Cocoa 9.24's managed form has no associatedEventId parameter.
             // `eventId` is the checkout error this toast was opened from.
             _ = eventId
-            DispatchQueue.main.async {
-                SentrySDK.feedback.show()
+            Task { @MainActor in
+                ShopFeedback.presentCheckoutForm()
             }
         }
 
-        // Configure presentation style
+        // Configure presentation style. No dim, so the feedback form stays usable.
         var config = SwiftMessages.defaultConfig
         config.presentationStyle = .top
         config.duration = .seconds(seconds: 8)  // Longer duration for feedback option
-        config.dimMode = .gray(interactive: true)
+        config.dimMode = .none
         config.interactiveHide = true
 
         SwiftMessages.show(config: config, view: view)
@@ -122,6 +122,24 @@ class ErrorToastManager {
         config.presentationStyle = .top
         config.duration = .seconds(seconds: 4)
         config.dimMode = .gray(interactive: true)
+        config.interactiveHide = true
+
+        SwiftMessages.show(config: config, view: view)
+    }
+
+    /// Short notice after add-to-cart, matching the React Native toast.
+    @MainActor
+    func showAddedToCart() {
+        let view = MessageView.viewFromNib(layout: .cardView)
+        view.configureTheme(.success)
+        view.configureContent(title: "Added to Cart", body: " ")
+        view.configureDropShadow()
+        view.button?.isHidden = true
+
+        var config = SwiftMessages.defaultConfig
+        config.presentationStyle = .bottom
+        config.duration = .seconds(seconds: 1)
+        config.dimMode = .none
         config.interactiveHide = true
 
         SwiftMessages.show(config: config, view: view)

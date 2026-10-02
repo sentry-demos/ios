@@ -16,6 +16,8 @@ class EmpowerPlantViewController: UIViewController {
 
     var products = [Product]()
     private var catalogSpan: Span?
+    private let cartButton = CartBadgeButton()
+    private static let productsEndpoint = "https://flask.empower-plant.com/products"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +35,12 @@ class EmpowerPlantViewController: UIViewController {
         ])
 
         configureNavigationItems()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshCartBadge),
+            name: .shoppingCartDidChange,
+            object: nil
+        )
         loadCatalog()
         checkRelease()
     }
@@ -45,6 +53,7 @@ class EmpowerPlantViewController: UIViewController {
         }
         SentrySDK.reportFullyDisplayed()
         SentrySDK.finishExtendedAppStart()
+        refreshCartBadge()
     }
 
     override func viewDidLayoutSubviews() {
@@ -61,23 +70,27 @@ class EmpowerPlantViewController: UIViewController {
         )
         feedback.accessibilityIdentifier = "Feedback"
         navigationItem.leftBarButtonItem = feedback
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "cart"),
-            style: .plain,
-            target: self,
-            action: #selector(goToCart)
-        )
-        navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Cart"
+        cartButton.onTap = { [weak self] in
+            ShopClick.play()
+            self?.goToCart()
+        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cartButton)
+        refreshCartBadge()
     }
 
     @objc private func showFeedback() {
+        ShopClick.play()
         SentrySDK.feedback.show()
+    }
+
+    @objc private func refreshCartBadge() {
+        cartButton.setCount(ShoppingCart.instance.items.count)
     }
 
     private func loadCatalog() {
         let span = ShopTrace.begin(operation: "catalog.load", description: "Load plant catalog", bindChildToScope: true)
         span.setData(value: "product_list", key: "screen")
-        span.setData(value: "https://flask.empower-plant.com/products-join", key: "endpoint")
+        span.setData(value: Self.productsEndpoint, key: "endpoint")
         catalogSpan = span
 
         ShopBreadcrumb.record(
@@ -89,7 +102,7 @@ class EmpowerPlantViewController: UIViewController {
             "Fetching products from server",
             attributes: [
                 "screen": "product_list",
-                "endpoint": "https://flask.empower-plant.com/products-join",
+                "endpoint": Self.productsEndpoint,
             ])
         SentrySDK.metrics.count(key: "catalog.viewed", value: 1)
 
@@ -187,11 +200,14 @@ class EmpowerPlantViewController: UIViewController {
 
     private func fetchProducts(catalogSpan: Span) {
         let startTime = Date()
-        let url = URL(string: "https://flask.empower-plant.com/products-join")!
-        let httpSpan = catalogSpan.startChild(operation: "http.client", description: "GET /products-join")
+        let url = URL(string: Self.productsEndpoint)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        ShopSession.applyRequestHeaders(to: &request)
+        let httpSpan = catalogSpan.startChild(operation: "http.client", description: "GET /products")
         httpSpan.setData(value: url.absoluteString, key: "url")
 
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
             let durationMs = Int(Date().timeIntervalSince(startTime) * 1000)
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
             let decoded = data.flatMap { try? JSONDecoder().decode([CatalogProduct].self, from: $0) }
@@ -367,6 +383,7 @@ extension EmpowerPlantViewController: UITableViewDataSource {
     }
 
     private func addPlantToCart(_ product: Product) {
+        ShopClick.play()
         let title = product.title ?? "unknown"
         let plantId = product.productId ?? "unknown"
         let price = Int(product.price ?? "") ?? 0
@@ -399,6 +416,7 @@ extension EmpowerPlantViewController: UITableViewDataSource {
         SentrySDK.metrics.count(key: "cart.item_added", value: 1, attributes: ["plant_title": title])
         SentrySDK.metrics.gauge(key: "cart.size", value: Double(cartSize))
         span.finish()
+        ErrorToastManager.shared.showAddedToCart()
     }
 }
 

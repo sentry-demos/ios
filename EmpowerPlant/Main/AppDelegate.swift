@@ -74,7 +74,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.sessionReplay.networkCaptureBodies = true
 
             // Installs the user-feedback integration. The shop Feedback button
-            // and the checkout toast present the form with SentrySDK.feedback.show().
+            // presents the form with SentrySDK.feedback.show(). Checkout failure
+            // presents the same form with the message prefilled.
             options.configureUserFeedback = { config in
                 config.onSubmitSuccess = { data in
                     print("Feedback submitted successfully: \(data)")
@@ -116,8 +117,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SentrySDK.configureScope { scope in
             scope.setTag(
                 value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
-            scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")
+            scope.setTag(value: ShopSession.se, key: "se")
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
+            ShopSession.apply(to: scope)
         }
 
         let logger = SentrySDK.logger
@@ -125,7 +127,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             "Sentry SDK initialized",
             attributes: [
                 "enableSwizzling": enableSwizzling,
-                "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
+                "customerType": ShopSession.customerType,
+                "email": ShopSession.email,
             ])
 
         if ProcessInfo.processInfo.arguments.contains("--wipe-db") {

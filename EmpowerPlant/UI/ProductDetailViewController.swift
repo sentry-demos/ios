@@ -195,6 +195,7 @@ final class ProductDetailViewController: UIViewController {
     }
 
     @objc private func addToCart() {
+        ShopClick.play()
         let span = ShopTrace.begin(operation: "cart.add", description: "Add plant to cart", bindChildToScope: false)
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
@@ -223,10 +224,12 @@ final class ProductDetailViewController: UIViewController {
         SentrySDK.metrics.count(key: "cart.item_added", value: 1, attributes: ["plant_title": plantTitle])
         SentrySDK.metrics.gauge(key: "cart.size", value: Double(cartSize))
         span.finish()
+        ErrorToastManager.shared.showAddedToCart()
     }
 
     /// Slow UI moment: blocks the main thread for 3 seconds.
     @objc private func waterPlant() {
+        ShopClick.play()
         let span = ShopTrace.begin(operation: "watering.schedule", description: "Calculate watering schedule", bindChildToScope: true)
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
@@ -256,6 +259,7 @@ final class ProductDetailViewController: UIViewController {
 
     /// Native crash from a plant-care action. `SentrySDK.crash()` does not return.
     @objc private func repotPlant() {
+        ShopClick.play()
         let span = ShopTrace.begin(operation: "nursery.repot", description: "Repot plant", bindChildToScope: true)
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")

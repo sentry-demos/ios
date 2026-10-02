@@ -107,19 +107,24 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     private func configureNavigationItems() {
-        let purchaseButton = UIButton(type: .system)
-        purchaseButton.setTitle("  Purchase  ", for: .normal)
+        let checkoutButton = UIButton(type: .system)
+        checkoutButton.setTitle("  Checkout  ", for: .normal)
         if #unavailable(iOS 26.0) {
-            purchaseButton.setTitleColor(.white, for: .normal)
-            purchaseButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            purchaseButton.backgroundColor = EmpowerPlantTheme.buttonBackground
-            purchaseButton.layer.cornerRadius = 4
+            checkoutButton.setTitleColor(.white, for: .normal)
+            checkoutButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            checkoutButton.backgroundColor = EmpowerPlantTheme.buttonBackground
+            checkoutButton.layer.cornerRadius = 4
         }
-        purchaseButton.addTarget(self, action: #selector(purchase), for: .touchUpInside)
-        purchaseButton.accessibilityIdentifier = "Purchase"
-        ShopPrivacy.unmask(purchaseButton)
+        checkoutButton.addTarget(self, action: #selector(openCheckout), for: .touchUpInside)
+        checkoutButton.accessibilityIdentifier = "Checkout"
+        ShopPrivacy.unmask(checkoutButton)
 
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: purchaseButton)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: checkoutButton)
+    }
+
+    @objc private func openCheckout() {
+        ShopClick.play()
+        navigationController?.pushViewController(CheckoutViewController(cart: self), animated: true)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -135,7 +140,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     @objc
-    func purchase() {
+    func purchase(openFeedbackOnFailure: Bool = false) {
         let checkoutSpan = beginCheckoutSpan()
         let logger = SentrySDK.logger
         let cartItems = ShoppingCart.instance.items
@@ -163,8 +168,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let url = URL(string: "https://flask.empower-plant.com/checkout")!
 
         var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
+        ShopSession.applyRequestHeaders(to: &request)
 
         let bodyData = try? JSONSerialization.data(
             withJSONObject: setJson(),
@@ -227,6 +232,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                         },
                         showFeedbackOption: true
                     )
+                    if openFeedbackOnFailure {
+                        Task { @MainActor in
+                            ShopFeedback.presentCheckoutForm()
+                        }
+                    }
                 } else if (httpResponse.statusCode) == 200 {
                     logger.info(
                         "Purchase completed successfully",
