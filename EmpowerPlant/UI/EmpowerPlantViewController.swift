@@ -56,12 +56,15 @@ class EmpowerPlantViewController: UIViewController {
          3 get products from DB (so we get db.query span) and reload the table with this data
          */
 
-        getAllProductsFromServer()
-        getAllProductsFromDb()
-        // readCurrentDirectory() Disabled to avoid scanning outside app sandbox
-        performLongFileOperation()
-        processProducts()
-        checkRelease()
+        // Delay loading of data so the Sentry SDK can do full session setup before the app crashes
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) { [self] in
+            getAllProductsFromServer()
+            getAllProductsFromDb()
+            // readCurrentDirectory() Disabled to avoid scanning outside app sandbox
+            performLongFileOperation()
+            processProducts()
+            checkRelease()
+        }
 
         NotificationCenter.default.addObserver(forName: modifiedDBNotificationName, object: nil, queue: nil) { _ in
             SentrySDK.logger.debug("Received modified DB notification, refreshing products from database")

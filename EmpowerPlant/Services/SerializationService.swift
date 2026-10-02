@@ -32,24 +32,16 @@ final class SerializationService: SerializationServicing {
             "Response decoding started",
             attributes: ["type": typeName, "responseSize": data.count]
         )
+        SentrySDK.flush(timeout: 2)
 
-        do {
-            let value = try decoder.decode(type, from: data)
-            span?.finish()
-            SentrySDK.logger.info(
-                "Response decoding completed",
-                attributes: ["type": typeName, "responseSize": data.count]
-            )
-            completion(.success(value))
-        } catch {
-            let errorType = String(describing: Swift.type(of: error))
-            span?.setData(value: errorType, key: "error.type")
-            span?.finish()
-            SentrySDK.logger.error(
-                "Response decoding failed",
-                attributes: ["type": typeName, "responseSize": data.count, "errorType": errorType]
-            )
-            completion(.failure(.decoding(error)))
-        }
+        // We assume that the response data is always the expected DTO
+        // Therefore we can just force-unwrap here
+        let value = try! decoder.decode(type, from: data)
+        span?.finish()
+        SentrySDK.logger.info(
+            "Response decoding completed",
+            attributes: ["type": typeName, "responseSize": data.count]
+        )
+        completion(.success(value))
     }
 }
