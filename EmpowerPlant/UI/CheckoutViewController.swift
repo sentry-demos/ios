@@ -23,21 +23,36 @@ final class CheckoutViewController: UIViewController {
 
     private let promoField = UITextField()
     private let feedbackCorner: UIButton = {
-        var config = UIButton.Configuration.filled()
+        var config = UIButton.Configuration.plain()
         config.title = "Feedback"
-        config.cornerStyle = .capsule
-        config.baseBackgroundColor = EmpowerPlantTheme.buttonBackground
-        config.baseForegroundColor = .black
-        config.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 10)
+        config.baseForegroundColor = .white
+        config.background.backgroundColor = .black
+        config.background.cornerRadius = 8
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
-            outgoing.font = .systemFont(ofSize: 13, weight: .semibold)
+            outgoing.font = .systemFont(ofSize: 15, weight: .semibold)
+            outgoing.foregroundColor = .white
             return outgoing
         }
         let button = UIButton(configuration: config)
+        button.backgroundColor = .black
+        button.layer.backgroundColor = UIColor.black.cgColor
+        button.tintColor = .white
+        button.isOpaque = true
+        button.alpha = 0
         button.isHidden = true
         button.accessibilityIdentifier = "CheckoutFeedback"
         button.translatesAutoresizingMaskIntoConstraints = false
+        var applyingSolidColor = false
+        button.configurationUpdateHandler = { button in
+            guard !applyingSolidColor, var updated = button.configuration else { return }
+            applyingSolidColor = true
+            updated.background.backgroundColor = .black
+            updated.baseForegroundColor = .white
+            button.configuration = updated
+            applyingSolidColor = false
+        }
         return button
     }()
     private let promoError: UILabel = {
@@ -170,7 +185,7 @@ final class CheckoutViewController: UIViewController {
     @objc private func placeOrder() {
         ShopClick.play()
         cart?.purchase { [weak self] in
-            self?.feedbackCorner.isHidden = false
+            self?.revealFeedbackCorner()
         }
     }
 
@@ -181,12 +196,23 @@ final class CheckoutViewController: UIViewController {
 
     private func layoutFeedbackCorner() {
         feedbackCorner.addTarget(self, action: #selector(showCheckoutFeedback), for: .touchUpInside)
+        feedbackCorner.transform = CGAffineTransform(translationX: 48, y: 72)
         view.addSubview(feedbackCorner)
         NSLayoutConstraint.activate([
             feedbackCorner.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             feedbackCorner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
         ShopPrivacy.unmask(feedbackCorner)
+    }
+
+    private func revealFeedbackCorner() {
+        guard feedbackCorner.isHidden else { return }
+        view.bringSubviewToFront(feedbackCorner)
+        feedbackCorner.isHidden = false
+        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseOut]) {
+            self.feedbackCorner.alpha = 1
+            self.feedbackCorner.transform = .identity
+        }
     }
 
     private func textField(placeholder: String, text: String) -> UITextField {
