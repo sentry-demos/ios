@@ -229,7 +229,7 @@ class EmpowerPlantViewController: UIViewController {
         guard products.isEmpty else {
             catalogSpan.setData(value: products.count, key: "product.count")
             catalogSpan.finish()
-            catalogSpan = nil
+            self.catalogSpan = nil
             return
         }
 
@@ -275,7 +275,7 @@ class EmpowerPlantViewController: UIViewController {
         if operations.isEmpty {
             persistSpan.finish()
             catalogSpan.finish()
-            catalogSpan = nil
+            self.catalogSpan = nil
         } else {
             operations.append(saveOp)
             OperationQueue.main.addOperations(operations, waitUntilFinished: false)
