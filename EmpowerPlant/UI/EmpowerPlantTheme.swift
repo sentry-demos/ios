@@ -21,18 +21,18 @@ extension UIColor {
 
 // MARK: - EmpowerPlant Theme
 
-/// Centralized color palette matching the Android demo app's design.
+/// Shop chrome uses the React Native demo green (`#002626`).
 enum EmpowerPlantTheme {
-    static let primary = UIColor(hex: "#3F51B5")  // Indigo
-    static let primaryDark = UIColor(hex: "#303F9F")  // Darker indigo
+    static let primary = UIColor(hex: "#002626")
+    static let primaryDark = UIColor(hex: "#002626")
     static let accent = UIColor(hex: "#FF4081")  // Pink
-    static let buttonBackground = UIColor(hex: "#6C5FC7")  // Purple
-    static let buttonPressed = UIColor(hex: "#562E7D")  // Deep purple
-    static let textHeader = UIColor(hex: "#361A67")  // Dark purple for titles
+    static let buttonBackground = UIColor(hex: "#002626")
+    static let buttonPressed = UIColor(hex: "#002626")
+    static let textHeader = UIColor(hex: "#002626")
     static let cardBackground = UIColor.white
     static let tableBackground = UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1.0)
 
-    /// Applies the purple/indigo navigation bar theme globally.
+    /// Applies the shop green navigation bar globally.
     static func applyNavBarAppearance() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
