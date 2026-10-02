@@ -52,7 +52,6 @@ class EmpowerPlantViewController: UIViewController {
             scope.setTag(value: "product_list", key: "screen")
         }
         SentrySDK.reportFullyDisplayed()
-        SentrySDK.finishExtendedAppStart()
         refreshCartBadge()
     }
 

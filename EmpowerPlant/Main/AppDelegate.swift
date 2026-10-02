@@ -47,9 +47,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableCoreDataTracing = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
-            // Cocoa 9.24 keeps standalone app start under experimental.
-            // 9.30 promotes it to options.enableStandaloneAppStartTracing.
-            options.experimental.enableStandaloneAppStartTracing = true
+            // Automatic app start attaches app_start_cold to the first ui.load
+            // transaction (EmpowerPlantViewController). Standalone tracing would
+            // send that measurement on its own app.start transaction instead.
+            options.experimental.enableStandaloneAppStartTracing = false
 
             // Sentry's app-hang watcher is off. MetricKit sends MXHangDiagnostic,
             // MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
@@ -107,9 +108,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        // Standalone app start would otherwise end when this method returns.
-        // The shop's first screen finishes it from viewDidAppear.
-        SentrySDK.extendAppStart()
         ShopFlags.register()
 
         EmpowerPlantTheme.applyNavBarAppearance()
