@@ -248,19 +248,24 @@ final class CheckoutViewController: UIViewController {
     }
 
     @objc private func pressDown(_ button: UIButton) {
-        UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState]) {
-            button.transform = CGAffineTransform(scaleX: 0.96, y: 0.96)
-            button.backgroundColor = Self.pressedGreen
+        button.setTitleColor(.black, for: .normal)
+        UIView.animate(withDuration: 0.12, delay: 0, options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState]) {
+            button.transform = CGAffineTransform(scaleX: 0.90, y: 0.90)
+            button.backgroundColor = .white
         }
     }
 
     @objc private func pressUp(_ button: UIButton) {
-        UIView.animate(withDuration: 0.12, delay: 0, options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState]) {
+        button.setTitleColor(.black, for: .normal)
+        UIView.animate(
+            withDuration: 0.45,
+            delay: 0,
+            usingSpringWithDamping: 0.55,
+            initialSpringVelocity: 0.8,
+            options: [.allowUserInteraction, .beginFromCurrentState]
+        ) {
             button.transform = .identity
             button.backgroundColor = EmpowerPlantTheme.buttonBackground
         }
     }
-
-    /// Darker leaf green so the tap reads against the resting button color.
-    private static let pressedGreen = UIColor(red: 0.45, green: 0.48, blue: 0.18, alpha: 1)
 }
