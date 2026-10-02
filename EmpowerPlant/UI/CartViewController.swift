@@ -2,6 +2,14 @@ import Darwin
 import SentrySwift
 import UIKit
 
+enum PurchaseError: Error, LocalizedError {
+    case insufficientInventory
+
+    var errorDescription: String? {
+        "Insufficient inventory available"
+    }
+}
+
 protocol URLSessionProtocol {
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
         -> URLSessionDataTaskProtocol
@@ -123,13 +131,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 "itemCount": ShoppingCart.instance.items.count,
             ])
         recordCheckoutMetrics()
-
-        // Simulate potential app hang scenario for AppHang V2 demonstration
-        // This creates a brief delay that could trigger hang detection if it exceeds threshold
-        DispatchQueue.main.async {
-            // Simulate processing delay that might cause UI to appear unresponsive
-            Thread.sleep(forTimeInterval: 0.5)  // 500ms delay - under 2s threshold but shows interaction
-        }
+        processCart(on: checkoutSpan)
 
         // use localhost for development against dev-backend
         // let url = URL(string: "http://127.0.0.1:8080/checkout")!
@@ -145,23 +147,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         )
         request.httpBody = bodyData
 
-        enum PurchaseError: Error, LocalizedError {
-            case insufficientInventory
-
-            var errorDescription: String? {
-                switch self {
-                case .insufficientInventory:
-                    return "Insufficient inventory available"
-                }
-            }
-        }
-
         let task = URLSession.shared.dataTask(with: request) { _, response, _ in
             SentrySDK.configureScope { scope in
                 scope.span = checkoutSpan
             }
+            var outcome: SentrySpanStatus = .ok
             defer {
-                checkoutSpan.finish()
+                checkoutSpan.finish(status: outcome)
                 SentrySDK.configureScope { scope in
                     if scope.span?.spanId.sentrySpanIdString == checkoutSpan.spanId.sentrySpanIdString {
                         scope.span = nil
@@ -176,17 +168,39 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
-                    let err = PurchaseError.insufficientInventory
+                    outcome = .internalError
+                    let delivery = checkoutSpan.startChild(operation: "delivery.workflow", description: "Start delivery")
+                    delivery.setData(value: 500, key: "http.status_code")
+                    delivery.setData(value: ShoppingCart.instance.total, key: "cart.total")
+                    delivery.setData(value: ShoppingCart.instance.items.count, key: "cart.item_count")
+                    delivery.setData(value: "insufficient_inventory", key: "failure")
+                    delivery.finish(status: .internalError)
                     logger.error(
                         "Purchase failed with server error",
                         attributes: [
                             "statusCode": 500,
                             "errorType": "insufficient_inventory",
+                            "cartTotal": ShoppingCart.instance.total,
+                            "itemCount": ShoppingCart.instance.items.count,
+                            "endpoint": "https://flask.empower-plant.com/checkout",
                         ])
-                    ErrorToastManager.shared.logErrorAndShowToast(  // Flagship!
-                        error: err,
+                    ErrorToastManager.shared.logErrorAndShowToast(
+                        error: PurchaseError.insufficientInventory,
                         message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                        showFeedbackOption: true  // Enable User Feedback for checkout errors
+                        scopeCallback: { scope in
+                            scope.setTag(value: "checkout", key: "shop.action")
+                            scope.setContext(
+                                value: [
+                                    "cart_total": ShoppingCart.instance.total,
+                                    "item_count": ShoppingCart.instance.items.count,
+                                    "status_code": 500,
+                                    "endpoint": "https://flask.empower-plant.com/checkout",
+                                    "failure": "insufficient_inventory",
+                                ],
+                                key: "checkout"
+                            )
+                        },
+                        showFeedbackOption: true
                     )
                 } else if (httpResponse.statusCode) == 200 {
                     logger.info(
@@ -196,6 +210,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                             "cartTotal": ShoppingCart.instance.total,
                         ])
                 } else {
+                    outcome = .internalError
                     logger.warn(
                         "Purchase completed with unexpected status",
                         attributes: [
@@ -219,16 +234,36 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         task.resume()
     }
 
+    /// Slow cart work on the checkout trace. Stays under the 2s hang threshold.
+    private func processCart(on checkoutSpan: Span) {
+        let span = checkoutSpan.startChild(operation: "cart.process", description: "Process cart")
+        let itemCount = ShoppingCart.instance.items.count
+        let total = ShoppingCart.instance.total
+        span.setData(value: itemCount, key: "cart.item_count")
+        span.setData(value: total, key: "cart.total")
+        span.setData(value: 500, key: "duration_ms")
+        Thread.sleep(forTimeInterval: 0.5)
+        SentrySDK.logger.info(
+            "Cart processed for checkout",
+            attributes: [
+                "itemCount": itemCount,
+                "cartTotal": total,
+                "durationMs": 500,
+            ])
+        span.finish()
+    }
+
     /// Keeps purchase logs, checkout metrics, and the Flask request on one trace.
     private func beginCheckoutSpan() -> Span {
-        if let parent = SentrySDK.span {
-            let child = parent.startChild(operation: "checkout", description: "checkout")
-            SentrySDK.configureScope { scope in
-                scope.span = child
-            }
-            return child
-        }
-        return SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
+        let itemCount = ShoppingCart.instance.items.count
+        let total = ShoppingCart.instance.total
+        let span = ShopTrace.begin(operation: "checkout", description: "checkout", bindChildToScope: true)
+        span.setData(value: "checkout", key: "shop.action")
+        span.setData(value: itemCount, key: "cart.item_count")
+        span.setData(value: total, key: "cart.total")
+        span.setData(value: "https://flask.empower-plant.com/checkout", key: "endpoint")
+        span.setTag(value: "checkout", key: "shop.action")
+        return span
     }
 
     /// Application metrics. CPU, heap, frames, and energy stay on the profiler payload.
