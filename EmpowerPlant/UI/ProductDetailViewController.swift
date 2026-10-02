@@ -40,7 +40,7 @@ final class ProductDetailViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        super.init(nibName: nil, bundle: nil)
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
