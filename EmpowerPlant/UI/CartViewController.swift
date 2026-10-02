@@ -138,6 +138,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func purchase() {
         let checkoutSpan = beginCheckoutSpan()
         let logger = SentrySDK.logger
+        let cartItems = ShoppingCart.instance.items
+        let plantTitles = cartItems.compactMap(\.title).joined(separator: ", ")
+        let plantIds = cartItems.compactMap(\.productId).joined(separator: ", ")
+        ShopBreadcrumb.record(
+            message: "Purchase started",
+            category: "shop.checkout",
+            screen: "cart",
+            plantTitle: plantTitles.isEmpty ? nil : plantTitles,
+            plantId: plantIds.isEmpty ? nil : plantIds,
+            plantPrice: cartItems.count == 1 ? Int(cartItems[0].price ?? "") : nil
+        )
         logger.info(
             "Purchase initiated",
             attributes: [

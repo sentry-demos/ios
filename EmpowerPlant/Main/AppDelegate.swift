@@ -37,6 +37,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
+            // These swizzle features default on, except FileManager tracing.
+            options.enableNetworkTracking = true
+            options.enableNetworkBreadcrumbs = true
+            options.enableUIViewControllerTracing = true
+            options.enableUserInteractionTracing = true
+            options.enableFileIOTracing = true
+            options.enableFileManagerSwizzling = true
+            options.enableCoreDataTracing = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             // Cocoa 9.24 keeps standalone app start under experimental.
@@ -47,9 +55,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
             options.enableAppHangTracking = false
             options.enableMetricKit = true
-
-            // Enable Mobile Session Health configurations
-            options.enableUserInteractionTracing = true
 
             // Enable Distributed Tracing
             options.tracePropagationTargets = [

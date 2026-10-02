@@ -69,6 +69,11 @@ class EmpowerPlantViewController: UIViewController {
         span.setData(value: "https://flask.empower-plant.com/products-join", key: "endpoint")
         catalogSpan = span
 
+        ShopBreadcrumb.record(
+            message: "Catalog load started",
+            category: "shop.catalog",
+            screen: "product_list"
+        )
         SentrySDK.logger.info(
             "Fetching products from server",
             attributes: [
@@ -357,6 +362,14 @@ extension EmpowerPlantViewController: UITableViewDataSource {
         let cartSize = ShoppingCart.instance.items.count
         span.setData(value: cartSize, key: "cart.item_count")
         span.setData(value: ShoppingCart.instance.total, key: "cart.total")
+        ShopBreadcrumb.record(
+            message: "Added plant to cart",
+            category: "shop.cart",
+            screen: "product_list",
+            plantTitle: title,
+            plantId: plantId,
+            plantPrice: price
+        )
         SentrySDK.logger.info(
             "Product added to cart",
             attributes: [
