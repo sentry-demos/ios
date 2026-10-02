@@ -255,17 +255,14 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     /// phys_footprint from task_info(TASK_VM_INFO), the same reading the profiler stores as heap.
     private static func memoryFootprintBytes() -> Double? {
         var info = task_vm_info_data_t()
-        var count = mach_msg_type_number_t(TASK_VM_INFO_COUNT)
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.stride / MemoryLayout<integer_t>.stride)
         let result = withUnsafeMutablePointer(to: &info) { pointer -> kern_return_t in
             pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { rebound in
                 task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), rebound, &count)
             }
         }
         guard result == KERN_SUCCESS else { return nil }
-        if count >= TASK_VM_INFO_REV1_COUNT {
-            return Double(info.phys_footprint)
-        }
-        return Double(info.resident_size)
+        return Double(info.phys_footprint)
     }
 
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration

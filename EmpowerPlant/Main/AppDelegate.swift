@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         SentrySDK.start { options in
             // previousDemoDSN: restore the demo project by assigning this string to options.dsn.
-            let previousDemoDSN = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            // "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
             options.dsn = "https://a9e3c927433fc5a2ef7c87bd5938cb72@o4510868817379328.ingest.us.sentry.io/4512181895495680"
 
             // set the SDK debug mode according to defaults and overrides.
