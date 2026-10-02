@@ -39,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableSwizzling = enableSwizzling
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
+            // Cocoa 9.24 keeps standalone app start under experimental.
+            // 9.30 promotes it to options.enableStandaloneAppStartTracing.
             options.experimental.enableStandaloneAppStartTracing = true
 
             // Sentry's app-hang watcher is off. MetricKit sends MXHangDiagnostic,
@@ -99,6 +101,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return event
             }
         }
+
+        // Standalone app start would otherwise end when this method returns.
+        // The shop's first screen finishes it from viewDidAppear.
+        SentrySDK.extendAppStart()
+        ShopFlags.register()
+
         EmpowerPlantTheme.applyNavBarAppearance()
 
         SentrySDK.configureScope { scope in
