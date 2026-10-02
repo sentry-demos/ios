@@ -53,7 +53,14 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     private func configureNavigationItems() {
-        navigationItem.leftBarButtonItems = nil
+        let feedback = UIBarButtonItem(
+            title: "Feedback",
+            style: .plain,
+            target: self,
+            action: #selector(showFeedback)
+        )
+        feedback.accessibilityIdentifier = "Feedback"
+        navigationItem.leftBarButtonItem = feedback
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "cart"),
             style: .plain,
@@ -61,6 +68,10 @@ class EmpowerPlantViewController: UIViewController {
             action: #selector(goToCart)
         )
         navigationItem.rightBarButtonItem?.accessibilityIdentifier = "Cart"
+    }
+
+    @objc private func showFeedback() {
+        SentrySDK.feedback.show()
     }
 
     private func loadCatalog() {
@@ -183,35 +194,40 @@ class EmpowerPlantViewController: UIViewController {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             let durationMs = Int(Date().timeIntervalSince(startTime) * 1000)
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            httpSpan.setData(value: statusCode, key: "http.status_code")
-            httpSpan.setData(value: durationMs, key: "duration_ms")
+            let decoded = data.flatMap { try? JSONDecoder().decode([CatalogProduct].self, from: $0) }
+            let failureMessage = error?.localizedDescription ?? "Invalid response from server when fetching products"
+            let fetchError = error
 
-            if let data, let productsResponse = try? JSONDecoder().decode([CatalogProduct].self, from: data) {
-                httpSpan.finish()
-                self.finishCatalogDecode(
-                    productsResponse: productsResponse,
-                    durationMs: durationMs,
-                    catalogSpan: catalogSpan
-                )
-            } else {
-                httpSpan.finish(status: .internalError)
-                catalogSpan.finish(status: .internalError)
-                self.catalogSpan = nil
-                let message = error?.localizedDescription ?? "Invalid response from server when fetching products"
-                SentrySDK.logger.error(
-                    "Failed to fetch products from server",
-                    attributes: [
-                        "durationMs": durationMs,
-                        "statusCode": statusCode,
-                        "error": message,
-                    ])
-                if let error {
-                    ErrorToastManager.shared.logErrorAndShowToast(
-                        error: error,
-                        message: "Failed to fetch products from server"
+            Task { @MainActor in
+                httpSpan.setData(value: statusCode, key: "http.status_code")
+                httpSpan.setData(value: durationMs, key: "duration_ms")
+
+                if let productsResponse = decoded {
+                    httpSpan.finish()
+                    self.finishCatalogDecode(
+                        productsResponse: productsResponse,
+                        durationMs: durationMs,
+                        catalogSpan: catalogSpan
                     )
                 } else {
-                    ErrorToastManager.shared.showErrorToast(message: message)
+                    httpSpan.finish(status: .internalError)
+                    catalogSpan.finish(status: .internalError)
+                    self.catalogSpan = nil
+                    SentrySDK.logger.error(
+                        "Failed to fetch products from server",
+                        attributes: [
+                            "durationMs": durationMs,
+                            "statusCode": statusCode,
+                            "error": failureMessage,
+                        ])
+                    if let fetchError {
+                        ErrorToastManager.shared.logErrorAndShowToast(
+                            error: fetchError,
+                            message: "Failed to fetch products from server"
+                        )
+                    } else {
+                        ErrorToastManager.shared.showErrorToast(message: failureMessage)
+                    }
                 }
             }
         }

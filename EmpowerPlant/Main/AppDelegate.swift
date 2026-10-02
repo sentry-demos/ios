@@ -73,9 +73,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ]
             options.sessionReplay.networkCaptureBodies = true
 
-            // Installs the user-feedback integration. SceneDelegate shows the
-            // injected widget after a window scene exists. Setting configureWidget
-            // here would build that overlay before any scene is connected.
+            // Installs the user-feedback integration. The shop Feedback button
+            // and the checkout toast present the form with SentrySDK.feedback.show().
             options.configureUserFeedback = { config in
                 config.onSubmitSuccess = { data in
                     print("Feedback submitted successfully: \(data)")
