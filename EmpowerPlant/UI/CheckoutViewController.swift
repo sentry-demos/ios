@@ -233,14 +233,34 @@ final class CheckoutViewController: UIViewController {
     }
 
     private func filledButton(title: String, action: Selector) -> UIButton {
-        let button = UIButton(type: .system)
+        let button = UIButton(type: .custom)
         button.setTitle(title, for: .normal)
         button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.black, for: .highlighted)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
         button.backgroundColor = EmpowerPlantTheme.buttonBackground
         button.layer.cornerRadius = 8
+        button.addTarget(self, action: #selector(pressDown(_:)), for: .touchDown)
+        button.addTarget(self, action: #selector(pressUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         button.addTarget(self, action: action, for: .touchUpInside)
         ShopPrivacy.unmask(button)
         return button
     }
+
+    @objc private func pressDown(_ button: UIButton) {
+        UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState]) {
+            button.transform = CGAffineTransform(scaleX: 0.96, y: 0.96)
+            button.backgroundColor = Self.pressedGreen
+        }
+    }
+
+    @objc private func pressUp(_ button: UIButton) {
+        UIView.animate(withDuration: 0.12, delay: 0, options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState]) {
+            button.transform = .identity
+            button.backgroundColor = EmpowerPlantTheme.buttonBackground
+        }
+    }
+
+    /// Darker leaf green so the tap reads against the resting button color.
+    private static let pressedGreen = UIColor(red: 0.45, green: 0.48, blue: 0.18, alpha: 1)
 }
