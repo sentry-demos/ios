@@ -2,7 +2,7 @@ import SentrySwift
 import UIKit
 
 /// Plant detail. Add to cart stays on the happy path. Watering blocks the main
-/// thread long enough for an app hang. Repot ends in a native crash.
+/// thread as a slow UI moment. Repot ends in a native crash.
 final class ProductDetailViewController: UIViewController {
 
     private let product: Product
@@ -209,7 +209,7 @@ final class ProductDetailViewController: UIViewController {
         span.finish()
     }
 
-    /// Blocks the main thread past `appHangTimeoutInterval` (2s).
+    /// Slow UI moment: blocks the main thread for 3 seconds.
     @objc private func waterPlant() {
         let span = ShopTrace.begin(operation: "watering.schedule", description: "Calculate watering schedule", bindChildToScope: true)
         span.setData(value: plantTitle, key: "plant.title")

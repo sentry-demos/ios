@@ -41,11 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableTimeToFullDisplayTracing = true
             options.experimental.enableStandaloneAppStartTracing = true
 
-            // Enable AppHang configurations
-            options.appHangTimeoutInterval = 2.0
-            options.enableReportNonFullyBlockingAppHangs = true
-            // MXHangDiagnostic, MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
-            // Delivered on a physical device running iOS 15 or later.
+            // Sentry's app-hang watcher is off. MetricKit sends MXHangDiagnostic,
+            // MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
+            options.enableAppHangTracking = false
             options.enableMetricKit = true
 
             // Enable Mobile Session Health configurations
