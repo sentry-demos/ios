@@ -68,7 +68,14 @@ class EmpowerPlantViewController: UIViewController {
             action: #selector(showFeedback)
         )
         feedback.accessibilityIdentifier = "Feedback"
-        navigationItem.leftBarButtonItem = feedback
+        let more = UIBarButtonItem(
+            title: "more",
+            style: .plain,
+            target: self,
+            action: #selector(showDebugMenu)
+        )
+        more.accessibilityIdentifier = "more"
+        navigationItem.leftBarButtonItems = [feedback, more]
         cartButton.onTap = { [weak self] in
             ShopClick.play()
             self?.goToCart()
@@ -84,6 +91,11 @@ class EmpowerPlantViewController: UIViewController {
     @objc private func showFeedback() {
         ShopClick.play()
         SentrySDK.feedback.show()
+    }
+
+    @objc private func showDebugMenu() {
+        ShopClick.play()
+        navigationController?.pushViewController(ListAppViewController(), animated: true)
     }
 
     @objc private func refreshCartBadge() {
