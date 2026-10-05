@@ -10,10 +10,26 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Shop Home-->
+        <scene sceneID="Shp-Hm-Sc01">
+            <objects>
+                <viewController id="Shp-Hm-Vc01" customClass="ShopHomeViewController" customModule="EmpowerPlant" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Shp-Hm-Vw01">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="Shp-Hm-Sa01"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Empower Plants" id="Shp-Hm-Ni01"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Shp-Hm-Fr01" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="600" y="126"/>
+        </scene>
         <!--Empower Plants-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="EmpowerPlantViewController" customModule="EmpowerPlant" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="EmpowerPlantViewController" id="BYZ-38-t0r" customClass="EmpowerPlantViewController" customModule="EmpowerPlant" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -68,7 +84,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="sYO-97-ke2"/>
+                        <segue destination="Shp-Hm-Vc01" kind="relationship" relationship="rootViewController" id="sYO-97-ke2"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZYX-0L-xHz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
