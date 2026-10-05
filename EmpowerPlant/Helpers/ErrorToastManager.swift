@@ -93,6 +93,7 @@ class ErrorToastManager {
                 ShopFeedback.presentCheckoutForm()
             }
         }
+        ShopPrivacy.unmask(view)
 
         // Configure presentation style. No dim, so the feedback form stays usable.
         var config = SwiftMessages.defaultConfig

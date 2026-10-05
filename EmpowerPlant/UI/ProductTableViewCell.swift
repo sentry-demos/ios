@@ -90,6 +90,7 @@ class ProductTableViewCell: UITableViewCell {
         cardView.addSubview(addToCartButton)
 
         addToCartButton.addTarget(self, action: #selector(addToCartTapped), for: .touchUpInside)
+        ShopPrivacy.unmask(addToCartButton)
 
         NSLayoutConstraint.activate([
             // Card inset from cell edges

@@ -65,6 +65,9 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         cell.isAccessibilityElement = false
         cell.textLabel?.isAccessibilityElement = true
         cell.textLabel?.accessibilityIdentifier = title
+        if let label = cell.textLabel {
+            ShopPrivacy.unmask(label)
+        }
         return cell
     }
 

@@ -96,6 +96,7 @@ final class ShopHomeViewController: UIViewController {
     private func layoutShopfront() {
         viewProductsButton.addTarget(self, action: #selector(showProducts), for: .touchUpInside)
         otherIssuesButton.addTarget(self, action: #selector(showOtherIssues), for: .touchUpInside)
+        ShopPrivacy.unmask(titleLabel)
         ShopPrivacy.unmask(viewProductsButton)
         ShopPrivacy.unmask(otherIssuesButton)
         view.addSubview(backgroundImageView)

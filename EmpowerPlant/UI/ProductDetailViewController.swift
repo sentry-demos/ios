@@ -85,6 +85,7 @@ final class ProductDetailViewController: UIViewController {
 
         let addButton = filledButton(title: "Add to Cart", action: #selector(addToCart))
         addButton.accessibilityIdentifier = "AddToCartDetail"
+        ShopPrivacy.unmask(addButton)
 
         let careHeading = UILabel()
         careHeading.font = .systemFont(ofSize: 13, weight: .semibold)
