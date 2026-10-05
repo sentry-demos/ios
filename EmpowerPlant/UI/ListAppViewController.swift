@@ -19,13 +19,13 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     private lazy var actions: [Action] = [
         Action(title: "Error", run: { [weak self] in self?.captureError() }),
         Action(title: "NSException", run: { [weak self] in self?.captureNSException() }),
-        Action(title: "Fatal Error", run: { self?.captureFatalError() }),
-        Action(title: "DiskWriteException (!)", run: { self?.diskWriteException() }),
-        Action(title: "HighCPULoad", run: { self?.highCPULoad() }),
-        Action(title: "Permissions (!)", run: { self?.permissions() }),
-        Action(title: "Async Crash (!)", run: { self?.asyncCrash() }),
-        Action(title: "ANR Fully Blocking", run: { self?.anrFullyBlocking() }),
-        Action(title: "ANR Filling Run Loop", run: { self?.anrFillingRunLoop() }),
+        Action(title: "Fatal Error", run: { [weak self] in self?.captureFatalError() }),
+        Action(title: "DiskWriteException (!)", run: { [weak self] in self?.diskWriteException() }),
+        Action(title: "HighCPULoad", run: { [weak self] in self?.highCPULoad() }),
+        Action(title: "Permissions (!)", run: { [weak self] in self?.permissions() }),
+        Action(title: "Async Crash (!)", run: { [weak self] in self?.asyncCrash() }),
+        Action(title: "ANR Fully Blocking", run: { [weak self] in self?.anrFullyBlocking() }),
+        Action(title: "ANR Filling Run Loop", run: { [weak self] in self?.anrFillingRunLoop() }),
     ]
 
     private let workQueue = DispatchQueue(label: "EmpowerPlant.ListApp", qos: .userInitiated, attributes: .concurrent)
