@@ -20,7 +20,7 @@
                         <viewLayoutGuide key="safeArea" id="Shp-Hm-Sa01"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Empower Plants" id="Shp-Hm-Ni01"/>
+                    <navigationItem key="navigationItem" id="Shp-Hm-Ni01"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Shp-Hm-Fr01" sceneMemberID="firstResponder"/>
             </objects>
