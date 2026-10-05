@@ -48,7 +48,6 @@ final class ProductDetailViewController: UIViewController {
         title = product.title ?? "Plant"
         view.backgroundColor = EmpowerPlantTheme.tableBackground
         layoutStorefront()
-        ShopHomeButton.install(on: self)
     }
 
     override func viewDidAppear(_ animated: Bool) {

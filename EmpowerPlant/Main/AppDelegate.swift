@@ -75,9 +75,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ]
             options.sessionReplay.networkCaptureBodies = true
 
-            // Installs the user-feedback integration. The shop Feedback button
-            // presents the form with SentrySDK.feedback.show(). Checkout failure
-            // presents the same form with the message prefilled.
+            // Installs the user-feedback integration. Checkout failure reveals a
+            // button that presents the form with SentrySDK.feedback.show(), with
+            // the message prefilled.
             options.configureUserFeedback = { config in
                 config.onSubmitSuccess = { data in
                     print("Feedback submitted successfully: \(data)")
