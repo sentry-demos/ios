@@ -44,6 +44,21 @@ final class ShopHomeViewController: UIViewController {
         return button
     }()
 
+    private let otherIssuesButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Other issues", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.white, for: .highlighted)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        button.backgroundColor = .clear
+        button.layer.cornerRadius = 22
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.white.withAlphaComponent(0.85).cgColor
+        button.accessibilityIdentifier = "more"
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
 
     override func viewDidLoad() {
@@ -80,10 +95,13 @@ final class ShopHomeViewController: UIViewController {
 
     private func layoutShopfront() {
         viewProductsButton.addTarget(self, action: #selector(showProducts), for: .touchUpInside)
+        otherIssuesButton.addTarget(self, action: #selector(showOtherIssues), for: .touchUpInside)
         ShopPrivacy.unmask(viewProductsButton)
+        ShopPrivacy.unmask(otherIssuesButton)
         view.addSubview(backgroundImageView)
         view.addSubview(scrimView)
         view.addSubview(titleLabel)
+        view.addSubview(otherIssuesButton)
         view.addSubview(viewProductsButton)
 
         NSLayoutConstraint.activate([
@@ -104,7 +122,12 @@ final class ShopHomeViewController: UIViewController {
 
             titleLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
             titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
-            titleLabel.bottomAnchor.constraint(equalTo: viewProductsButton.topAnchor, constant: -20),
+            titleLabel.bottomAnchor.constraint(equalTo: otherIssuesButton.topAnchor, constant: -16),
+
+            otherIssuesButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            otherIssuesButton.bottomAnchor.constraint(equalTo: viewProductsButton.topAnchor, constant: -12),
+            otherIssuesButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 180),
+            otherIssuesButton.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
 
@@ -113,6 +136,11 @@ final class ShopHomeViewController: UIViewController {
         let storyboard = self.storyboard ?? UIStoryboard(name: "Main", bundle: nil)
         let catalog = storyboard.instantiateViewController(withIdentifier: "EmpowerPlantViewController")
         navigationController?.pushViewController(catalog, animated: true)
+    }
+
+    @objc private func showOtherIssues() {
+        ShopClick.play()
+        navigationController?.pushViewController(ListAppViewController(), animated: true)
     }
 }
 

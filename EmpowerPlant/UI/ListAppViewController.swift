@@ -3,7 +3,7 @@ import UIKit
 
 /// Debug actions for the Empower TDA error-list test.
 /// Row titles are the accessibility names the test looks up.
-/// The screen stays in the app, with no navigation-bar button that opens it.
+/// The succulent home screen opens it. No other screen has a bar button for it.
 final class ListAppViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private struct Action {
         let title: String
