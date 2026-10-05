@@ -120,6 +120,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ShopPrivacy.unmask(checkoutButton)
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: checkoutButton)
+        ShopHomeButton.install(on: self)
     }
 
     @objc private func openCheckout() {

@@ -86,6 +86,7 @@ class EmpowerPlantViewController: UIViewController {
         }
         navigationItem.rightBarButtonItem = cartItem
         refreshCartBadge()
+        ShopHomeButton.install(on: self)
     }
 
     @objc private func showFeedback() {

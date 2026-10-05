@@ -80,6 +80,7 @@ final class CheckoutViewController: UIViewController {
         view.backgroundColor = EmpowerPlantTheme.tableBackground
         layoutForm()
         layoutFeedbackCorner()
+        ShopHomeButton.install(on: self)
     }
 
     override func viewDidAppear(_ animated: Bool) {
