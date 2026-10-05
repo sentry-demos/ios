@@ -53,7 +53,6 @@ final class ShopHomeViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .never
         view.backgroundColor = .black
         applyTransparentNavigationBar()
-        configureNavigationItems()
         layoutShopfront()
     }
 
@@ -77,18 +76,6 @@ final class ShopHomeViewController: UIViewController {
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
         navigationItem.compactScrollEdgeAppearance = appearance
-    }
-
-    private func configureNavigationItems() {
-        let more = UIBarButtonItem(
-            title: "more",
-            style: .plain,
-            target: self,
-            action: #selector(showDebugMenu)
-        )
-        more.accessibilityIdentifier = "more"
-        more.tintColor = .white
-        navigationItem.leftBarButtonItem = more
     }
 
     private func layoutShopfront() {
@@ -126,11 +113,6 @@ final class ShopHomeViewController: UIViewController {
         let storyboard = self.storyboard ?? UIStoryboard(name: "Main", bundle: nil)
         let catalog = storyboard.instantiateViewController(withIdentifier: "EmpowerPlantViewController")
         navigationController?.pushViewController(catalog, animated: true)
-    }
-
-    @objc private func showDebugMenu() {
-        ShopClick.play()
-        navigationController?.pushViewController(ListAppViewController(), animated: true)
     }
 }
 

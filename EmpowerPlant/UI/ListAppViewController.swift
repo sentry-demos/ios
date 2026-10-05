@@ -1,8 +1,9 @@
 import SentrySwift
 import UIKit
 
-/// Debug actions the Empower TDA error-list test taps after the `more` button.
+/// Debug actions for the Empower TDA error-list test.
 /// Row titles are the accessibility names the test looks up.
+/// The screen stays in the app, with no navigation-bar button that opens it.
 final class ListAppViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private struct Action {
         let title: String

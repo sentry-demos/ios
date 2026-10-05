@@ -61,15 +61,6 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     private func configureNavigationItems() {
-        let more = UIBarButtonItem(
-            title: "more",
-            style: .plain,
-            target: self,
-            action: #selector(showDebugMenu)
-        )
-        more.accessibilityIdentifier = "more"
-        navigationItem.leftBarButtonItem = more
-        navigationItem.leftItemsSupplementBackButton = true
         cartButton.onTap = { [weak self] in
             ShopClick.play()
             self?.goToCart()
@@ -80,11 +71,6 @@ class EmpowerPlantViewController: UIViewController {
         }
         navigationItem.rightBarButtonItem = cartItem
         refreshCartBadge()
-    }
-
-    @objc private func showDebugMenu() {
-        ShopClick.play()
-        navigationController?.pushViewController(ListAppViewController(), animated: true)
     }
 
     @objc private func refreshCartBadge() {
