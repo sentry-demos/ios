@@ -103,6 +103,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.configureScope { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
         }
+        SentrySDK.flush(timeout: 2)
         fatalError(reason)
     }
 
@@ -119,8 +120,21 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         )
     }
 
-    /// Background writes so the next TDA tap can still land. MetricKit reports the disk exception.
+    /// Background writes so the next TDA tap can still land. The captured error is the issue;
+    /// MetricKit disk diagnostics are not delivered on the simulator.
     private func diskWriteException() {
+        let reason = "Disk write storm: repeated 256KB writes for 8 seconds"
+        let error = NSError(
+            domain: "DiskWriteException",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: reason,
+                NSDebugDescriptionErrorKey: reason,
+            ]
+        )
+        SentrySDK.capture(error: error) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "DiskWriteException (!)", reason: reason)
+        }
         let span = ShopTrace.begin(operation: "file.write", description: "Disk write", bindChildToScope: false)
         span.setData(value: 8000, key: "duration_ms")
         span.setData(value: "actions", key: "screen")
@@ -137,6 +151,18 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     private func highCPULoad() {
+        let reason = "High CPU load: a background thread is computing pi without stopping"
+        let error = NSError(
+            domain: "HighCPULoad",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: reason,
+                NSDebugDescriptionErrorKey: reason,
+            ]
+        )
+        SentrySDK.capture(error: error) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "HighCPULoad", reason: reason)
+        }
         workQueue.async {
             while true {
                 _ = Self.calcPi()
@@ -182,11 +208,12 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     private func asyncCrash2() {
         DispatchQueue.main.async {
+            SentrySDK.flush(timeout: 2)
             SentrySDK.crash()
         }
     }
 
-    /// Blocks the main thread. Sentry's hang watcher stays off; MetricKit can still report it.
+    /// Blocks the main thread for 5 seconds. The hang watcher runs off the main thread and reports an App Hang.
     private func anrFullyBlocking() {
         let span = ShopTrace.begin(operation: "app.hang", description: "Block main thread", bindChildToScope: false)
         span.setData(value: 5000, key: "duration_ms")
@@ -200,16 +227,22 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         span.finish()
     }
 
-    /// Fills the main run loop with short blocks instead of one long sleep.
+    /// Fills the main run loop with short blocks for 5 seconds, long enough for the 2 second hang watcher.
     private func anrFillingRunLoop() {
         let span = ShopTrace.begin(operation: "app.hang", description: "Fill the run loop", bindChildToScope: false)
         span.setData(value: "actions", key: "screen")
         let started = Date()
+        let fillDuration: TimeInterval = 5
         workQueue.async {
-            for _ in 0...100_000 {
+            let end = Date().addingTimeInterval(fillDuration)
+            while Date() < end {
                 DispatchQueue.main.async {
-                    _ = CFAbsoluteTimeGetCurrent()
+                    let sliceEnd = Date().addingTimeInterval(0.02)
+                    while Date() < sliceEnd {
+                        _ = CFAbsoluteTimeGetCurrent()
+                    }
                 }
+                Thread.sleep(forTimeInterval: 0.02)
             }
             DispatchQueue.main.async {
                 let elapsedMs = Int(Date().timeIntervalSince(started) * 1000)

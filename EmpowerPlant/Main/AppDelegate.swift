@@ -53,9 +53,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Cocoa 9.26 moved this off options.experimental.
             options.enableStandaloneAppStartTracing = false
 
-            // Sentry's app-hang watcher is off. MetricKit sends MXHangDiagnostic,
-            // MXCPUExceptionDiagnostic, and MXDiskWriteExceptionDiagnostic.
-            options.enableAppHangTracking = false
+            // The hang watcher reports a main-thread stall longer than 2 seconds.
+            // MetricKit stays on; the simulator does not deliver those diagnostics.
+            options.enableAppHangTracking = true
+            options.appHangTimeoutInterval = 2.0
             options.enableMetricKit = true
 
             // Enable Distributed Tracing
