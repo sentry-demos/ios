@@ -35,7 +35,7 @@ The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`
    - Install Brewfile tools (including `sentry-cli`) and Ruby gems
    - Install pre-commit hooks
 
-   `.env` is gitignored. Do not commit it, a `wassim-local` environment, or an auth token.
+   `.env` is gitignored. Do not commit it, an auth token, or a personal environment override. The EmpowerPlant scheme sets `SENTRY_ENVIRONMENT=production`, and the app copies that value onto each event.
 
 3. **Configure Sentry authentication:**
 
