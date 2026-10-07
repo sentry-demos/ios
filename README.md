@@ -136,29 +136,20 @@ EmpowerPlant/
 
 ## Creating releases
 
-### Prerequisites
+The [Release workflow](https://github.com/sentry-demos/ios/actions/workflows/release.yml) builds one unsigned Release archive, uploads that build, then publishes `EmpowerPlant.ipa` from the archive.
 
-- `Info.plist` has the version number you want to ship
-- Commit the release changes on `master` (recommended)
+It runs every Monday at 00:00 UTC. GitHub only runs that schedule from the default branch (`master`). **Run workflow** starts the same workflow with no inputs.
 
-### Release process
+The version name is the UTC date `YY.M.D` (7 October 2026 is `26.10.7`). The build code is `YYMMDD` (`261007`). The workflow writes those into the archive as `CFBundleShortVersionString` and `CFBundleVersion`. It does not commit them. If that GitHub release already exists, the tag becomes `26.10.7-1` and the build code becomes `2610071`. The short version stays `26.10.7`.
 
-1. **Go to GitHub Actions:**
-   - Open the repo's [Actions](https://github.com/sentry-demos/ios/actions) page
-   - Open the [Release workflow](https://github.com/sentry-demos/ios/actions/workflows/release.yml)
+There is no Apple distribution certificate in this repository (`CODE_SIGNING_ALLOWED=NO`), so the IPA is unsigned. The workflow sends that build to the demo **ios** project, then creates the GitHub release:
 
-2. **Trigger the release:**
-   - Click **Run workflow**
-   - Enter the version number (for example `0.0.43`)
-   - Click **Run workflow**
+- **Debug symbols.** `sentry-cli upload-dif --include-sources` on `EmpowerPlant.xcarchive/dSYMs`. This is the same command as `upload-symbols.sh`. The Xcode build phase also runs during the archive, because the workflow passes `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN`.
+- **Size analysis.** `sentry-cli build upload EmpowerPlant.ipa` with `--build-configuration Release`, `--head-sha`, `--head-ref`, `--vcs-provider github`, and `--head-repo-name`. When the commit is not `master`, it also sends the merge-base as `--base-sha` and `--base-ref master`. `--dsym` points at the archive dSYMs so the IPA upload still has symbols. The Flutter [size analysis guide](https://github.com/sentry-demos/flutter/blob/main/SIZE_ANALYSIS_GUIDE.md) uses this command.
+- **Build distribution.** The same `sentry-cli build upload`. The Flutter demo uses that one command for size analysis and build distribution. No extra secret. Auth is the existing `SENTRY_AUTH_TOKEN`, with `SENTRY_ORG` and `SENTRY_PROJECT`. The release workflow installs sentry-cli **3.8.0** so `--dsym` is available. An unsigned IPA can be uploaded. Installing it on a device still needs an Apple signature, which this repo does not have a secret for.
+- **GitHub release.** The tag is the version name. The only asset is `EmpowerPlant.ipa`.
 
-3. **What happens:**
-   - Builds the iOS app at that version
-   - Uploads debug symbols to Sentry
-   - Creates a GitHub release with the app binary
-   - Uses the repository secrets for authentication
-
-TDA must be restarted to pick up a new version. See a [sample release](https://github.com/sentry-demos/ios/releases/tag/0.0.1).
+Sauce Labs TDA still downloads `EmpowerPlant_release.zip` (a simulator `.app`). This workflow no longer publishes that zip. See an older [sample release](https://github.com/sentry-demos/ios/releases/tag/0.0.1).
 
 ## TDA
 

@@ -2,59 +2,79 @@
 
 set -eo pipefail
 
-# Function to display error message and exit
+# Weekly and manual release used by .github/workflows/release.yml.
+#
+# Usage: ./deploy_project.sh <marketing-version> <build-code> <release-tag>
+# Example: ./deploy_project.sh 26.10.7 261007 26.10.7
+#
+# marketing-version is CFBundleShortVersionString (YY.M.D).
+# build-code is CFBundleVersion (YYMMDD, digits only).
+# release-tag is the GitHub release tag (YY.M.D, or YY.M.D-N if that tag exists).
+#
+# Requires SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN.
+# Builds one unsigned Release archive and packages EmpowerPlant.ipa from it.
+# The workflow uploads that archive's dSYMs and the IPA, then publishes the IPA.
+
 error_exit() {
     echo "$1" >&2
     exit 1
 }
 
-SENTRY_ORG_INPUT=${2}
-SENTRY_PROJECT_INPUT=${3}
-SENTRY_AUTH_TOKEN_INPUT=${4}
+if [ "$#" -ne 3 ]; then
+    error_exit "Usage: ./deploy_project.sh <marketing-version> <build-code> <release-tag>"
+fi
 
-# Build the simulator bundle (for Saucelabs / GitHub release zip)
-echo "Building the simulator bundle..."
-SENTRY_ORG=$SENTRY_ORG_INPUT SENTRY_PROJECT=$SENTRY_PROJECT_INPUT SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN_INPUT xcodebuild -project EmpowerPlant.xcodeproj -scheme EmpowerPlant -configuration Release -derivedDataPath build -destination "platform=iOS Simulator,OS=latest,name=iPhone 16" -quiet clean build
-zip -r EmpowerPlant_release.zip ./build/Build/Products/Release-iphonesimulator/EmpowerPlant.app
-ZIP_PATH="./EmpowerPlant_release.zip"
+MARKETING_VERSION="$1"
+BUILD_CODE="$2"
+RELEASE_TAG="$3"
 
-# Build the XCArchive (for Sentry Size Analysis upload)
-echo "Building XCArchive for Sentry Size Analysis..."
+case "$MARKETING_VERSION" in
+    ''|*[!0-9.]*) error_exit "marketing version must look like YY.M.D, got: $MARKETING_VERSION" ;;
+esac
+case "$BUILD_CODE" in
+    ''|*[!0-9]*) error_exit "build code must be digits (YYMMDD), got: $BUILD_CODE" ;;
+esac
+case "$RELEASE_TAG" in
+    ''|*[!0-9.-]*) error_exit "release tag must look like YY.M.D or YY.M.D-N, got: $RELEASE_TAG" ;;
+esac
+
+if [ -z "${SENTRY_ORG}" ] || [ -z "${SENTRY_PROJECT}" ] || [ -z "${SENTRY_AUTH_TOKEN}" ]; then
+    error_exit "SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN must be set."
+fi
+
+INFO_PLIST="EmpowerPlant/Resources/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $MARKETING_VERSION" "$INFO_PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_CODE" "$INFO_PLIST"
+
+echo "Building one Release archive ($MARKETING_VERSION / $BUILD_CODE)..."
+SENTRY_ORG="$SENTRY_ORG" \
+SENTRY_PROJECT="$SENTRY_PROJECT" \
+SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
 xcodebuild archive \
-  -project EmpowerPlant.xcodeproj \
-  -scheme EmpowerPlant \
-  -configuration Release \
-  -destination "generic/platform=iOS" \
-  -archivePath build/EmpowerPlant.xcarchive \
-  CODE_SIGNING_REQUIRED=NO \
-  CODE_SIGNING_ALLOWED=NO \
-  -quiet
+    -project EmpowerPlant.xcodeproj \
+    -scheme EmpowerPlant \
+    -configuration Release \
+    -destination "generic/platform=iOS" \
+    -archivePath build/EmpowerPlant.xcarchive \
+    CODE_SIGNING_REQUIRED=NO \
+    CODE_SIGNING_ALLOWED=NO \
+    -quiet
 
-# Check if gh is installed
-if ! command -v gh &> /dev/null; then
-  error_exit "gh is not installed, make sure you run 'make setup' (see README.md)."
+APP_PATH="build/EmpowerPlant.xcarchive/Products/Applications/EmpowerPlant.app"
+if [ ! -d "$APP_PATH" ]; then
+    error_exit "Archive did not contain $APP_PATH"
 fi
 
-# Get release version
-if [ "$#" -eq 1 ]; then
-    TAG="$1"
-else
-    echo "Release name not provided as CLI argument, incrementing patch version of latest release in GH then..."
-    # Fetch the most recent release tag using gh and sort
-    LATEST_RELEASE=$(gh release list | sort -V | tail -n 1 | awk '{print $1}')
-    if [ -z "$LATEST_RELEASE" ]; then
-        error_exit "Could not find any existing releases in GitHub. This is either a bug in the script or this is being run in a new repo with no releases."
-    fi
-    # Split the version and increment the last digit
-    IFS='.' read -ra VERSION_PARTS <<< "$LATEST_RELEASE"
-    LAST_DIGIT_INCREMENTED=$(( VERSION_PARTS[2] + 1 ))
-    TAG="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$LAST_DIGIT_INCREMENTED"
-fi
+# Unsigned IPA: Payload/*.app, the same .app that is inside the archive.
+# This repo has no Apple distribution certificate to sign it with.
+STAGE="build/ipa-stage"
+IPA_PATH="build/EmpowerPlant.ipa"
+rm -rf "$STAGE" "$IPA_PATH"
+mkdir -p "$STAGE/Payload"
+cp -R "$APP_PATH" "$STAGE/Payload/"
+(
+    cd "$STAGE"
+    zip -r -y "../EmpowerPlant.ipa" Payload
+)
 
-TITLE="$TAG"
-NOTES="Generated automatically by ios/deploy_project.sh"
-
-# Create the GitHub release with the attached iOS build zip
-gh release create "$TAG" "$ZIP_PATH" -t "$TITLE" -n "$NOTES" || error_exit "Failed to create GitHub release."
-
-echo "Release created successfully with version $TAG!"
+echo "Archive and ${IPA_PATH} are ready for ${RELEASE_TAG}."
