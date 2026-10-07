@@ -88,7 +88,7 @@ The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`
    - ANR Filling Run Loop
    - File I/O on Main Thread
 
-   Fatal Error and Async Crash flush for 2 seconds before they crash. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
+   Fatal Error and Async Crash flush for 2 seconds before they crash. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread stays on the main thread and finishes its own transaction. The `file.write` and `file.read` spans set `blocked_main_thread` and `file.size`, which is what Sentry uses for the File I/O on Main Thread performance issue. Background the app after the tap so that transaction can send.
 
 ## Testing
 
