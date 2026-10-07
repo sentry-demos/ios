@@ -78,31 +78,45 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     private func captureError() {
-        do {
-            try RandomErrorGenerator.generate()
-        } catch {
-            ErrorToastManager.shared.logErrorAndShowToast(
-                error: error,
-                message: "A random error occurred while testing the app"
-            ) { scope in
-                scope.setTag(value: "value", key: "myTag")
-            }
+        let error = DemoFailure.make()
+        let reason = error.localizedDescription
+        ErrorToastManager.shared.logErrorAndShowToast(error: error, message: reason) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "Error", reason: reason)
         }
     }
 
     private func captureNSException() {
+        let reason = "Checkout failed: the order total could not be confirmed before payment"
         let exception = NSException(
-            name: NSExceptionName("My Custom exeption"),
-            reason: "User clicked the button",
+            name: NSExceptionName("CheckoutFlowException"),
+            reason: reason,
             userInfo: nil
         )
-        let scope = Scope()
-        scope.setLevel(.fatal)
-        SentrySDK.capture(exception: exception, scope: scope)
+        SentrySDK.capture(exception: exception) { [weak self] scope in
+            scope.setLevel(.fatal)
+            self?.attachDemoContext(to: scope, action: "NSException", reason: reason)
+        }
     }
 
     private func captureFatalError() {
-        fatalError("You've encountered a fatal error. Bummer. 😬")
+        let reason = "Checkout crashed: the payment session was missing"
+        SentrySDK.configureScope { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
+        }
+        fatalError(reason)
+    }
+
+    private func attachDemoContext(to scope: Scope, action: String, reason: String) {
+        scope.setTag(value: "actions", key: "screen")
+        scope.setTag(value: action, key: "action")
+        scope.setContext(
+            value: [
+                "screen": "actions",
+                "action": action,
+                "reason": reason,
+            ],
+            key: "demo"
+        )
     }
 
     /// Background writes so the next TDA tap can still land. MetricKit reports the disk exception.
