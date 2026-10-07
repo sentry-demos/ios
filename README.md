@@ -70,7 +70,7 @@ The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`
 
    - Launch opens the home screen: the succulent photo, the title **Empower Plants**, **Other issues**, and **View products** (`ViewProducts`).
    - **View products** opens the plant catalog. `GET https://flask.empower-plant.com/products` runs when that screen loads, not at launch.
-   - Each catalog row has **Add to Cart** immediately. Empower TDA's checkout test still expects that button on the list. Opening a plant is optional; product detail also has Add to Cart, plus Water and Repot.
+   - Each catalog row has **Add to Cart**. Empower’s checkout TDA test still expects that button on launch, because the plant list used to be the first screen. Do not hide it behind product detail. Product detail also has Add to Cart, plus Water and Repot.
    - The cart icon with the red count badge is on the trailing side of the plant list. The cart lists only plants with a quantity greater than zero. **Checkout** is the trailing button on the cart.
    - Checkout prefills the contact fields. **Apply** fails the promo code. **Place your order** posts to `https://flask.empower-plant.com/checkout` with `validate_inventory` and fails with an inventory error. That error shows a feedback button.
    - The system back chevron is how you leave a screen. There is no Home bar button and no overflow menu.
@@ -162,8 +162,8 @@ TDA must be restarted to pick up a new version. See a [sample release](https://g
 
 ## TDA
 
-The error-list test starts from **Other issues** (accessibility id `more`) on the home screen, then taps the row titles above. That used to be a **more** bar button that opened an Actions menu.
+The error-list test should use the home-screen **Other issues** button (accessibility id `more`), then the row titles above. That used to be a **more** bar button that opened an Actions menu.
 
-The checkout test still expects **Add to Cart** on the plant list as soon as that screen is visible. Do not hide it behind product detail.
+The checkout test still expects **Add to Cart** on launch. The plant list used to be the first screen, and each row still has that button. Do not hide it behind product detail.
 
 The command that runs this app in TDA is in [empower `tda/conftest.py`](https://github.com/sentry-demos/empower/blob/a77428aec6cb8e6563caf3d9671419461946db2e/tda/conftest.py#L480-L514).

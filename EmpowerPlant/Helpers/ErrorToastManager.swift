@@ -23,7 +23,7 @@ class ErrorToastManager {
         print("[EmpowerPlant] [Error]: \(error)")
 
         if let scopeCallback = scopeCallback {
-            SentrySDK.capture(error: error, block: scopeCallback)  // Flagship
+            SentrySDK.capture(error: error, block: scopeCallback)
         } else {
             SentrySDK.capture(error: error)
         }

@@ -196,29 +196,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         return container
     }()
-
-    // MARK: - Core Data Saving support
-
-    func saveContext() {
-        let logger = SentrySDK.logger
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            logger.debug("Attempting to save Core Data context changes")
-            do {
-                try context.save()
-                logger.info("Core Data context saved successfully")
-            } catch {
-                logger.error(
-                    "Failed to save Core Data context",
-                    attributes: [
-                        "error": error.localizedDescription
-                    ])
-                ErrorToastManager.shared.logErrorAndShowToast(
-                    error: error,
-                    message: "Failed to save context changes"
-                )
-            }
-        }
-    }
-
 }

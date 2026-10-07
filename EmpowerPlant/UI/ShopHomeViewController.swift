@@ -54,6 +54,8 @@ final class ShopHomeViewController: UIViewController {
         button.layer.cornerRadius = 22
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.white.withAlphaComponent(0.85).cgColor
+        // Empower's error-list TDA test taps this by accessibility id `more`.
+        // It stays on the home screen instead of a navigation-bar debug menu.
         button.accessibilityIdentifier = "more"
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

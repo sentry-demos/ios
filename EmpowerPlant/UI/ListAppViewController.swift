@@ -104,6 +104,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.configureScope { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
         }
+        // Flush first. fatalError kills the process before the event would otherwise send.
         SentrySDK.flush(timeout: 2)
         fatalError(reason)
     }
@@ -209,6 +210,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     private func asyncCrash2() {
         DispatchQueue.main.async {
+            // Flush first. SentrySDK.crash() does not return, so this is the last chance to send.
             SentrySDK.flush(timeout: 2)
             SentrySDK.crash()
         }
@@ -256,9 +258,9 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
 
-    /// Main-thread file read and write. Long enough for the file-I/O-on-main-thread
-    /// performance issue, and short of the 2 second hang threshold. The app stays up
-    /// so the spans can be sent. The Disk write row remains a background handled error.
+    /// Presenter row for the File I/O on Main Thread performance issue.
+    /// The read and write stay on the main thread, then return so the spans can send.
+    /// The Disk write row stays a background handled error.
     private func fileIOOnMainThread() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-main-thread-io.bin")
         let parent = ShopTrace.begin(
