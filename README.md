@@ -1,94 +1,109 @@
 ## Overview
 
-An iOS app integrating Sentry to demo its various product features. See [Empower: How to Contribute](https://www.notion.so/sentry/Empower-How-to-Contribute-3190417cf9b14e7c895fb352d5c28bd6#0a64b16867e9418abc027f2450635510) for more information.
+Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.30.0** (`SentrySPM`, `import SentrySwift`).
+
+The DSN in `EmpowerPlant/Main/AppDelegate.swift` sends events to the demo organization, project **ios**. A commented wassim-test DSN sits above `options.dsn` so that project can be restored. Leave the active DSN on the demo ios project.
+
+Sentry's app-hang watcher is off (`enableAppHangTracking = false`). MetricKit is the hang reporter (`enableMetricKit = true`). The iOS Simulator does not deliver MetricKit diagnostics.
 
 ## Prerequisites
 
-- **macOS** with Xcode 15.0 or later
-- **Homebrew** (will be installed automatically if not present)
-- **Git** (for cloning the repository)
+- **macOS** with Xcode and an iOS Simulator
+- **Homebrew**
+- **Git**
+
+The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`DEVICE_NAME` and `SIMULATOR_OS` override that).
 
 ## Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/sentry-demos/ios.git
    cd ios
    ```
 
-2. **Run the automated setup:**
+2. **Run setup:**
+
    ```bash
-   make init
+   make setup
    ```
+
    This command will:
-   - Install Homebrew (if not already installed)
-   - Install required tools via `brew bundle` (sentry-cli, gh)
-   - Create a `.env` file with placeholder values
-   - Set up Xcode first launch (fixes CoreSimulator issues)
-   - Download iOS platform images if needed
+
+   - Create a `.env` file with placeholder `SENTRY_ORG` and `SENTRY_PROJECT` values, if one is not already there
+   - Install Brewfile tools (including `sentry-cli`) and Ruby gems
+   - Install pre-commit hooks
+
+   `.env` is gitignored. Do not commit it, a `wassim-local` environment, or an auth token.
 
 3. **Configure Sentry authentication:**
+
    ```bash
    sentry-cli login
    ```
-   Use an **org-level** auth token from your Sentry organization. See [`sentry-cli` docs](https://docs.sentry.io/product/cli/) for more information.
 
-4. **Update environment configuration:**
-   Edit the `.env` file and provide valid values:
+   Use an **org-level** auth token. Symbol upload reads that token from `SENTRY_AUTH_TOKEN`, `~/.sentryclirc`, or `~/.zshrc`. See the [`sentry-cli` docs](https://docs.sentry.io/product/cli/).
+
+4. **Set the org and project for symbol upload:**
+
+   Edit `.env`:
+
    ```bash
-   SENTRY_ORG=<your-org-slug>
-   SENTRY_PROJECT=<your-project-slug>
-   ```
-
-   **Default values** (for demo purposes):
-   ```
    SENTRY_ORG=demo
    SENTRY_PROJECT=ios
    ```
 
-5. **Optional - Use custom Sentry DSN:**
-   If you want to send events to a different org/project than the default, update the DSN in `EmpowerPlant/AppDelegate.swift`:
-   ```swift
-   options.dsn = "https://your-dsn-here@sentry.io/project-id"
-   ```
+   The Xcode build phase **[Sentry] Upload debug symbols** runs `./upload-symbols.sh`. That script reads `SENTRY_ORG` and `SENTRY_PROJECT` from the environment or from `.env`. Test builds skip the upload. `./upload-size-analysis.sh` uses the same two values.
 
-## Running the App
+## Running the demo
 
 1. **Open the project in Xcode:**
+
    ```bash
    open EmpowerPlant.xcodeproj
    ```
 
-2. **Run the app:**
-   - Click the "Play" button (▶️) in Xcode, or
-   - Press `⌘R`, or
-   - Select **Product > Run** from the menu
+2. **Run the app** with the Play button, `⌘R`, or **Product > Run**. The iOS Simulator is enough for the shop. A physical device needs an Apple Developer account.
 
-3. **Choose your target:**
-   - **iOS Simulator** (recommended for development)
-   - **Physical device** (requires Apple Developer account)
+3. **Walk the shop:**
+
+   - Launch opens the home screen: the succulent photo, the title **Empower Plants**, **Other issues**, and **View products** (`ViewProducts`).
+   - **View products** opens the plant catalog. `GET https://flask.empower-plant.com/products` runs when that screen loads, not at launch.
+   - Each catalog row has **Add to Cart** immediately. Empower TDA's checkout test still expects that button on the list. Opening a plant is optional; product detail also has Add to Cart, plus Water and Repot.
+   - The cart icon with the red count badge is on the trailing side of the plant list. The cart lists only plants with a quantity greater than zero. **Checkout** is the trailing button on the cart.
+   - Checkout prefills the contact fields. **Apply** fails the promo code. **Place your order** posts to `https://flask.empower-plant.com/checkout` with `validate_inventory` and fails with an inventory error. That error shows a feedback button.
+   - The system back chevron is how you leave a screen. There is no Home bar button and no overflow menu.
+
+4. **Other issues** is the old Actions menu. The button is on the home screen only, with accessibility id `more`. It is not in the navigation bar. The list rows are:
+
+   - Error
+   - NSException
+   - Fatal Error
+   - DiskWriteException (!)
+   - HighCPULoad
+   - Permissions (!)
+   - Async Crash (!)
+   - ANR Fully Blocking
+   - ANR Filling Run Loop
+   - File I/O on Main Thread
+
+   Fatal Error and Async Crash flush for 2 seconds before they crash. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
 
 ## Testing
-
-Run the test suite:
 
 ```bash
 make test
 ```
 
-This will:
-
-- Run unit tests on the latest iOS Simulator
-- Generate code coverage reports using Slather
+This runs unit tests on the iOS Simulator and writes a coverage report with Slather.
 
 ## Troubleshooting
 
-### Common Issues
-
-**CoreSimulator out of date error:**
+**CoreSimulator is out of date:**
 
 ```bash
-make init  # This runs xcodebuild -runFirstLaunch to fix the issue
+xcodebuild -runFirstLaunch
 ```
 
 **Missing iOS SDK:**
@@ -99,55 +114,56 @@ xcodebuild -downloadPlatform iOS
 
 **Build failures:**
 
-- Ensure you have the latest Xcode version
-- Clean build folder: `⌘+Shift+K` in Xcode
-- Reset package cache: `File > Packages > Reset Package Caches`
+- Clean the build folder: `⌘+Shift+K` in Xcode
+- Reset package cache: **File > Packages > Reset Package Caches**
 
-**Sentry authentication issues:**
+**Sentry authentication:**
 
-- Verify your auth token has the correct permissions
-- Check that your org/project slugs in `.env` match your Sentry setup
-- Run `sentry-cli login` again if needed
+- The auth token needs permission to upload debug files for the org and project in `.env`
+- Run `sentry-cli login` again if the token is missing
 
-### Project Structure
+### Project structure
 
 ```
 EmpowerPlant/
-├── AppDelegate.swift          # Sentry configuration
-├── Views/                     # UI Controllers
-├── Models/                    # Core Data models
-├── Helpers/                   # Utility classes
-└── Resources/                 # Assets and data files
+├── Main/AppDelegate.swift     # Sentry configuration and the demo DSN
+├── UI/                        # Home, catalog, cart, checkout, Other issues
+├── Helpers/                   # Shop telemetry helpers
+├── Logic/                     # Shopping cart
+├── Models/                    # Core Data product
+└── Resources/                 # Storyboard, assets, and catalog copy
 ```
 
-## Creating Releases
+## Creating releases
 
 ### Prerequisites
 
-- Ensure `Info.plist` has the correct version number
-- Commit changes to the `master` branch (recommended)
+- `Info.plist` has the version number you want to ship
+- Commit the release changes on `master` (recommended)
 
-### Release Process
+### Release process
 
 1. **Go to GitHub Actions:**
-   - Navigate to the repo's [Actions](https://github.com/sentry-demos/ios/actions) page
-   - Find the [Release workflow](https://github.com/sentry-demos/ios/actions/workflows/release.yml)
+   - Open the repo's [Actions](https://github.com/sentry-demos/ios/actions) page
+   - Open the [Release workflow](https://github.com/sentry-demos/ios/actions/workflows/release.yml)
 
 2. **Trigger the release:**
-   - Click "Run workflow" dropdown
-   - Enter the version number (e.g., `0.0.43`)
-   - Click "Run workflow" to start the build
+   - Click **Run workflow**
+   - Enter the version number (for example `0.0.43`)
+   - Click **Run workflow**
 
 3. **What happens:**
-   - Builds the iOS app with the specified version
+   - Builds the iOS app at that version
    - Uploads debug symbols to Sentry
    - Creates a GitHub release with the app binary
-   - Uses configured secrets for authentication
+   - Uses the repository secrets for authentication
 
-**Note:** TDA (Test Data Automation) must be restarted to pick up new versions.
-
-See [sample release](https://github.com/sentry-demos/ios/releases/tag/0.0.1) for reference.
+TDA must be restarted to pick up a new version. See a [sample release](https://github.com/sentry-demos/ios/releases/tag/0.0.1).
 
 ## TDA
 
-The command that runs this in TDA can be found here: https://github.com/sentry-demos/empower/blob/a77428aec6cb8e6563caf3d9671419461946db2e/tda/conftest.py#L480-L514
+The error-list test starts from **Other issues** (accessibility id `more`) on the home screen, then taps the row titles above. That used to be a **more** bar button that opened an Actions menu.
+
+The checkout test still expects **Add to Cart** on the plant list as soon as that screen is visible. Do not hide it behind product detail.
+
+The command that runs this app in TDA is in [empower `tda/conftest.py`](https://github.com/sentry-demos/empower/blob/a77428aec6cb8e6563caf3d9671419461946db2e/tda/conftest.py#L480-L514).

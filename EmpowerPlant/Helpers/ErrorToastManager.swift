@@ -22,18 +22,17 @@ class ErrorToastManager {
     ) {
         print("[EmpowerPlant] [Error]: \(error)")
 
-        let eventId: SentryId
         if let scopeCallback = scopeCallback {
-            eventId = SentrySDK.capture(error: error, block: scopeCallback)  // Flagship
+            SentrySDK.capture(error: error, block: scopeCallback)  // Flagship
         } else {
-            eventId = SentrySDK.capture(error: error)
+            SentrySDK.capture(error: error)
         }
 
         // Show toast on main thread
         let displayMessage = message ?? error.localizedDescription
         Task { @MainActor in
             if showFeedbackOption {
-                self.showErrorToastWithFeedback(message: displayMessage, eventId: eventId)
+                self.showErrorToastWithFeedback(message: displayMessage)
             } else {
                 self.showErrorToast(message: displayMessage)
             }
@@ -66,11 +65,9 @@ class ErrorToastManager {
     }
 
     /// Shows an error toast message with User Feedback option
-    /// - Parameters:
-    ///   - message: The message to display
-    ///   - eventId: The Sentry event ID to associate with feedback
+    /// - Parameter message: The message to display
     @MainActor
-    func showErrorToastWithFeedback(message: String, eventId: SentryId) {
+    func showErrorToastWithFeedback(message: String) {
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.error)
         view.configureContent(title: "Checkout Error", body: message)
@@ -86,9 +83,6 @@ class ErrorToastManager {
         view.button?.setTitle("Provide Feedback", for: .normal)
         view.buttonTapHandler = { _ in
             SwiftMessages.hide()
-            // Cocoa 9.24's managed form has no associatedEventId parameter.
-            // `eventId` is the checkout error this toast was opened from.
-            _ = eventId
             Task { @MainActor in
                 ShopFeedback.presentCheckoutForm()
             }
@@ -100,29 +94,6 @@ class ErrorToastManager {
         config.presentationStyle = .top
         config.duration = .seconds(seconds: 8)  // Longer duration for feedback option
         config.dimMode = .none
-        config.interactiveHide = true
-
-        SwiftMessages.show(config: config, view: view)
-    }
-
-    /// Shows a warning toast message
-    /// - Parameter message: The message to display
-    @MainActor
-    func showWarningToast(message: String) {
-        let view = MessageView.viewFromNib(layout: .cardView)
-        view.configureTheme(.warning)
-        view.configureContent(title: "Warning", body: message)
-        view.configureDropShadow()
-
-        view.button?.setTitle("Dismiss", for: .normal)
-        view.buttonTapHandler = { _ in
-            SwiftMessages.hide()
-        }
-
-        var config = SwiftMessages.defaultConfig
-        config.presentationStyle = .top
-        config.duration = .seconds(seconds: 4)
-        config.dimMode = .gray(interactive: true)
         config.interactiveHide = true
 
         SwiftMessages.show(config: config, view: view)
@@ -141,29 +112,6 @@ class ErrorToastManager {
         config.presentationStyle = .bottom
         config.duration = .seconds(seconds: 1)
         config.dimMode = .none
-        config.interactiveHide = true
-
-        SwiftMessages.show(config: config, view: view)
-    }
-
-    /// Shows an info toast message
-    /// - Parameter message: The message to display
-    @MainActor
-    func showInfoToast(message: String) {
-        let view = MessageView.viewFromNib(layout: .cardView)
-        view.configureTheme(.info)
-        view.configureContent(title: "Info", body: message)
-        view.configureDropShadow()
-
-        view.button?.setTitle("Dismiss", for: .normal)
-        view.buttonTapHandler = { _ in
-            SwiftMessages.hide()
-        }
-
-        var config = SwiftMessages.defaultConfig
-        config.presentationStyle = .top
-        config.duration = .seconds(seconds: 3)
-        config.dimMode = .gray(interactive: true)
         config.interactiveHide = true
 
         SwiftMessages.show(config: config, view: view)

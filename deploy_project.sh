@@ -32,7 +32,7 @@ xcodebuild archive \
 
 # Check if gh is installed
 if ! command -v gh &> /dev/null; then
-  error_exit "gh is not installed, make sure you run 'make init' (see README.md)."
+  error_exit "gh is not installed, make sure you run 'make setup' (see README.md)."
 fi
 
 # Get release version

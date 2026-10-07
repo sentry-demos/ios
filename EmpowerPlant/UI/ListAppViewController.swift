@@ -1,9 +1,9 @@
 import SentrySwift
 import UIKit
 
-/// Debug actions for the Empower TDA error-list test.
+/// Other issues list for the Empower TDA error-list test.
 /// Row titles are the accessibility names the test looks up.
-/// The succulent home screen opens it. No other screen has a bar button for it.
+/// The home screen button opens it. No other screen has a bar button for it.
 final class ListAppViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private struct Action {
         let title: String
@@ -34,7 +34,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Actions"
+        title = "Other issues"
         view.backgroundColor = EmpowerPlantTheme.tableBackground
         tableView.dataSource = self
         tableView.delegate = self
@@ -214,7 +214,9 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
 
-    /// Blocks the main thread for 5 seconds. The hang watcher runs off the main thread and reports an App Hang.
+    /// Blocks the main thread for 5 seconds. The app-hang watcher is off, so this
+    /// stall is not reported as an App Hang. MetricKit is the hang reporter.
+    /// The span still records the block.
     private func anrFullyBlocking() {
         let span = ShopTrace.begin(operation: "app.hang", description: "Block main thread", bindChildToScope: false)
         span.setData(value: 5000, key: "duration_ms")
@@ -228,7 +230,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         span.finish()
     }
 
-    /// Fills the main run loop with short blocks for 5 seconds, long enough for the 2 second hang watcher.
+    /// Fills the main run loop with short blocks for 5 seconds.
+    /// The span finishes on the main queue after those blocks drain.
     private func anrFillingRunLoop() {
         let span = ShopTrace.begin(operation: "app.hang", description: "Fill the run loop", bindChildToScope: false)
         span.setData(value: "actions", key: "screen")

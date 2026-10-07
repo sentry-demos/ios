@@ -10,18 +10,7 @@ enum PurchaseError: Error, LocalizedError {
     }
 }
 
-protocol URLSessionProtocol {
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
-        -> URLSessionDataTaskProtocol
-}
-
-protocol URLSessionDataTaskProtocol {
-    func resume()
-}
-
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
-    // private let session: URLSessionProtocol
 
     let tableView: UITableView = {
         let table = UITableView()
@@ -46,14 +35,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return l
     }()
 
-    // Used for mocking in unit test
-    init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
-        // self.session = session
-        super.init(nibName: nil, bundle: nil)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
     required init?(coder: NSCoder) {
-        // fatalError("init(coder:) has not been implemented")
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -101,8 +87,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         configureNavigationItems()
         checkRelease(screen: "cart")
-
-        print("CartViewController | TOTAL", ShoppingCart.instance.total)
         SentrySDK.reportFullyDisplayed()
     }
 
@@ -169,8 +153,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         recordCheckoutMetrics()
         processCart(on: checkoutSpan)
 
-        // use localhost for development against dev-backend
-        // let url = URL(string: "http://127.0.0.1:8080/checkout")!
         let url = URL(string: "https://flask.empower-plant.com/checkout")!
 
         var request = URLRequest(url: url)
@@ -259,17 +241,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                         ])
                 }
             }
-
-            // not getting met
-            // if let error = error {
-            //    print("> HTTP Request Failed \(error)")
-            //    SentrySDK.capture(error: error)
-            // }
-
-            // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            // if let data = data {
-            //     print("> no error, do nothing", data)
-            // }
         }
 
         task.resume()
@@ -368,15 +339,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
 
-    // total, quantities, items
     func setJson() -> [String: Any] {
-
-        // total DONE
-        // quantities DONE below
-        // TODO: items
-
-        let json: [String: Any] = [
-            "form": ["email": "will@example.com"],  // TODO: email update + check if all tx's+errors have email
+        [
+            "form": ["email": "will@example.com"],
             "cart": [
                 "total": ShoppingCart.instance.total,
                 "quantities": [
@@ -387,13 +352,10 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 ],
                 "items": [
                     ["id": "4", "title": "Plant Nodes"]
-                    // ["id":"5", "title":"Plant Stroller"]
                 ],
             ],
             "validate_inventory": "true",
         ]
-
-        return json
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -419,15 +381,4 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             ("Plant Nodes", ShoppingCart.instance.quantities.plantNodes),
         ].filter { $0.1 > 0 }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

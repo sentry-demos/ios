@@ -1,6 +1,5 @@
 import CoreData
 import Foundation
-import SentrySwift
 
 extension Product {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Product> {
@@ -9,7 +8,6 @@ extension Product {
         return fr
     }
 
-    //    @NSManaged public var text: String?
     @NSManaged public var title: String?
     @NSManaged public var productDescription: String?
     @NSManaged public var productDescriptionFull: String?

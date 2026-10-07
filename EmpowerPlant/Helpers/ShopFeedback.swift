@@ -2,7 +2,7 @@ import SentrySwift
 import UIKit
 
 /// Checkout failure opens Sentry's form with only the message filled in.
-/// Cocoa 9.24 has no API to prefill that field, so the text view is set after presentation.
+/// The managed form has no prefill API, so the text view is set after presentation.
 @MainActor
 enum ShopFeedback {
     static let checkoutMessage = "It's broken again! Please fix it."
