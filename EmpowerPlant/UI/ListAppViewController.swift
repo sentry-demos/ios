@@ -256,25 +256,28 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
 
-    /// Main-thread file read and write for the File I/O on Main Thread performance issue.
-    /// Cocoa 9.30's file I/O integration sets `blocked_main_thread`, `file.size`, and
-    /// `file.path` on `file.read` / `file.write` spans. A dedicated transaction is
-    /// finished here so those spans are sent even when no screen transaction is open.
-    /// The Disk write row stays a background handled error.
+    /// Main-thread file read and write. Long enough for the file-I/O-on-main-thread
+    /// performance issue, and short of the 2 second hang threshold. The app stays up
+    /// so the spans can be sent. The Disk write row remains a background handled error.
     private func fileIOOnMainThread() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-main-thread-io.bin")
-        let transaction = SentrySDK.startTransaction(
-            name: "File I/O on Main Thread",
+        let parent = ShopTrace.begin(
             operation: "file.io",
-            bindToScope: false
+            description: "File I/O on Main Thread",
+            bindChildToScope: false
         )
-        transaction.setData(value: "actions", key: "screen")
-        transaction.setData(value: "File I/O on Main Thread", key: "action")
+        parent.setData(value: "actions", key: "screen")
+        parent.setData(value: "File I/O on Main Thread", key: "action")
+        defer {
+            try? FileManager.default.removeItem(at: url)
+            parent.finish()
+        }
 
         let chunk = Data(repeating: 0x42, count: 64 * 1024)
-        let writeSpan = transaction.startChild(operation: "file.write", description: url.lastPathComponent)
-        writeSpan.setData(value: url.path, key: "file.path")
-        writeSpan.setData(value: true, key: "blocked_main_thread")
+        let writeSpan = parent.startChild(operation: "file.write", description: "Write file on main thread")
+        writeSpan.setData(value: "actions", key: "screen")
+        writeSpan.setData(value: url.lastPathComponent, key: "file.name")
+        let writeStarted = Date()
         var bytesWritten = 0
         FileManager.default.createFile(atPath: url.path, contents: nil)
         if let handle = try? FileHandle(forWritingTo: url) {
@@ -290,12 +293,15 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
             try? handle.synchronize()
             try? handle.close()
         }
-        writeSpan.setData(value: bytesWritten, key: "file.size")
+        let writeMs = Int(Date().timeIntervalSince(writeStarted) * 1000)
+        writeSpan.setData(value: writeMs, key: "duration_ms")
+        writeSpan.setData(value: bytesWritten, key: "file.bytes")
         writeSpan.finish()
 
-        let readSpan = transaction.startChild(operation: "file.read", description: url.lastPathComponent)
-        readSpan.setData(value: url.path, key: "file.path")
-        readSpan.setData(value: true, key: "blocked_main_thread")
+        let readSpan = parent.startChild(operation: "file.read", description: "Read file on main thread")
+        readSpan.setData(value: "actions", key: "screen")
+        readSpan.setData(value: url.lastPathComponent, key: "file.name")
+        let readStarted = Date()
         var bytesRead = 0
         if let handle = try? FileHandle(forReadingFrom: url) {
             let readEnd = Date().addingTimeInterval(0.2)
@@ -309,10 +315,10 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
             }
             try? handle.close()
         }
-        readSpan.setData(value: bytesRead, key: "file.size")
+        let readMs = Int(Date().timeIntervalSince(readStarted) * 1000)
+        readSpan.setData(value: readMs, key: "duration_ms")
+        readSpan.setData(value: bytesRead, key: "file.bytes")
         readSpan.finish()
-
-        try? FileManager.default.removeItem(at: url)
-        transaction.finish()
+        parent.setData(value: writeMs + readMs, key: "duration_ms")
     }
 }
