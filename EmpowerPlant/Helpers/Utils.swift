@@ -47,7 +47,7 @@ public func wipeDB() {
 }
 
 /// Add a delay based on current version.
-public func checkRelease() {
+public func checkRelease(screen: String) {
     let logger = SentrySDK.logger
 
     guard let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
@@ -67,6 +67,11 @@ public func checkRelease() {
                 "version": versionString,
                 "delaySeconds": 1,
             ])
+        let span = ShopTrace.begin(operation: "release.wait", description: "Version check wait", bindChildToScope: false)
+        span.setData(value: 1000, key: "duration_ms")
+        span.setData(value: screen, key: "screen")
+        span.setData(value: versionString, key: "app.version")
         sleep(1)  // sleep takes seconds, not ms
+        span.finish()
     }
 }

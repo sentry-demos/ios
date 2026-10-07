@@ -100,7 +100,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ShopPrivacy.unmask(totalLabel)
 
         configureNavigationItems()
-        checkRelease()
+        checkRelease(screen: "cart")
 
         print("CartViewController | TOTAL", ShoppingCart.instance.total)
         SentrySDK.reportFullyDisplayed()

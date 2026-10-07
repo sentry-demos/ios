@@ -107,6 +107,9 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     /// Background writes so the next TDA tap can still land. MetricKit reports the disk exception.
     private func diskWriteException() {
+        let span = ShopTrace.begin(operation: "file.write", description: "Disk write", bindChildToScope: false)
+        span.setData(value: 8000, key: "duration_ms")
+        span.setData(value: "actions", key: "screen")
         workQueue.async {
             let chunk = Data(repeating: 0x41, count: 256 * 1024)
             let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-disk-write.bin")
@@ -115,6 +118,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
                 try? chunk.write(to: url)
             }
             try? FileManager.default.removeItem(at: url)
+            span.finish()
         }
     }
 
@@ -170,21 +174,33 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     /// Blocks the main thread. Sentry's hang watcher stays off; MetricKit can still report it.
     private func anrFullyBlocking() {
+        let span = ShopTrace.begin(operation: "app.hang", description: "Block main thread", bindChildToScope: false)
+        span.setData(value: 5000, key: "duration_ms")
+        span.setData(value: "actions", key: "screen")
         let end = Date().addingTimeInterval(5)
         var i = 0
         while Date() < end {
             i &+= Int.random(in: 0...10)
             i &-= 1
         }
+        span.finish()
     }
 
     /// Fills the main run loop with short blocks instead of one long sleep.
     private func anrFillingRunLoop() {
+        let span = ShopTrace.begin(operation: "app.hang", description: "Fill the run loop", bindChildToScope: false)
+        span.setData(value: "actions", key: "screen")
+        let started = Date()
         workQueue.async {
             for _ in 0...100_000 {
                 DispatchQueue.main.async {
                     _ = CFAbsoluteTimeGetCurrent()
                 }
+            }
+            DispatchQueue.main.async {
+                let elapsedMs = Int(Date().timeIntervalSince(started) * 1000)
+                span.setData(value: elapsedMs, key: "duration_ms")
+                span.finish()
             }
         }
     }

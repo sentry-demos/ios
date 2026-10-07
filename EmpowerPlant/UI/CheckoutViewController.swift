@@ -163,7 +163,11 @@ final class CheckoutViewController: UIViewController {
                 "action": "promo_apply",
             ])
 
+        let span = ShopTrace.begin(operation: "promo.apply", description: "Apply promo code", bindChildToScope: false)
+        span.setData(value: 750, key: "duration_ms")
+        span.setData(value: "checkout", key: "screen")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
+            defer { span.finish() }
             guard let self else { return }
             self.applyingPromo = false
             let applied = self.promoField.text ?? code

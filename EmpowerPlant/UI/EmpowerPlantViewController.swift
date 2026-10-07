@@ -42,7 +42,7 @@ class EmpowerPlantViewController: UIViewController {
             object: nil
         )
         loadCatalog()
-        checkRelease()
+        checkRelease(screen: "product_list")
     }
 
     override func viewDidAppear(_ animated: Bool) {
