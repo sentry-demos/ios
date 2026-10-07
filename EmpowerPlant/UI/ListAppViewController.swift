@@ -104,8 +104,6 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.configureScope { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
         }
-        // Flush first. fatalError kills the process before the event would otherwise send.
-        SentrySDK.flush(timeout: 2)
         fatalError(reason)
     }
 
@@ -197,21 +195,7 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     private func asyncCrash() {
-        DispatchQueue.main.async { [weak self] in
-            self?.asyncCrash1()
-        }
-    }
-
-    private func asyncCrash1() {
-        DispatchQueue.main.async { [weak self] in
-            self?.asyncCrash2()
-        }
-    }
-
-    private func asyncCrash2() {
         DispatchQueue.main.async {
-            // Flush first. SentrySDK.crash() does not return, so this is the last chance to send.
-            SentrySDK.flush(timeout: 2)
             SentrySDK.crash()
         }
     }

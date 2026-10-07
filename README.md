@@ -88,7 +88,7 @@ The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`
    - ANR Filling Run Loop
    - File I/O on Main Thread
 
-   Fatal Error and Async Crash flush for 2 seconds before they crash. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
+   Fatal Error and Async Crash end the process immediately. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
 
 ## Testing
 
