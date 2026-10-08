@@ -47,6 +47,16 @@ INFO_PLIST="EmpowerPlant/Resources/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_CODE" "$INFO_PLIST"
 
 echo "Building one Release archive ($MARKETING_VERSION / $BUILD_CODE)..."
+# macos-15 defaults to Xcode 16.4 (Swift 6.1). That tools version loads
+# sentry-cocoa 9.30.0's Package@swift-6.1.swift and rejects the KSCrash
+# revision as an unstable dependency of stable 9.30.0. Swift 6.2 (Xcode 26)
+# ignores that revision unless the V10 trait is enabled or SDK_V10=1.
+# Local Xcode already resolved the pin that way.
+unset SDK_V10
+export DEVELOPER_DIR=/Applications/Xcode_26.3.app
+if [ ! -d "$DEVELOPER_DIR" ]; then
+    error_exit "Need $DEVELOPER_DIR so SwiftPM can resolve sentry-cocoa 9.30.0 without the unused KSCrash revision."
+fi
 SENTRY_ORG="$SENTRY_ORG" \
 SENTRY_PROJECT="$SENTRY_PROJECT" \
 SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
