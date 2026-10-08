@@ -58,7 +58,7 @@ class ProductTableViewCell: UITableViewCell {
     private let addToCartButton: UIButton = {
         let b = UIButton(type: .system)
         b.setTitle("Add to Cart", for: .normal)
-        b.setTitleColor(.white, for: .normal)
+        b.setTitleColor(.black, for: .normal)
         b.titleLabel?.font = .systemFont(ofSize: 13, weight: .bold)
         b.backgroundColor = EmpowerPlantTheme.buttonBackground
         b.layer.cornerRadius = 4
@@ -70,7 +70,7 @@ class ProductTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .none
+        selectionStyle = .default
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         setupViews()
@@ -90,6 +90,7 @@ class ProductTableViewCell: UITableViewCell {
         cardView.addSubview(addToCartButton)
 
         addToCartButton.addTarget(self, action: #selector(addToCartTapped), for: .touchUpInside)
+        ShopPrivacy.unmask(addToCartButton)
 
         NSLayoutConstraint.activate([
             // Card inset from cell edges

@@ -58,7 +58,6 @@ class ShoppingCart {
                     "productId": productId,
                     "expectedIds": "3, 4, 5, 6",
                 ])
-            print("product id not found in ShoppingCart switch statement")
         }
 
         logger.info(
@@ -68,7 +67,7 @@ class ShoppingCart {
                 "newTotal": self.instance.total,
                 "cartItemCount": self.instance.items.count,
             ])
-        print("> TOTAL", self.instance.total)
+        NotificationCenter.default.post(name: .shoppingCartDidChange, object: nil)
     }
 
     static func updateTotal(product: Product) {
@@ -77,25 +76,7 @@ class ShoppingCart {
     }
 }
 
-/*
- Cannot dynamically set KeyId's like in javascript, so coding the product names into the Quantities class
-
- The following code fails because you can't add key names on the go
-    self.instance.quantities.setValue(1, forKey: "someProperty")
-    self.instance.quantities.value(forKey: "someProperty"))
- */
 class Quantities: NSObject {
-
-    var _name: Int = 0
-    var name: Int {
-        get {
-            return _name
-        }
-        set(newVal) {
-            _name = newVal
-        }
-    }
-
     var _plantMood: Int = 0
     var plantMood: Int {
         get {
@@ -135,4 +116,8 @@ class Quantities: NSObject {
             _plantNodes = newVal
         }
     }
+}
+
+extension Notification.Name {
+    static let shoppingCartDidChange = Notification.Name("EmpowerPlant.shoppingCartDidChange")
 }

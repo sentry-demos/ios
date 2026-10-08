@@ -46,8 +46,9 @@ public func wipeDB() {
     }
 }
 
-/// Add a delay based on current version.
-public func checkRelease() {
+/// Even app versions sleep for one second so that release shows a slow span. Odd versions skip it.
+/// The check sums the version numbers because build numbers are auto-incremented (0.0.28 -> 28).
+public func checkRelease(screen: String) {
     let logger = SentrySDK.logger
 
     guard let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
@@ -56,8 +57,6 @@ public func checkRelease() {
         return
     }
 
-    // as a workaround to auto-incremented build numbers, we just calculate the integer sum of all segments
-    // of the semantic version, e.g. 0.0.28 -> 0+0+28 = 28 -> sleep, 0.0.29 -> 0+0+29 = 29 -> no sleep
     let versionSum = versionString.components(separatedBy: ".").compactMap { Int($0) }.reduce(0, +)
 
     if versionSum % 2 == 0 {
@@ -67,6 +66,11 @@ public func checkRelease() {
                 "version": versionString,
                 "delaySeconds": 1,
             ])
+        let span = ShopTrace.begin(operation: "release.wait", description: "Version check wait", bindChildToScope: false)
+        span.setData(value: 1000, key: "duration_ms")
+        span.setData(value: screen, key: "screen")
+        span.setData(value: versionString, key: "app.version")
         sleep(1)  // sleep takes seconds, not ms
+        span.finish()
     }
 }

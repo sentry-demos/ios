@@ -1,358 +1,310 @@
-import BigInt
 import SentrySwift
 import UIKit
 
-class ListAppViewController: UIViewController {
+/// Other issues list for the Empower TDA error-list test.
+/// Row titles are the accessibility names the test looks up.
+/// The home screen button opens it. No other screen has a bar button for it.
+final class ListAppViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    private struct Action {
+        let title: String
+        let run: () -> Void
+    }
 
-    @IBOutlet weak var dsnTextField: UITextField!
-    @IBOutlet weak var anrFullyBlockingButton: UIButton!
-    @IBOutlet weak var anrFillingRunLoopButton: UIButton!
-    @IBOutlet weak var framesLabel: UILabel!
-    @IBOutlet weak var breadcrumbLabel: UILabel!
+    private let tableView: UITableView = {
+        let table = UITableView(frame: .zero, style: .plain)
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "action")
+        return table
+    }()
 
-    private let dispatchQueue = DispatchQueue(label: "ViewController", attributes: .concurrent)
-    // private let diskWriteException = DiskWriteException()
+    private lazy var actions: [Action] = [
+        Action(title: "Error", run: { [weak self] in self?.captureError() }),
+        Action(title: "NSException", run: { [weak self] in self?.captureNSException() }),
+        Action(title: "Fatal Error", run: { [weak self] in self?.captureFatalError() }),
+        Action(title: "DiskWriteException (!)", run: { [weak self] in self?.diskWriteException() }),
+        Action(title: "HighCPULoad", run: { [weak self] in self?.highCPULoad() }),
+        Action(title: "Permissions (!)", run: { [weak self] in self?.permissions() }),
+        Action(title: "Async Crash (!)", run: { [weak self] in self?.asyncCrash() }),
+        Action(title: "ANR Fully Blocking", run: { [weak self] in self?.anrFullyBlocking() }),
+        Action(title: "ANR Filling Run Loop", run: { [weak self] in self?.anrFillingRunLoop() }),
+        Action(title: "File I/O on Main Thread", run: { [weak self] in self?.fileIOOnMainThread() }),
+    ]
+
+    private let workQueue = DispatchQueue(label: "EmpowerPlant.ListApp", qos: .userInitiated, attributes: .concurrent)
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Actions"
-        activityIndicator.isHidden = true
+        title = "Other issues"
+        view.backgroundColor = EmpowerPlantTheme.tableBackground
+        tableView.dataSource = self
+        tableView.delegate = self
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
     }
 
-    @IBAction func addBreadcrumb(_ sender: Any) {
-        let crumb = Breadcrumb(level: SentryLevel.info, category: "Debug")
-        crumb.message = "tapped addBreadcrumb"
-        crumb.type = "user"
-        SentrySDK.addBreadcrumb(crumb)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        ShopPrivacy.unmaskNavigationButtons(of: self)
     }
 
-    @IBAction func captureMessage(_ sender: Any) {
-        let eventId = SentrySDK.capture(message: "Yeah captured a message")
-        // Returns eventId in case of successfull processed event
-        // otherwise nil
-        print("\(String(describing: eventId))")
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        actions.count
     }
 
-    @IBAction func uiClickTransaction(_ sender: Any) {
-        dispatchQueue.async {
-            if let path = Bundle.main.path(forResource: "LoremIpsum", ofType: "txt") {
-                _ = FileManager.default.contents(atPath: path)
-            }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "action", for: indexPath)
+        let title = actions[indexPath.row].title
+        cell.textLabel?.text = title
+        cell.textLabel?.font = .systemFont(ofSize: 17)
+        cell.textLabel?.textColor = EmpowerPlantTheme.textHeader
+        // The TDA test looks up XCUIElementTypeStaticText by these names.
+        cell.isAccessibilityElement = false
+        cell.textLabel?.isAccessibilityElement = true
+        cell.textLabel?.accessibilityIdentifier = title
+        if let label = cell.textLabel {
+            ShopPrivacy.unmask(label)
         }
-
-        guard let imgUrl = URL(string: "https://sentry-brand.storage.googleapis.com/sentry-logo-black.png") else {
-            return
-        }
-        let session = URLSession(configuration: URLSessionConfiguration.default)
-        let dataTask = session.dataTask(with: imgUrl) { (_, _, _) in }
-        dataTask.resume()
+        return cell
     }
 
-    @IBAction func captureUserFeedback(_ sender: Any) {
-        // Create a realistic ecommerce-related error
-        let error = NSError(
-            domain: "EmpowerPlant.EcommerceError", code: 1001,
-            userInfo: [
-                NSLocalizedDescriptionKey: "Checkout process failed due to payment processing error",
-                "error_type": "payment_failure",
-                "checkout_step": "payment_processing",
-            ])
-
-        let eventId = SentrySDK.capture(error: error) { scope in
-            scope.setLevel(.error)  // Changed from .fatal to .error for user-initiated feedback
-            scope.setTag(value: "ecommerce_feedback", key: "feedback_type")
-            scope.setTag(value: "checkout", key: "user_journey")
-            scope.setContext(
-                value: [
-                    "cart_items": ShoppingCart.instance.items.count,
-                    "total_amount": ShoppingCart.instance.total,
-                    "user_action": "manual_feedback_request",
-                ], key: "ecommerce_context")
-        }
-
-        SentrySDK.capture(
-            feedback: SentryFeedback(
-                message: "I was trying to purchase some plants but the checkout process failed...",
-                name: "Plant Enthusiast",
-                email: "customer@example.com"
-            ))
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        ShopClick.play()
+        actions[indexPath.row].run()
     }
 
-    @IBAction func captureError(_ sender: Any) {
-
-        do {
-            try RandomErrorGenerator.generate()
-        } catch {
-            ErrorToastManager.shared.logErrorAndShowToast(
-                error: error,
-                message: "A random error occurred while testing the app"
-            ) { (scope) in
-                // Changes in here will only be captured for this event
-                // The scope in this callback is a clone of the current scope
-                // It contains all data but mutations only influence the event being sent
-                scope.setTag(value: "value", key: "myTag")
-            }
+    private func captureError() {
+        let error = DemoFailure.make()
+        let reason = error.localizedDescription
+        ErrorToastManager.shared.logErrorAndShowToast(error: error, message: reason) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "Error", reason: reason)
         }
-
     }
 
-    @IBAction func captureNSException(_ sender: Any) {
+    private func captureNSException() {
+        let reason = "Checkout failed: the order total could not be confirmed before payment"
         let exception = NSException(
-            name: NSExceptionName("My Custom exeption"), reason: "User clicked the button", userInfo: nil)
-        let scope = Scope()
-        scope.setLevel(.fatal)
-        // !!!: By explicity just passing the scope, only the data in this scope object will be added to the event; the global scope (calls to configureScope) will be ignored. If you do that, be careful–a lot of useful info is lost. If you just want to mutate what's in the scope use the callback, see: captureError.
-        SentrySDK.capture(exception: exception, scope: scope)
-    }
-
-    @IBAction func captureFatalError(_ sender: Any) {
-        fatalError("You've encountered a fatal error. Bummer. 😬")
-    }
-
-    @IBAction func captureTransaction(_ sender: Any) {
-        let transaction = SentrySDK.startTransaction(name: "Some Transaction", operation: "Some Operation")
-        /*
-        //Below Breaks
-        transaction.setMeasurement(name: "duration", value: 44, unit: MeasurementUnitDuration.nanosecond)
-        transaction.setMeasurement(name: "information", value: 44, unit: MeasurementUnitInformation.bit)
-        transaction.setMeasurement(name: "duration-custom", value: 22, unit: MeasurementUnit(unit: "custom"))
-        */ // Above Breaks
-        let span = transaction.startChild(operation: "user", description: "calls out")
-
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + 0.1,
-            execute: {
-                span.finish()
-            })
-
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + Double.random(in: 0.4...0.6),
-            execute: {
-                transaction.finish()
-            })
-    }
-
-    @IBAction func crash(_ sender: Any) {
-        SentrySDK.crash()
-    }
-
-    // swiftlint:disable force_unwrapping
-    @IBAction func unwrapCrash(_ sender: Any) {
-        let a: String! = nil
-        let b: String = a!
-        print(b)
-    }
-    // swiftlint:enable force_unwrapping
-    @IBAction func asyncCrash(_ sender: Any) {
-        DispatchQueue.main.async {
-            self.asyncCrash1()
+            name: NSExceptionName("CheckoutFlowException"),
+            reason: reason,
+            userInfo: nil
+        )
+        SentrySDK.capture(exception: exception) { [weak self] scope in
+            scope.setLevel(.fatal)
+            self?.attachDemoContext(to: scope, action: "NSException", reason: reason)
         }
     }
 
-    func asyncCrash1() {
-        DispatchQueue.main.async {
-            self.asyncCrash2()
+    private func captureFatalError() {
+        let reason = "Checkout crashed: the payment session was missing"
+        SentrySDK.configureScope { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
+        }
+        fatalError(reason)
+    }
+
+    private func attachDemoContext(to scope: Scope, action: String, reason: String) {
+        scope.setTag(value: "actions", key: "screen")
+        scope.setTag(value: action, key: "action")
+        scope.setContext(
+            value: [
+                "screen": "actions",
+                "action": action,
+                "reason": reason,
+            ],
+            key: "demo"
+        )
+    }
+
+    /// Background writes so the next TDA tap can still land. The captured error is the issue;
+    /// MetricKit disk diagnostics are not delivered on the simulator.
+    private func diskWriteException() {
+        let reason = "Disk write storm: repeated 256KB writes for 8 seconds"
+        let error = NSError(
+            domain: "DiskWriteException",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: reason,
+                NSDebugDescriptionErrorKey: reason,
+            ]
+        )
+        SentrySDK.capture(error: error) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "DiskWriteException (!)", reason: reason)
+        }
+        let span = ShopTrace.begin(operation: "file.write", description: "Disk write", bindChildToScope: false)
+        span.setData(value: 8000, key: "duration_ms")
+        span.setData(value: "actions", key: "screen")
+        workQueue.async {
+            let chunk = Data(repeating: 0x41, count: 256 * 1024)
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-disk-write.bin")
+            let end = Date().addingTimeInterval(8)
+            while Date() < end {
+                try? chunk.write(to: url)
+            }
+            try? FileManager.default.removeItem(at: url)
+            span.finish()
         }
     }
 
-    func asyncCrash2() {
-        DispatchQueue.main.async {
-            SentrySDK.crash()
+    private func highCPULoad() {
+        let reason = "High CPU load: a background thread is computing pi without stopping"
+        let error = NSError(
+            domain: "HighCPULoad",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: reason,
+                NSDebugDescriptionErrorKey: reason,
+            ]
+        )
+        SentrySDK.capture(error: error) { [weak self] scope in
+            self?.attachDemoContext(to: scope, action: "HighCPULoad", reason: reason)
         }
-    }
-
-    @IBAction func oomCrash(_ sender: Any) {
-        DispatchQueue.main.async {
-            let megaByte = 1_024 * 1_024
-            let memoryPageSize = NSPageSize()
-            let memoryPages = megaByte / memoryPageSize
-
+        workQueue.async {
             while true {
-                // Allocate one MB and set one element of each memory page to something.
-                let ptr = UnsafeMutablePointer<Int8>.allocate(capacity: megaByte)
-                for i in 0..<memoryPages {
-                    ptr[i * memoryPageSize] = 40
-                }
+                _ = Self.calcPi()
             }
         }
     }
 
-    @IBAction func diskWriteException(_ sender: Any) {
-        // diskWriteException.continuouslyWriteToDisk()
-
-        // As we are writing to disk continuously we would keep adding spans to this UIEventTransaction.
-        SentrySDK.span?.finish()
-    }
-
-    @IBAction func highCPULoad(_ sender: Any) {
-        dispatchQueue.async {
-            while true {
-                _ = self.calcPi()
-            }
-        }
-    }
-
-    private func calcPi() -> Double {
+    private static func calcPi() -> Double {
         var denominator = 1.0
         var pi = 0.0
-
         for i in 0..<10_000_000 {
             if i % 2 == 0 {
                 pi += 4 / denominator
             } else {
                 pi -= 4 / denominator
             }
-
             denominator += 2
         }
-
         return pi
     }
 
-    @IBAction func anrFullyBlocking(_ sender: Any) {
-        let buttonTitle = self.anrFullyBlockingButton.currentTitle
+    /// A real permission failure that does not abort the process.
+    private func permissions() {
+        let protected = URL(fileURLWithPath: "/var/root/sentry-demo-permission")
+        do {
+            _ = try Data(contentsOf: protected)
+        } catch {
+            SentrySDK.capture(error: error)
+        }
+    }
+
+    private func asyncCrash() {
+        DispatchQueue.main.async {
+            SentrySDK.crash()
+        }
+    }
+
+    /// Blocks the main thread for 5 seconds. The app-hang watcher is off, so this
+    /// stall is not reported as an App Hang. MetricKit is the hang reporter.
+    /// The span still records the block.
+    private func anrFullyBlocking() {
+        let span = ShopTrace.begin(operation: "app.hang", description: "Block main thread", bindChildToScope: false)
+        span.setData(value: 5000, key: "duration_ms")
+        span.setData(value: "actions", key: "screen")
+        let end = Date().addingTimeInterval(5)
         var i = 0
-
-        for _ in 0...5_000_000 {
-            i += Int.random(in: 0...10)
-            i -= 1
-
-            self.anrFullyBlockingButton.setTitle("\(i)", for: .normal)
+        while Date() < end {
+            i &+= Int.random(in: 0...10)
+            i &-= 1
         }
-
-        self.anrFullyBlockingButton.setTitle(buttonTitle, for: .normal)
-    }
-
-    @IBAction func anrFillingRunLoop(_ sender: Any) {
-        let buttonTitle = self.anrFillingRunLoopButton.currentTitle
-        var i = 0
-
-        dispatchQueue.async {
-            for _ in 0...100_000 {
-                i += Int.random(in: 0...10)
-                i -= 1
-
-                DispatchQueue.main.async {
-                    self.anrFillingRunLoopButton.setTitle("Work in Progress \(i)", for: .normal)
-                }
-            }
-
-            DispatchQueue.main.async {
-                self.anrFillingRunLoopButton.setTitle(buttonTitle, for: .normal)
-            }
-        }
-    }
-
-    @IBAction func dsnChanged(_ sender: UITextField) {
-        let options = Options()
-        options.dsn = sender.text
-
-        if let dsn = options.dsn {
-            sender.backgroundColor = UIColor.systemGreen
-
-            dispatchQueue.async {
-                // DSNStorage.shared.saveDSN(dsn: dsn)
-            }
-        } else {
-            sender.backgroundColor = UIColor.systemRed
-
-            dispatchQueue.async {
-                // DSNStorage.shared.deleteDSN()
-            }
-        }
-    }
-
-    @IBAction func close(_ sender: Any) {
-        SentrySDK.close()
-    }
-
-    @IBOutlet weak var imageView: UIImageView!
-    @available(iOS 15.0, *)
-    @IBAction func imageOnMain(_ sender: Any) {
-        imageView.isHidden = false
-        let span = SentrySDK.startTransaction(name: "test", operation: "image-on-main")
-        imageView.image = UIImage(named: "jwt-deep-field.png")
         span.finish()
     }
 
-    @IBOutlet weak var progressIndicator: UIProgressView!
-    @IBAction func jsonMainThread(_ sender: Any) {
-        // build up a huge JSON structure
-        progressIndicator.isHidden = false
-        DispatchQueue.global(qos: .utility).async {
-            var dict = [String: String]()
-            let limit = 1_000_000
-            for i in 0..<limit {
-                dict["\(i)"] = "\(i)\(i)"
+    /// Fills the main run loop with short blocks for 5 seconds.
+    /// The span finishes on the main queue after those blocks drain.
+    private func anrFillingRunLoop() {
+        let span = ShopTrace.begin(operation: "app.hang", description: "Fill the run loop", bindChildToScope: false)
+        span.setData(value: "actions", key: "screen")
+        let started = Date()
+        let fillDuration: TimeInterval = 5
+        workQueue.async {
+            let end = Date().addingTimeInterval(fillDuration)
+            while Date() < end {
                 DispatchQueue.main.async {
-                    self.progressIndicator.progress = Float(i) / Float(limit)
+                    let sliceEnd = Date().addingTimeInterval(0.02)
+                    while Date() < sliceEnd {
+                        _ = CFAbsoluteTimeGetCurrent()
+                    }
+                }
+                Thread.sleep(forTimeInterval: 0.02)
+            }
+            DispatchQueue.main.async {
+                let elapsedMs = Int(Date().timeIntervalSince(started) * 1000)
+                span.setData(value: elapsedMs, key: "duration_ms")
+                span.finish()
+            }
+        }
+    }
+
+    /// Presenter row for the File I/O on Main Thread performance issue.
+    /// The read and write stay on the main thread, then return so the spans can send.
+    /// The Disk write row stays a background handled error.
+    private func fileIOOnMainThread() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-main-thread-io.bin")
+        let parent = ShopTrace.begin(
+            operation: "file.io",
+            description: "File I/O on Main Thread",
+            bindChildToScope: false
+        )
+        parent.setData(value: "actions", key: "screen")
+        parent.setData(value: "File I/O on Main Thread", key: "action")
+        defer {
+            try? FileManager.default.removeItem(at: url)
+            parent.finish()
+        }
+
+        let chunk = Data(repeating: 0x42, count: 64 * 1024)
+        let writeSpan = parent.startChild(operation: "file.write", description: "Write file on main thread")
+        writeSpan.setData(value: "actions", key: "screen")
+        writeSpan.setData(value: url.lastPathComponent, key: "file.name")
+        let writeStarted = Date()
+        var bytesWritten = 0
+        FileManager.default.createFile(atPath: url.path, contents: nil)
+        if let handle = try? FileHandle(forWritingTo: url) {
+            let writeEnd = Date().addingTimeInterval(0.3)
+            while Date() < writeEnd {
+                do {
+                    try handle.write(contentsOf: chunk)
+                    bytesWritten += chunk.count
+                } catch {
+                    break
                 }
             }
-            let data = try! JSONSerialization.data(withJSONObject: dict)
-            DispatchQueue.main.async {
-                let span = SentrySDK.startTransaction(name: "test", operation: "json-on-main")
-                _ = try! JSONSerialization.jsonObject(with: data)
-                span.finish()
-                self.progressIndicator.isHidden = true
-            }
+            try? handle.synchronize()
+            try? handle.close()
         }
-    }
+        let writeMs = Int(Date().timeIntervalSince(writeStarted) * 1000)
+        writeSpan.setData(value: writeMs, key: "duration_ms")
+        writeSpan.setData(value: bytesWritten, key: "file.bytes")
+        writeSpan.finish()
 
-    @IBAction func regexOnMainThread(_ sender: Any) {
-        let string = try! String(contentsOf: Bundle.main.url(forResource: "mobydick", withExtension: "txt")!)
-        let regex = try! NSRegularExpression(pattern: "([Tt]he)?.*([Ww]hale)")
-        let span = SentrySDK.startTransaction(name: "test", operation: "regex-on-main")
-        regex.matches(in: string, range: NSRange(location: 0, length: string.count))
-        span.finish()
-    }
-
-    @IBAction func fileIoOnMainThread(_ sender: Any) {
-        progressIndicator.isHidden = false
-        DispatchQueue.global(qos: .utility).async {
-            let longString = String(repeating: UUID().uuidString, count: 5_000_000)
-            let data = longString.data(using: .utf8)!
-            let filePath = FileManager.default.temporaryDirectory.appendingPathComponent("tmp" + UUID().uuidString)
-            DispatchQueue.main.async {
-                let transaction = SentrySDK.startTransaction(
-                    name: "test", operation: "fileio-on-main", bindToScope: true)
-                try! data.write(to: filePath)
-                transaction.finish()
-                self.progressIndicator.isHidden = true
-                DispatchQueue.global(qos: .utility).async {
-                    try! FileManager.default.removeItem(at: filePath)
+        let readSpan = parent.startChild(operation: "file.read", description: "Read file on main thread")
+        readSpan.setData(value: "actions", key: "screen")
+        readSpan.setData(value: url.lastPathComponent, key: "file.name")
+        let readStarted = Date()
+        var bytesRead = 0
+        if let handle = try? FileHandle(forReadingFrom: url) {
+            let readEnd = Date().addingTimeInterval(0.2)
+            while Date() < readEnd {
+                let data = (try? handle.read(upToCount: chunk.count)) ?? Data()
+                if data.isEmpty {
+                    try? handle.seek(toOffset: 0)
+                } else {
+                    bytesRead += data.count
                 }
             }
+            try? handle.close()
         }
-    }
-
-    // !!!: profiling doesn't correctly collect backtraces with this (armcknight 12 Oct 2023)
-    func factorialRecursive(int x: BigInt) -> BigInt {
-        if x == 0 { return 1 }
-        return x * factorialRecursive(int: x - 1)
-    }
-
-    func factorialIterative(int x: BigInt) -> BigInt {
-        var i: BigInt = x
-        var result: BigInt = 1
-        while i > 0 {
-            result *= i
-            i -= 1
-        }
-        return result
-    }
-
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-
-    @IBAction func simulateDroppedFrame(_ sender: Any) {
-        activityIndicator.startAnimating()
-        activityIndicator.isHidden = false
-        let span = SentrySDK.startTransaction(name: "test", operation: "gpu-frame-drop")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            _ = self.factorialIterative(int: 15_000)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                span.finish()
-                self.activityIndicator.stopAnimating()
-                self.activityIndicator.isHidden = true
-            }
-        }
+        let readMs = Int(Date().timeIntervalSince(readStarted) * 1000)
+        readSpan.setData(value: readMs, key: "duration_ms")
+        readSpan.setData(value: bytesRead, key: "file.bytes")
+        readSpan.finish()
+        parent.setData(value: writeMs + readMs, key: "duration_ms")
     }
 }

@@ -1,10 +1,12 @@
 name: release.yml
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: Version to release
-        required: true
+  workflow_dispatch: {}
+  schedule:
+    # Mondays at 00:00 UTC. GitHub runs this only from the default branch.
+    - cron: "0 0 * * 1"
+
+permissions:
+  contents: write
 
 jobs:
   empower-plant-release:
@@ -12,25 +14,100 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup Sentry CLI
         uses: mathieu-bour/setup-sentry-cli@v1.3.0
         with:
-          version: 3.3.5
+          # 3.8.0 is the sentry-cli the iOS build-distribution docs install.
+          # `build upload --dsym` (3.7.0) attaches this archive's dSYMs to the IPA.
+          version: 3.8.0
           token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - name: Run Deploy Script
-        run: ./deploy_project.sh ${{ github.event.inputs.version }} ${{ secrets.SENTRY_ORG }} ${{ secrets.SENTRY_PROJECT }} ${{ secrets.SENTRY_AUTH_TOKEN }}
-        shell: sh
+
+      - name: Compute version
+        id: version
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload to Sentry Size Analysis
         run: |
-          sentry-cli build upload build/EmpowerPlant.xcarchive \
-            --org ${{ secrets.SENTRY_ORG }} \
-            --project ${{ secrets.SENTRY_PROJECT }} \
-            --build-configuration Release \
-            --head-sha ${{ github.sha }} \
-            --head-ref "${{ github.ref_name }}" \
-            --vcs-provider github \
-            --head-repo-name ${{ github.repository }}
+          set -euo pipefail
+          # YY.M.D drops leading zeros (26.10.7). YYMMDD keeps them (261007).
+          # A same-day rerun becomes 26.10.7-1 / 2610071, matching sentry_react_native.
+          BASE=$(date -u +'%-y.%-m.%-d')
+          CODE=$(date -u +'%y%m%d')
+          VERSION="$BASE"
+          VERSION_CODE="$CODE"
+          n=0
+          while gh release view "$VERSION" >/dev/null 2>&1; do
+            n=$((n + 1))
+            if [ "$n" -gt 20 ]; then
+              echo "Stopped after 20 existing releases for ${BASE}." >&2
+              exit 1
+            fi
+            VERSION="${BASE}-${n}"
+            VERSION_CODE="${CODE}${n}"
+          done
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version_code=${VERSION_CODE}" >> "$GITHUB_OUTPUT"
+          echo "marketing_version=${BASE}" >> "$GITHUB_OUTPUT"
+          echo "Release ${VERSION} (build ${VERSION_CODE}, short version ${BASE})"
+
+      - name: Run Deploy Script
+        run: ./deploy_project.sh "${{ steps.version.outputs.marketing_version }}" "${{ steps.version.outputs.version_code }}" "${{ steps.version.outputs.version }}"
+        shell: bash
+        env:
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Upload debug symbols
+        run: |
+          sentry-cli upload-dif --force-foreground --include-sources \
+            --org "$SENTRY_ORG" \
+            --project "$SENTRY_PROJECT" \
+            build/EmpowerPlant.xcarchive/dSYMs
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+
+      - name: Upload IPA for size analysis and build distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          # One `sentry-cli build upload` is what sentry-demos/flutter uses for
+          # both Size Analysis and Build Distribution. `--dsym` keeps the
+          # archive symbols on that IPA upload.
+          UPLOAD_ARGS=(
+            --org "$SENTRY_ORG"
+            --project "$SENTRY_PROJECT"
+            --build-configuration Release
+            --head-sha "$GITHUB_SHA"
+            --head-ref "$GITHUB_REF_NAME"
+            --vcs-provider github
+            --head-repo-name "$GITHUB_REPOSITORY"
+            --dsym build/EmpowerPlant.xcarchive/dSYMs
+          )
+          BASE_SHA="$(git merge-base HEAD origin/master || true)"
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "$GITHUB_SHA" ]; then
+            UPLOAD_ARGS+=(--base-sha "$BASE_SHA" --base-ref master)
+          fi
+          sentry-cli build upload build/EmpowerPlant.ipa "${UPLOAD_ARGS[@]}"
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+
+      - name: Publish the GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}"
+          BUILD_CODE="${{ steps.version.outputs.version_code }}"
+          NOTES="$(printf 'Release %s\nVersion %s (%s)\nGenerated by .github/workflows/release.yml\n' \
+            "$VERSION" "$MARKETING_VERSION" "$BUILD_CODE")"
+          gh release create "$VERSION" build/EmpowerPlant.ipa -t "$VERSION" -n "$NOTES"

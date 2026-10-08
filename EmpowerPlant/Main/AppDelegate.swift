@@ -14,7 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
 
         SentrySDK.start { options in
-            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            // wassimTestDSN: restore the wassim-test project by assigning this string to options.dsn.
+            // "https://a9e3c927433fc5a2ef7c87bd5938cb72@o4510868817379328.ingest.us.sentry.io/4512181895495680"
+            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@o87286.ingest.us.sentry.io/4508968167538688"
+
+            // Local runs set SENTRY_ENVIRONMENT so issues are easy to filter in Sentry.
+            if let sentryEnvironment = ProcessInfo.processInfo.environment["SENTRY_ENVIRONMENT"],
+                !sentryEnvironment.isEmpty
+            {
+                options.environment = sentryEnvironment
+            }
 
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
@@ -29,20 +38,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.configureProfiling = {
                 $0.sessionSampleRate = 1
                 $0.lifecycle = .trace
+                // Profiles the next cold start and attaches that profile to app.launch.
+                $0.profileAppStarts = true
             }
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
+            // These swizzle features default on, except FileManager tracing.
+            options.enableNetworkTracking = true
+            options.enableNetworkBreadcrumbs = true
+            options.enableUIViewControllerTracing = true
+            options.enableUserInteractionTracing = true
+            options.enableFileIOTracing = true
+            options.enableFileManagerSwizzling = true
+            options.enableCoreDataTracing = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
-            options.experimental.enableStandaloneAppStartTracing = true
+            // Automatic app start attaches app_start_cold to the first ui.load
+            // transaction (ShopHomeViewController). Standalone tracing would
+            // send that measurement on its own app.start transaction instead.
+            // Cocoa 9.26 moved this off options.experimental.
+            options.enableStandaloneAppStartTracing = false
 
-            // Enable AppHang configurations
-            options.appHangTimeoutInterval = 2.0
-            options.enableReportNonFullyBlockingAppHangs = true
-
-            // Enable Mobile Session Health configurations
-            options.enableUserInteractionTracing = true
+            // Sentry's app-hang watcher is off. MetricKit is the hang reporter
+            // (MXHangDiagnostic, MXCPUExceptionDiagnostic, MXDiskWriteExceptionDiagnostic).
+            options.enableAppHangTracking = false
+            options.enableMetricKit = true
 
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
@@ -61,7 +82,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ]
             options.sessionReplay.networkCaptureBodies = true
 
-            // Enable User Feedback Widget
+            // Installs the user-feedback integration. Checkout failure reveals a
+            // button that presents the form with SentrySDK.feedback.show(), with
+            // the message prefilled.
             options.configureUserFeedback = { config in
                 config.onSubmitSuccess = { data in
                     print("Feedback submitted successfully: \(data)")
@@ -92,13 +115,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return event
             }
         }
+
+        ShopFlags.register()
+
         EmpowerPlantTheme.applyNavBarAppearance()
 
         SentrySDK.configureScope { scope in
             scope.setTag(
                 value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
-            scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")
+            scope.setTag(value: ShopSession.se, key: "se")
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
+            ShopSession.apply(to: scope)
         }
 
         let logger = SentrySDK.logger
@@ -106,7 +133,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             "Sentry SDK initialized",
             attributes: [
                 "enableSwizzling": enableSwizzling,
-                "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
+                "customerType": ShopSession.customerType,
+                "email": ShopSession.email,
             ])
 
         if ProcessInfo.processInfo.arguments.contains("--wipe-db") {
@@ -175,29 +203,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         return container
     }()
-
-    // MARK: - Core Data Saving support
-
-    func saveContext() {
-        let logger = SentrySDK.logger
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            logger.debug("Attempting to save Core Data context changes")
-            do {
-                try context.save()
-                logger.info("Core Data context saved successfully")
-            } catch {
-                logger.error(
-                    "Failed to save Core Data context",
-                    attributes: [
-                        "error": error.localizedDescription
-                    ])
-                ErrorToastManager.shared.logErrorAndShowToast(
-                    error: error,
-                    message: "Failed to save context changes"
-                )
-            }
-        }
-    }
-
 }
