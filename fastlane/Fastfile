@@ -1,0 +1,104 @@
+# Weekly and manual release used by .github/workflows/release.yml.
+#
+# This repo has no Apple distribution certificate. build_ios_app exports a
+# signed IPA. This lane calls deploy_project.sh, which archives with
+# CODE_SIGNING_ALLOWED=NO and zips Payload/*.app. That script sets
+# DEVELOPER_DIR to Xcode 26.3 and unsets SDK_V10 before xcodebuild.
+#
+#   bundle exec fastlane ios release \
+#     marketing_version:26.10.7 build_code:261007 release_tag:26.10.7
+#
+# Requires SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN.
+# The workflow publishes the GitHub release with gh release create.
+
+opt_out_usage
+skip_docs
+
+ENV["FASTLANE_SKIP_UPDATE_CHECK"] ||= "true"
+ENV["FASTLANE_HIDE_CHANGELOG"] ||= "true"
+
+default_platform(:ios)
+
+def release_git(repo_root, *args)
+  require "open3"
+  stdout, status = Open3.capture2("git", "-C", repo_root, *args, err: File::NULL)
+  status.success? ? stdout.strip : ""
+end
+
+platform :ios do
+  desc "Build an unsigned Release IPA and upload symbols, size analysis, and build distribution"
+  lane :release do |options|
+    marketing_version = options[:marketing_version].to_s
+    build_code = options[:build_code].to_s
+    release_tag = options[:release_tag].to_s
+    if marketing_version.empty? || build_code.empty? || release_tag.empty?
+      UI.user_error!("Pass marketing_version, build_code, and release_tag.")
+    end
+
+    # The plugin reads SENTRY_ORG_SLUG and SENTRY_PROJECT_SLUG. This repo uses
+    # SENTRY_ORG and SENTRY_PROJECT, so pass those through. The token stays in
+    # the environment; do not hardcode it.
+    org = ENV["SENTRY_ORG"].to_s
+    project = ENV["SENTRY_PROJECT"].to_s
+    auth_token = ENV["SENTRY_AUTH_TOKEN"].to_s
+    if org.empty? || project.empty? || auth_token.empty?
+      UI.user_error!("SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN must be set.")
+    end
+    FastlaneCore::Secrets.register(auth_token, name: "sentry_auth_token")
+
+    # `sh` runs inside the fastlane directory, so the script path is absolute.
+    # The script cds to its own directory, pins Xcode 26.3, and unsets SDK_V10.
+    repo_root = File.expand_path("..", FastlaneCore::FastlaneFolder.path)
+    sh(File.join(repo_root, "deploy_project.sh"), marketing_version, build_code, release_tag)
+
+    ipa_path = File.join(repo_root, "build/EmpowerPlant.ipa")
+    dsym_path = File.join(repo_root, "build/EmpowerPlant.xcarchive/dSYMs")
+    UI.user_error!("Archive did not produce #{ipa_path}") unless File.exist?(ipa_path)
+    UI.user_error!("Archive did not produce #{dsym_path}") unless File.directory?(dsym_path)
+
+    sentry_debug_files_upload(
+      auth_token: auth_token,
+      org_slug: org,
+      project_slug: project,
+      path: dsym_path,
+      include_sources: true
+    )
+
+    # Same metadata the workflow used to pass to sentry-cli build upload.
+    # GitHub Actions sets the GITHUB_* values. A local run falls back to git.
+    head_sha = ENV["GITHUB_SHA"].to_s.strip
+    head_sha = release_git(repo_root, "rev-parse", "HEAD") if head_sha.empty?
+
+    head_ref = ENV["GITHUB_REF_NAME"].to_s.strip
+    if head_ref.empty?
+      head_ref = release_git(repo_root, "rev-parse", "--abbrev-ref", "HEAD")
+      head_ref = "" if head_ref == "HEAD"
+    end
+
+    repo_name = ENV["GITHUB_REPOSITORY"].to_s.strip
+    repo_name = "sentry-demos/ios" if repo_name.empty?
+
+    base_sha = release_git(repo_root, "merge-base", "HEAD", "origin/master")
+
+    upload = {
+      auth_token: auth_token,
+      org_slug: org,
+      project_slug: project,
+      ipa_path: ipa_path,
+      dsym_path: dsym_path,
+      build_configuration: "Release",
+      vcs_provider: "github"
+    }
+    upload[:head_sha] = head_sha unless head_sha.empty?
+    upload[:head_ref] = head_ref unless head_ref.empty?
+    upload[:head_repo_name] = repo_name unless repo_name.empty?
+    if !base_sha.empty? && base_sha != head_sha
+      upload[:base_sha] = base_sha
+      upload[:base_ref] = "master"
+    end
+
+    sentry_upload_build(upload)
+
+    UI.success("Uploaded #{release_tag}. The workflow publishes the GitHub release.")
+  end
+end

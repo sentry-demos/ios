@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-# Weekly and manual release used by .github/workflows/release.yml.
+# Unsigned Release archive for fastlane/Fastfile's release lane.
 #
 # Usage: ./deploy_project.sh <marketing-version> <build-code> <release-tag>
 # Example: ./deploy_project.sh 26.10.7 261007 26.10.7
@@ -13,7 +13,7 @@ set -eo pipefail
 #
 # Requires SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN.
 # Builds one unsigned Release archive and packages EmpowerPlant.ipa from it.
-# The workflow uploads that archive's dSYMs and the IPA, then publishes the IPA.
+# The lane uploads that archive's dSYMs and the IPA. The workflow publishes the IPA.
 
 error_exit() {
     echo "$1" >&2
@@ -41,6 +41,8 @@ esac
 if [ -z "${SENTRY_ORG}" ] || [ -z "${SENTRY_PROJECT}" ] || [ -z "${SENTRY_AUTH_TOKEN}" ]; then
     error_exit "SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN must be set."
 fi
+
+cd "$(dirname "$0")"
 
 INFO_PLIST="EmpowerPlant/Resources/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $MARKETING_VERSION" "$INFO_PLIST"
