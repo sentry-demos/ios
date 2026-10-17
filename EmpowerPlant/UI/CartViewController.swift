@@ -131,7 +131,22 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc
     func purchase(onFailure: (@MainActor () -> Void)? = nil) {
-        let checkoutSpan = beginCheckoutSpan()
+        let itemCount = ShoppingCart.instance.items.count
+        let total = ShoppingCart.instance.total
+        let checkoutSpan: Span
+        if let parent = SentrySDK.span {
+            checkoutSpan = parent.startChild(operation: "checkout", description: "checkout")
+            SentrySDK.configureScope { scope in
+                scope.span = checkoutSpan
+            }
+        } else {
+            checkoutSpan = SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
+        }
+        checkoutSpan.setData(value: "checkout", key: "shop.action")
+        checkoutSpan.setData(value: itemCount, key: "cart.item_count")
+        checkoutSpan.setData(value: total, key: "cart.total")
+        checkoutSpan.setData(value: "https://flask.empower-plant.com/checkout", key: "endpoint")
+        checkoutSpan.setTag(value: "checkout", key: "shop.action")
         let logger = SentrySDK.logger
         let cartItems = ShoppingCart.instance.items
         let plantTitles = cartItems.compactMap(\.title).joined(separator: ", ")
@@ -263,19 +278,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 "durationMs": 500,
             ])
         span.finish()
-    }
-
-    /// Keeps purchase logs, checkout metrics, and the Flask request on one trace.
-    private func beginCheckoutSpan() -> Span {
-        let itemCount = ShoppingCart.instance.items.count
-        let total = ShoppingCart.instance.total
-        let span = ShopTrace.begin(operation: "checkout", description: "checkout", bindChildToScope: true)
-        span.setData(value: "checkout", key: "shop.action")
-        span.setData(value: itemCount, key: "cart.item_count")
-        span.setData(value: total, key: "cart.total")
-        span.setData(value: "https://flask.empower-plant.com/checkout", key: "endpoint")
-        span.setTag(value: "checkout", key: "shop.action")
-        return span
     }
 
     /// Application metrics. CPU, heap, frames, and energy stay on the profiler payload.

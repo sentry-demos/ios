@@ -78,7 +78,15 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     private func loadCatalog() {
-        let span = ShopTrace.begin(operation: "catalog.load", description: "Load plant catalog", bindChildToScope: true)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "catalog.load", description: "Load plant catalog")
+            SentrySDK.configureScope { scope in
+                scope.span = span
+            }
+        } else {
+            span = SentrySDK.startTransaction(name: "Load plant catalog", operation: "catalog.load", bindToScope: true)
+        }
         span.setData(value: "product_list", key: "screen")
         span.setData(value: Self.productsEndpoint, key: "endpoint")
         catalogSpan = span
@@ -375,7 +383,12 @@ extension EmpowerPlantViewController: UITableViewDataSource {
         let title = product.title ?? "unknown"
         let plantId = product.productId ?? "unknown"
         let price = Int(product.price ?? "") ?? 0
-        let span = ShopTrace.begin(operation: "cart.add", description: "Add plant to cart", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "cart.add", description: "Add plant to cart")
+        } else {
+            span = SentrySDK.startTransaction(name: "Add plant to cart", operation: "cart.add", bindToScope: true)
+        }
         span.setData(value: title, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
         span.setData(value: price, key: "plant.price")

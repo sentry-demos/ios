@@ -66,7 +66,12 @@ public func checkRelease(screen: String) {
                 "version": versionString,
                 "delaySeconds": 1,
             ])
-        let span = ShopTrace.begin(operation: "release.wait", description: "Version check wait", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "release.wait", description: "Version check wait")
+        } else {
+            span = SentrySDK.startTransaction(name: "Version check wait", operation: "release.wait", bindToScope: true)
+        }
         span.setData(value: 1000, key: "duration_ms")
         span.setData(value: screen, key: "screen")
         span.setData(value: versionString, key: "app.version")

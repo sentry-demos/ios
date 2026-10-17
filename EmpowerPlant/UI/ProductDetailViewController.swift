@@ -125,7 +125,12 @@ final class ProductDetailViewController: UIViewController {
     }
 
     private func recordProductView() {
-        let span = ShopTrace.begin(operation: "product.detail", description: "View plant", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "product.detail", description: "View plant")
+        } else {
+            span = SentrySDK.startTransaction(name: "View plant", operation: "product.detail", bindToScope: true)
+        }
         span.setData(value: "product_detail", key: "screen")
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
@@ -197,7 +202,12 @@ final class ProductDetailViewController: UIViewController {
 
     @objc private func addToCart() {
         ShopClick.play()
-        let span = ShopTrace.begin(operation: "cart.add", description: "Add plant to cart", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "cart.add", description: "Add plant to cart")
+        } else {
+            span = SentrySDK.startTransaction(name: "Add plant to cart", operation: "cart.add", bindToScope: true)
+        }
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
         span.setData(value: plantPrice, key: "plant.price")
@@ -231,7 +241,19 @@ final class ProductDetailViewController: UIViewController {
     /// Slow UI moment: blocks the main thread for 3 seconds.
     @objc private func waterPlant() {
         ShopClick.play()
-        let span = ShopTrace.begin(operation: "watering.schedule", description: "Calculate watering schedule", bindChildToScope: true)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "watering.schedule", description: "Calculate watering schedule")
+            SentrySDK.configureScope { scope in
+                scope.span = span
+            }
+        } else {
+            span = SentrySDK.startTransaction(
+                name: "Calculate watering schedule",
+                operation: "watering.schedule",
+                bindToScope: true
+            )
+        }
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
         span.setData(value: 3000, key: "duration_ms")
@@ -261,7 +283,15 @@ final class ProductDetailViewController: UIViewController {
     /// Native crash from a plant-care action. `SentrySDK.crash()` does not return.
     @objc private func repotPlant() {
         ShopClick.play()
-        let span = ShopTrace.begin(operation: "nursery.repot", description: "Repot plant", bindChildToScope: true)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "nursery.repot", description: "Repot plant")
+            SentrySDK.configureScope { scope in
+                scope.span = span
+            }
+        } else {
+            span = SentrySDK.startTransaction(name: "Repot plant", operation: "nursery.repot", bindToScope: true)
+        }
         span.setData(value: plantTitle, key: "plant.title")
         span.setData(value: plantId, key: "plant.id")
         span.setData(value: plantPrice, key: "plant.price")

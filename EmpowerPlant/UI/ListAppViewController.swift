@@ -147,7 +147,12 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.capture(error: error) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "DiskWriteException (!)", reason: reason)
         }
-        let span = ShopTrace.begin(operation: "file.write", description: "Disk write", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "file.write", description: "Disk write")
+        } else {
+            span = SentrySDK.startTransaction(name: "Disk write", operation: "file.write", bindToScope: true)
+        }
         span.setData(value: 8000, key: "duration_ms")
         span.setData(value: "actions", key: "screen")
         workQueue.async {
@@ -216,7 +221,12 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// stall is not reported as an App Hang. MetricKit is the hang reporter.
     /// The span still records the block.
     private func anrFullyBlocking() {
-        let span = ShopTrace.begin(operation: "app.hang", description: "Block main thread", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "app.hang", description: "Block main thread")
+        } else {
+            span = SentrySDK.startTransaction(name: "Block main thread", operation: "app.hang", bindToScope: true)
+        }
         span.setData(value: 5000, key: "duration_ms")
         span.setData(value: "actions", key: "screen")
         let end = Date().addingTimeInterval(5)
@@ -231,7 +241,12 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// Fills the main run loop with short blocks for 5 seconds.
     /// The span finishes on the main queue after those blocks drain.
     private func anrFillingRunLoop() {
-        let span = ShopTrace.begin(operation: "app.hang", description: "Fill the run loop", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "app.hang", description: "Fill the run loop")
+        } else {
+            span = SentrySDK.startTransaction(name: "Fill the run loop", operation: "app.hang", bindToScope: true)
+        }
         span.setData(value: "actions", key: "screen")
         let started = Date()
         let fillDuration: TimeInterval = 5
@@ -259,11 +274,16 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// The Disk write row stays a background handled error.
     private func fileIOOnMainThread() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-main-thread-io.bin")
-        let parent = ShopTrace.begin(
-            operation: "file.io",
-            description: "File I/O on Main Thread",
-            bindChildToScope: false
-        )
+        let parent: Span
+        if let activeSpan = SentrySDK.span {
+            parent = activeSpan.startChild(operation: "file.io", description: "File I/O on Main Thread")
+        } else {
+            parent = SentrySDK.startTransaction(
+                name: "File I/O on Main Thread",
+                operation: "file.io",
+                bindToScope: true
+            )
+        }
         parent.setData(value: "actions", key: "screen")
         parent.setData(value: "File I/O on Main Thread", key: "action")
         defer {

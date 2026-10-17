@@ -163,7 +163,12 @@ final class CheckoutViewController: UIViewController {
                 "action": "promo_apply",
             ])
 
-        let span = ShopTrace.begin(operation: "promo.apply", description: "Apply promo code", bindChildToScope: false)
+        let span: Span
+        if let parent = SentrySDK.span {
+            span = parent.startChild(operation: "promo.apply", description: "Apply promo code")
+        } else {
+            span = SentrySDK.startTransaction(name: "Apply promo code", operation: "promo.apply", bindToScope: true)
+        }
         span.setData(value: 750, key: "duration_ms")
         span.setData(value: "checkout", key: "screen")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
