@@ -1,4 +1,5 @@
 import Foundation
+import SentrySwift
 import SwiftMessages
 import UIKit
 
@@ -52,7 +53,13 @@ class ErrorToastManager {
         view.buttonTapHandler = { _ in
             SwiftMessages.hide()
             Task { @MainActor in
-                ShopFeedback.presentCheckoutForm()
+                SentrySDK.feedback.show { config in
+                    config.configureForm = { form in
+                        form.showName = false
+                        form.showEmail = false
+                    }
+                }
+                ShopFeedback.prefillCheckoutMessage()
             }
         }
         ShopPrivacy.unmask(view)

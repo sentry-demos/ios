@@ -1,20 +1,13 @@
-import SentrySwift
 import UIKit
 
-/// Checkout failure opens Sentry's form with only the message filled in.
+/// Prefills the checkout feedback message after the form is on screen.
 /// The managed form has no prefill API, so the text view is set after presentation.
 @MainActor
 enum ShopFeedback {
-    static let checkoutMessage = "It's broken again! Please fix it."
+    private static let checkoutMessage = "It's broken again! Please fix it."
     private static let messageIdentifier = "io.sentry.feedback.form.message"
 
-    static func presentCheckoutForm() {
-        SentrySDK.feedback.show { config in
-            config.configureForm = { form in
-                form.showName = false
-                form.showEmail = false
-            }
-        }
+    static func prefillCheckoutMessage() {
         fillMessage(attempt: 0)
     }
 

@@ -195,7 +195,13 @@ final class CheckoutViewController: UIViewController {
 
     @objc private func showCheckoutFeedback() {
         ShopClick.play()
-        ShopFeedback.presentCheckoutForm()
+        SentrySDK.feedback.show { config in
+            config.configureForm = { form in
+                form.showName = false
+                form.showEmail = false
+            }
+        }
+        ShopFeedback.prefillCheckoutMessage()
     }
 
     private func layoutFeedbackCorner() {

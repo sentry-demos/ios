@@ -1,33 +1,29 @@
 import Foundation
 
-/// Handled failures for the Other issues screen. Each domain is its own Sentry issue.
-enum DemoFailure {
-    static func make() -> NSError {
-        let options: [(domain: String, code: Int, message: String)] = [
-            (
-                "CatalogLoadError",
-                1001,
-                "Catalog request failed: the product service returned no prices"
-            ),
-            (
-                "CheckoutReservationError",
-                1002,
-                "Checkout failed: inventory could not be reserved for this order"
-            ),
-            (
-                "PaymentAuthorizationError",
-                1003,
-                "Payment failed: the card authorization was declined"
-            ),
+/// Handled failures for the Other issues Error button.
+/// One case per failure, captured as a Swift error.
+enum DemoFailure: Error, LocalizedError {
+    case catalogRequestFailed
+    case checkoutReservationFailed
+    case paymentAuthorizationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .catalogRequestFailed:
+            return "Catalog request failed: the product service returned no prices"
+        case .checkoutReservationFailed:
+            return "Checkout failed: inventory could not be reserved for this order"
+        case .paymentAuthorizationFailed:
+            return "Payment failed: the card authorization was declined"
+        }
+    }
+
+    static func random() -> DemoFailure {
+        let cases: [DemoFailure] = [
+            .catalogRequestFailed,
+            .checkoutReservationFailed,
+            .paymentAuthorizationFailed,
         ]
-        let choice = options.randomElement()!
-        return NSError(
-            domain: choice.domain,
-            code: choice.code,
-            userInfo: [
-                NSLocalizedDescriptionKey: choice.message,
-                NSDebugDescriptionErrorKey: choice.message,
-            ]
-        )
+        return cases.randomElement()!
     }
 }
