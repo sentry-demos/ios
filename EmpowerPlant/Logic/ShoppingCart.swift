@@ -13,6 +13,24 @@ class ShoppingCart {
     var total = 0
     var quantities = Quantities()
 
+    // Each read returns a new stream so the plant list and the cart screen can listen together.
+    private static let updateLock = NSLock()
+    private static var updateContinuations: [UUID: AsyncStream<Void>.Continuation] = [:]
+
+    static var updates: AsyncStream<Void> {
+        AsyncStream { continuation in
+            let id = UUID()
+            updateLock.lock()
+            updateContinuations[id] = continuation
+            updateLock.unlock()
+            continuation.onTermination = { _ in
+                updateLock.lock()
+                updateContinuations.removeValue(forKey: id)
+                updateLock.unlock()
+            }
+        }
+    }
+
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
         let logger = SentrySDK.logger
@@ -67,7 +85,16 @@ class ShoppingCart {
                 "newTotal": self.instance.total,
                 "cartItemCount": self.instance.items.count,
             ])
-        NotificationCenter.default.post(name: .shoppingCartDidChange, object: nil)
+        Self.publishUpdate()
+    }
+
+    private static func publishUpdate() {
+        updateLock.lock()
+        let continuations = Array(updateContinuations.values)
+        updateLock.unlock()
+        for continuation in continuations {
+            continuation.yield(())
+        }
     }
 
     static func updateTotal(product: Product) {
@@ -116,8 +143,4 @@ class Quantities: NSObject {
             _plantNodes = newVal
         }
     }
-}
-
-extension Notification.Name {
-    static let shoppingCartDidChange = Notification.Name("EmpowerPlant.shoppingCartDidChange")
 }

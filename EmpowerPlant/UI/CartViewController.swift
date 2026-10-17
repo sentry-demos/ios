@@ -26,6 +26,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return v
     }()
 
+    private var cartUpdates: Task<Void, Never>?
+
     private let totalLabel: UILabel = {
         let l = UILabel()
         l.font = .systemFont(ofSize: 20, weight: .bold)
@@ -86,6 +88,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         totalLabel.sentryReplayUnmask()
 
         configureNavigationItems()
+        observeCartUpdates()
         checkRelease(screen: "cart")
         SentrySDK.reportFullyDisplayed()
     }
@@ -113,6 +116,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        refreshCart()
+    }
+
+    deinit {
+        cartUpdates?.cancel()
+    }
+
+    private func observeCartUpdates() {
+        let updates = ShoppingCart.updates
+        cartUpdates = Task { @MainActor [weak self] in
+            for await _ in updates {
+                self?.refreshCart()
+            }
+        }
+    }
+
+    private func refreshCart() {
         totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
         tableView.reloadData()
     }

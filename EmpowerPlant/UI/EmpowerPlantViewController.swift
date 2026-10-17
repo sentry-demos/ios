@@ -17,6 +17,7 @@ class EmpowerPlantViewController: UIViewController {
     var products = [Product]()
     private var catalogSpan: Span?
     private let cartButton = CartBadgeButton()
+    private var cartUpdates: Task<Void, Never>?
     private static let productsEndpoint = "https://flask.empower-plant.com/products"
 
     override func viewDidLoad() {
@@ -35,12 +36,7 @@ class EmpowerPlantViewController: UIViewController {
         ])
 
         configureNavigationItems()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(refreshCartBadge),
-            name: .shoppingCartDidChange,
-            object: nil
-        )
+        observeCartUpdates()
         loadCatalog()
         checkRelease(screen: "product_list")
     }
@@ -60,6 +56,10 @@ class EmpowerPlantViewController: UIViewController {
         ShopPrivacy.unmaskNavigationButtons(of: self)
     }
 
+    deinit {
+        cartUpdates?.cancel()
+    }
+
     private func configureNavigationItems() {
         cartButton.onTap = { [weak self] in
             ShopClick.play()
@@ -73,7 +73,16 @@ class EmpowerPlantViewController: UIViewController {
         refreshCartBadge()
     }
 
-    @objc private func refreshCartBadge() {
+    private func observeCartUpdates() {
+        let updates = ShoppingCart.updates
+        cartUpdates = Task { @MainActor [weak self] in
+            for await _ in updates {
+                self?.refreshCartBadge()
+            }
+        }
+    }
+
+    private func refreshCartBadge() {
         cartButton.setCount(ShoppingCart.instance.items.count)
     }
 
