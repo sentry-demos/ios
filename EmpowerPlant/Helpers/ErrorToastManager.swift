@@ -1,5 +1,4 @@
 import Foundation
-import SentrySwift
 import SwiftMessages
 import UIKit
 
@@ -7,37 +6,6 @@ class ErrorToastManager {
     static let shared = ErrorToastManager()
 
     private init() {}
-
-    /// Logs an error to Sentry and shows a toast message to the user
-    /// - Parameters:
-    ///   - error: The error to log
-    ///   - message: Optional custom message to display in toast (defaults to error description)
-    ///   - scopeCallback: Optional callback to configure Sentry scope
-    ///   - showFeedbackOption: Whether to show a User Feedback option in the toast
-    func logErrorAndShowToast(
-        error: Error,
-        message: String? = nil,
-        scopeCallback: ((Scope) -> Void)? = nil,
-        showFeedbackOption: Bool = false
-    ) {
-        print("[EmpowerPlant] [Error]: \(error)")
-
-        if let scopeCallback = scopeCallback {
-            SentrySDK.capture(error: error, block: scopeCallback)
-        } else {
-            SentrySDK.capture(error: error)
-        }
-
-        // Show toast on main thread
-        let displayMessage = message ?? error.localizedDescription
-        Task { @MainActor in
-            if showFeedbackOption {
-                self.showErrorToastWithFeedback(message: displayMessage)
-            } else {
-                self.showErrorToast(message: displayMessage)
-            }
-        }
-    }
 
     /// Shows an error toast message
     /// - Parameter message: The message to display

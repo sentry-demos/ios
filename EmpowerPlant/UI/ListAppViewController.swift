@@ -81,9 +81,10 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     private func captureError() {
         let error = DemoFailure.make()
         let reason = error.localizedDescription
-        ErrorToastManager.shared.logErrorAndShowToast(error: error, message: reason) { [weak self] scope in
+        SentrySDK.capture(error: error) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Error", reason: reason)
         }
+        ErrorToastManager.shared.showErrorToast(message: reason)
     }
 
     private func captureNSException() {

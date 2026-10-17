@@ -202,24 +202,24 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                             "itemCount": ShoppingCart.instance.items.count,
                             "endpoint": "https://flask.empower-plant.com/checkout",
                         ])
-                    ErrorToastManager.shared.logErrorAndShowToast(
-                        error: PurchaseError.insufficientInventory,
-                        message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                        scopeCallback: { scope in
-                            scope.setTag(value: "checkout", key: "shop.action")
-                            scope.setContext(
-                                value: [
-                                    "cart_total": ShoppingCart.instance.total,
-                                    "item_count": ShoppingCart.instance.items.count,
-                                    "status_code": 500,
-                                    "endpoint": "https://flask.empower-plant.com/checkout",
-                                    "failure": "insufficient_inventory",
-                                ],
-                                key: "checkout"
-                            )
-                        },
-                        showFeedbackOption: true
-                    )
+                    SentrySDK.capture(error: PurchaseError.insufficientInventory) { scope in
+                        scope.setTag(value: "checkout", key: "shop.action")
+                        scope.setContext(
+                            value: [
+                                "cart_total": ShoppingCart.instance.total,
+                                "item_count": ShoppingCart.instance.items.count,
+                                "status_code": 500,
+                                "endpoint": "https://flask.empower-plant.com/checkout",
+                                "failure": "insufficient_inventory",
+                            ],
+                            key: "checkout"
+                        )
+                    }
+                    Task { @MainActor in
+                        ErrorToastManager.shared.showErrorToastWithFeedback(
+                            message: "Purchase failed: Insufficient inventory available (HTTP 500)"
+                        )
+                    }
                     if let onFailure {
                         Task { @MainActor in
                             onFailure()

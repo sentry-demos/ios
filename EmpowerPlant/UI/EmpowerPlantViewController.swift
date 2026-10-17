@@ -181,10 +181,8 @@ class EmpowerPlantViewController: UIViewController {
         } catch {
             span.setData(value: error.localizedDescription, key: "error")
             span.finish(status: .internalError)
-            ErrorToastManager.shared.logErrorAndShowToast(
-                error: error,
-                message: "Failed to fetch products from database"
-            )
+            SentrySDK.capture(error: error)
+            ErrorToastManager.shared.showErrorToast(message: "Failed to fetch products from database")
         }
     }
 
@@ -227,10 +225,8 @@ class EmpowerPlantViewController: UIViewController {
                             "error": failureMessage,
                         ])
                     if let fetchError {
-                        ErrorToastManager.shared.logErrorAndShowToast(
-                            error: fetchError,
-                            message: "Failed to fetch products from server"
-                        )
+                        SentrySDK.capture(error: fetchError)
+                        ErrorToastManager.shared.showErrorToast(message: "Failed to fetch products from server")
                     } else {
                         ErrorToastManager.shared.showErrorToast(message: failureMessage)
                     }
@@ -285,10 +281,12 @@ class EmpowerPlantViewController: UIViewController {
                 persistSpan.finish(status: .internalError)
                 catalogSpan.finish(status: .internalError)
                 self.catalogSpan = nil
-                ErrorToastManager.shared.logErrorAndShowToast(
-                    error: error,
-                    message: "Failed to save products from server to database"
-                )
+                SentrySDK.capture(error: error)
+                Task { @MainActor in
+                    ErrorToastManager.shared.showErrorToast(
+                        message: "Failed to save products from server to database"
+                    )
+                }
             }
         }
         for product in productsResponse {

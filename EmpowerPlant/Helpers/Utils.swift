@@ -17,10 +17,10 @@ public func wipeDB() {
     else {
         logger.error("Failed to locate database file for wiping")
 
-        ErrorToastManager.shared.logErrorAndShowToast(
-            error: DBError.noPersistentStore,
-            message: "Failed to locate database file for wiping"
-        )
+        SentrySDK.capture(error: DBError.noPersistentStore)
+        Task { @MainActor in
+            ErrorToastManager.shared.showErrorToast(message: "Failed to locate database file for wiping")
+        }
         return
     }
 
@@ -38,10 +38,10 @@ public func wipeDB() {
                 "error": error.localizedDescription,
                 "databasePath": url.absoluteString,
             ])
-        ErrorToastManager.shared.logErrorAndShowToast(
-            error: error,
-            message: "Failed to wipe database file"
-        )
+        SentrySDK.capture(error: error)
+        Task { @MainActor in
+            ErrorToastManager.shared.showErrorToast(message: "Failed to wipe database file")
+        }
         return
     }
 }
