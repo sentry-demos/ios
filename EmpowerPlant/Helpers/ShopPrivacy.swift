@@ -2,12 +2,6 @@ import SentrySwift
 import UIKit
 
 enum ShopPrivacy {
-    /// `sentryReplayUnmask` is the per-view flag used by both Session Replay
-    /// and error screenshots (`attachScreenshot`).
-    static func unmask(_ view: UIView) {
-        view.sentryReplayUnmask()
-    }
-
     /// Unmasks bar buttons, including the cart, Purchase, and back controls.
     /// The navigation title stays masked. On newer iOS it is a `UIControl`.
     static func unmaskNavigationButtons(of viewController: UIViewController) {
@@ -20,7 +14,7 @@ enum ShopPrivacy {
         let barItems = (item.leftBarButtonItems ?? []) + (item.rightBarButtonItems ?? [])
         for barItem in barItems {
             if let customView = barItem.customView {
-                unmask(customView)
+                customView.sentryReplayUnmask()
             }
         }
     }

@@ -83,7 +83,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ])
 
         totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
-        ShopPrivacy.unmask(totalLabel)
+        totalLabel.sentryReplayUnmask()
 
         configureNavigationItems()
         checkRelease(screen: "cart")
@@ -101,7 +101,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         checkoutButton.addTarget(self, action: #selector(openCheckout), for: .touchUpInside)
         checkoutButton.accessibilityIdentifier = "Checkout"
-        ShopPrivacy.unmask(checkoutButton)
+        checkoutButton.sentryReplayUnmask()
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: checkoutButton)
     }
@@ -120,13 +120,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ShopPrivacy.unmaskNavigationButtons(of: self)
-        ShopPrivacy.unmask(totalLabel)
+        totalLabel.sentryReplayUnmask()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         ShopPrivacy.unmaskNavigationButtons(of: self)
-        ShopPrivacy.unmask(totalLabel)
+        totalLabel.sentryReplayUnmask()
     }
 
     @objc

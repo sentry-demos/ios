@@ -62,7 +62,7 @@ class ErrorToastManager {
                 ShopFeedback.prefillCheckoutMessage()
             }
         }
-        ShopPrivacy.unmask(view)
+        view.sentryReplayUnmask()
 
         // Configure presentation style. No dim, so the feedback form stays usable.
         var config = SwiftMessages.defaultConfig

@@ -1,3 +1,4 @@
+import SentrySwift
 import UIKit
 
 /// Small cart glyph with a compact red count on the icon's corner.
@@ -44,8 +45,8 @@ final class CartBadgeButton: UIView {
             badge.heightAnchor.constraint(equalToConstant: 12),
             badge.widthAnchor.constraint(greaterThanOrEqualToConstant: 12),
         ])
-        ShopPrivacy.unmask(button)
-        ShopPrivacy.unmask(badge)
+        button.sentryReplayUnmask()
+        badge.sentryReplayUnmask()
     }
 
     required init?(coder: NSCoder) {

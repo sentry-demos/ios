@@ -85,8 +85,8 @@ final class CheckoutViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         ShopPrivacy.unmaskNavigationButtons(of: self)
-        ShopPrivacy.unmask(promoError)
-        ShopPrivacy.unmask(feedbackCorner)
+        promoError.sentryReplayUnmask()
+        feedbackCorner.sentryReplayUnmask()
     }
 
     override func viewDidLayoutSubviews() {
@@ -217,7 +217,7 @@ final class CheckoutViewController: UIViewController {
             feedbackCorner.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             feedbackCorner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
-        ShopPrivacy.unmask(feedbackCorner)
+        feedbackCorner.sentryReplayUnmask()
     }
 
     private func revealFeedbackCorner() {
@@ -258,7 +258,7 @@ final class CheckoutViewController: UIViewController {
         button.addTarget(self, action: #selector(pressDown(_:)), for: .touchDown)
         button.addTarget(self, action: #selector(pressUp(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
         button.addTarget(self, action: action, for: .touchUpInside)
-        ShopPrivacy.unmask(button)
+        button.sentryReplayUnmask()
         return button
     }
 
