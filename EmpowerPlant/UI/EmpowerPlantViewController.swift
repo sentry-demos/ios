@@ -43,7 +43,7 @@ class EmpowerPlantViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
         SentrySDK.configureScope { scope in
             scope.setTag(value: "product_list", key: "screen")
         }
@@ -53,7 +53,42 @@ class EmpowerPlantViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
+    }
+
+    /// Cart and the system back control. The navigation title stays masked.
+    private func unmaskNavigationButtons() {
+        cartButton.sentryReplayUnmask()
+        let screenTitle = navigationItem.title ?? title
+        if let navigationBar = navigationController?.navigationBar {
+            unmaskBarControls(in: navigationBar, screenTitle: screenTitle)
+        }
+        let barItems = (navigationItem.leftBarButtonItems ?? []) + (navigationItem.rightBarButtonItems ?? [])
+        for barItem in barItems {
+            barItem.customView?.sentryReplayUnmask()
+        }
+    }
+
+    private func unmaskBarControls(in view: UIView, screenTitle: String?) {
+        if view is UIControl, !containsScreenTitle(view, screenTitle: screenTitle) {
+            view.sentryReplayUnmask()
+        }
+        for subview in view.subviews {
+            unmaskBarControls(in: subview, screenTitle: screenTitle)
+        }
+    }
+
+    /// True for the navigation title control and any ancestor that contains it.
+    private func containsScreenTitle(_ view: UIView, screenTitle: String?) -> Bool {
+        let className = NSStringFromClass(type(of: view))
+        if className.contains("TitleControl") || className.contains("NavigationBarTitle") {
+            return true
+        }
+        guard let screenTitle, !screenTitle.isEmpty else { return false }
+        if let label = view as? UILabel, label.text == screenTitle {
+            return true
+        }
+        return view.subviews.contains { containsScreenTitle($0, screenTitle: screenTitle) }
     }
 
     deinit {
@@ -100,11 +135,12 @@ class EmpowerPlantViewController: UIViewController {
         span.setData(value: Self.productsEndpoint, key: "endpoint")
         catalogSpan = span
 
-        ShopBreadcrumb.record(
-            message: "Catalog load started",
-            category: "shop.catalog",
-            screen: "product_list"
-        )
+        let crumb = Breadcrumb(level: .info, category: "shop.catalog")
+        crumb.message = "Catalog load started"
+        crumb.setData(value: "product_list", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.info(
             "Fetching products from server",
             attributes: [
@@ -405,14 +441,15 @@ extension EmpowerPlantViewController: UITableViewDataSource {
         let cartSize = ShoppingCart.instance.items.count
         span.setData(value: cartSize, key: "cart.item_count")
         span.setData(value: ShoppingCart.instance.total, key: "cart.total")
-        ShopBreadcrumb.record(
-            message: "Added plant to cart",
-            category: "shop.cart",
-            screen: "product_list",
-            plantTitle: title,
-            plantId: plantId,
-            plantPrice: price
-        )
+        let crumb = Breadcrumb(level: .info, category: "shop.cart")
+        crumb.message = "Added plant to cart"
+        crumb.setData(value: "product_list", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        crumb.setData(value: title, key: "plant_title")
+        crumb.setData(value: plantId, key: "plant_id")
+        crumb.setData(value: price, key: "plant_price")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.info(
             "Product added to cart",
             attributes: [

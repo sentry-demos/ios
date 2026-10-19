@@ -139,14 +139,48 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
         totalLabel.sentryReplayUnmask()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
         totalLabel.sentryReplayUnmask()
+    }
+
+    /// Checkout and the system back control. The navigation title stays masked.
+    private func unmaskNavigationButtons() {
+        let screenTitle = navigationItem.title ?? title
+        if let navigationBar = navigationController?.navigationBar {
+            unmaskBarControls(in: navigationBar, screenTitle: screenTitle)
+        }
+        let barItems = (navigationItem.leftBarButtonItems ?? []) + (navigationItem.rightBarButtonItems ?? [])
+        for barItem in barItems {
+            barItem.customView?.sentryReplayUnmask()
+        }
+    }
+
+    private func unmaskBarControls(in view: UIView, screenTitle: String?) {
+        if view is UIControl, !containsScreenTitle(view, screenTitle: screenTitle) {
+            view.sentryReplayUnmask()
+        }
+        for subview in view.subviews {
+            unmaskBarControls(in: subview, screenTitle: screenTitle)
+        }
+    }
+
+    /// True for the navigation title control and any ancestor that contains it.
+    private func containsScreenTitle(_ view: UIView, screenTitle: String?) -> Bool {
+        let className = NSStringFromClass(type(of: view))
+        if className.contains("TitleControl") || className.contains("NavigationBarTitle") {
+            return true
+        }
+        guard let screenTitle, !screenTitle.isEmpty else { return false }
+        if let label = view as? UILabel, label.text == screenTitle {
+            return true
+        }
+        return view.subviews.contains { containsScreenTitle($0, screenTitle: screenTitle) }
     }
 
     @objc
@@ -171,14 +205,21 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cartItems = ShoppingCart.instance.items
         let plantTitles = cartItems.compactMap(\.title).joined(separator: ", ")
         let plantIds = cartItems.compactMap(\.productId).joined(separator: ", ")
-        ShopBreadcrumb.record(
-            message: "Purchase started",
-            category: "shop.checkout",
-            screen: "cart",
-            plantTitle: plantTitles.isEmpty ? nil : plantTitles,
-            plantId: plantIds.isEmpty ? nil : plantIds,
-            plantPrice: cartItems.count == 1 ? Int(cartItems[0].price ?? "") : nil
-        )
+        let crumb = Breadcrumb(level: .info, category: "shop.checkout")
+        crumb.message = "Purchase started"
+        crumb.setData(value: "cart", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        if !plantTitles.isEmpty {
+            crumb.setData(value: plantTitles, key: "plant_title")
+        }
+        if !plantIds.isEmpty {
+            crumb.setData(value: plantIds, key: "plant_id")
+        }
+        if cartItems.count == 1, let price = Int(cartItems[0].price ?? "") {
+            crumb.setData(value: price, key: "plant_price")
+        }
+        SentrySDK.addBreadcrumb(crumb)
         logger.info(
             "Purchase initiated",
             attributes: [

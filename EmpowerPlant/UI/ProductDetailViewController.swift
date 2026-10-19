@@ -52,14 +52,48 @@ final class ProductDetailViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
         recordProductView()
         SentrySDK.reportFullyDisplayed()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
+    }
+
+    /// The system back control. The navigation title stays masked.
+    private func unmaskNavigationButtons() {
+        let screenTitle = navigationItem.title ?? title
+        if let navigationBar = navigationController?.navigationBar {
+            unmaskBarControls(in: navigationBar, screenTitle: screenTitle)
+        }
+        let barItems = (navigationItem.leftBarButtonItems ?? []) + (navigationItem.rightBarButtonItems ?? [])
+        for barItem in barItems {
+            barItem.customView?.sentryReplayUnmask()
+        }
+    }
+
+    private func unmaskBarControls(in view: UIView, screenTitle: String?) {
+        if view is UIControl, !containsScreenTitle(view, screenTitle: screenTitle) {
+            view.sentryReplayUnmask()
+        }
+        for subview in view.subviews {
+            unmaskBarControls(in: subview, screenTitle: screenTitle)
+        }
+    }
+
+    /// True for the navigation title control and any ancestor that contains it.
+    private func containsScreenTitle(_ view: UIView, screenTitle: String?) -> Bool {
+        let className = NSStringFromClass(type(of: view))
+        if className.contains("TitleControl") || className.contains("NavigationBarTitle") {
+            return true
+        }
+        guard let screenTitle, !screenTitle.isEmpty else { return false }
+        if let label = view as? UILabel, label.text == screenTitle {
+            return true
+        }
+        return view.subviews.contains { containsScreenTitle($0, screenTitle: screenTitle) }
     }
 
     private func layoutStorefront() {
@@ -140,14 +174,15 @@ final class ProductDetailViewController: UIViewController {
             scope.setExtra(value: self.plantTitle, key: "plant.title")
             scope.setExtra(value: self.plantPrice, key: "plant.price")
         }
-        ShopBreadcrumb.record(
-            message: "Opened plant detail",
-            category: "shop.product",
-            screen: "product_detail",
-            plantTitle: plantTitle,
-            plantId: plantId,
-            plantPrice: plantPrice
-        )
+        let crumb = Breadcrumb(level: .info, category: "shop.product")
+        crumb.message = "Opened plant detail"
+        crumb.setData(value: "product_detail", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        crumb.setData(value: plantTitle, key: "plant_title")
+        crumb.setData(value: plantId, key: "plant_id")
+        crumb.setData(value: plantPrice, key: "plant_price")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.info(
             "Product detail viewed",
             attributes: [
@@ -215,14 +250,15 @@ final class ProductDetailViewController: UIViewController {
         let cartSize = ShoppingCart.instance.items.count
         span.setData(value: cartSize, key: "cart.item_count")
         span.setData(value: ShoppingCart.instance.total, key: "cart.total")
-        ShopBreadcrumb.record(
-            message: "Added plant to cart",
-            category: "shop.cart",
-            screen: "product_detail",
-            plantTitle: plantTitle,
-            plantId: plantId,
-            plantPrice: plantPrice
-        )
+        let crumb = Breadcrumb(level: .info, category: "shop.cart")
+        crumb.message = "Added plant to cart"
+        crumb.setData(value: "product_detail", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        crumb.setData(value: plantTitle, key: "plant_title")
+        crumb.setData(value: plantId, key: "plant_id")
+        crumb.setData(value: plantPrice, key: "plant_price")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.info(
             "Product added to cart",
             attributes: [
@@ -258,15 +294,15 @@ final class ProductDetailViewController: UIViewController {
         span.setData(value: plantId, key: "plant.id")
         span.setData(value: 3000, key: "duration_ms")
         span.setData(value: "product_detail", key: "screen")
-        ShopBreadcrumb.record(
-            message: "Watered plant",
-            category: "shop.plant_care",
-            level: .warning,
-            screen: "product_detail",
-            plantTitle: plantTitle,
-            plantId: plantId,
-            plantPrice: plantPrice
-        )
+        let crumb = Breadcrumb(level: .warning, category: "shop.plant_care")
+        crumb.message = "Watered plant"
+        crumb.setData(value: "product_detail", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        crumb.setData(value: plantTitle, key: "plant_title")
+        crumb.setData(value: plantId, key: "plant_id")
+        crumb.setData(value: plantPrice, key: "plant_price")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.warn(
             "Watering schedule blocked the main thread",
             attributes: [
@@ -308,15 +344,15 @@ final class ProductDetailViewController: UIViewController {
                 key: "plant"
             )
         }
-        ShopBreadcrumb.record(
-            message: "Repotted plant",
-            category: "shop.plant_care",
-            level: .fatal,
-            screen: "product_detail",
-            plantTitle: plantTitle,
-            plantId: plantId,
-            plantPrice: plantPrice
-        )
+        let crumb = Breadcrumb(level: .fatal, category: "shop.plant_care")
+        crumb.message = "Repotted plant"
+        crumb.setData(value: "product_detail", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        crumb.setData(value: plantTitle, key: "plant_title")
+        crumb.setData(value: plantId, key: "plant_id")
+        crumb.setData(value: plantPrice, key: "plant_price")
+        SentrySDK.addBreadcrumb(crumb)
         SentrySDK.logger.fatal(
             "Repotting crashed in the nursery",
             attributes: [

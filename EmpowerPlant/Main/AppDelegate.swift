@@ -116,7 +116,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        ShopFlags.register()
+        // Checkout always posts validate_inventory.
+        SentrySDK.addFeatureFlag(name: "inventory-check", result: true)
+        // Product detail includes Water and Repot.
+        SentrySDK.addFeatureFlag(name: "plant-care", result: true)
+        // Session Replay and screenshots unmask the cart, nav buttons, and total.
+        SentrySDK.addFeatureFlag(name: "replay-unmask", result: true)
 
         EmpowerPlantTheme.applyNavBarAppearance()
 
@@ -125,7 +130,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
             scope.setTag(value: ShopSession.se, key: "se")
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
-            ShopSession.apply(to: scope)
+            scope.setTag(value: ShopSession.customerType, key: "customerType")
+            let user = User()
+            user.email = ShopSession.email
+            scope.setUser(user)
         }
 
         let logger = SentrySDK.logger

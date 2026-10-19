@@ -67,7 +67,41 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ShopPrivacy.unmaskNavigationButtons(of: self)
+        unmaskNavigationButtons()
+    }
+
+    /// The system back control. The navigation title stays masked.
+    private func unmaskNavigationButtons() {
+        let screenTitle = navigationItem.title ?? title
+        if let navigationBar = navigationController?.navigationBar {
+            unmaskBarControls(in: navigationBar, screenTitle: screenTitle)
+        }
+        let barItems = (navigationItem.leftBarButtonItems ?? []) + (navigationItem.rightBarButtonItems ?? [])
+        for barItem in barItems {
+            barItem.customView?.sentryReplayUnmask()
+        }
+    }
+
+    private func unmaskBarControls(in view: UIView, screenTitle: String?) {
+        if view is UIControl, !containsScreenTitle(view, screenTitle: screenTitle) {
+            view.sentryReplayUnmask()
+        }
+        for subview in view.subviews {
+            unmaskBarControls(in: subview, screenTitle: screenTitle)
+        }
+    }
+
+    /// True for the navigation title control and any ancestor that contains it.
+    private func containsScreenTitle(_ view: UIView, screenTitle: String?) -> Bool {
+        let className = NSStringFromClass(type(of: view))
+        if className.contains("TitleControl") || className.contains("NavigationBarTitle") {
+            return true
+        }
+        guard let screenTitle, !screenTitle.isEmpty else { return false }
+        if let label = view as? UILabel, label.text == screenTitle {
+            return true
+        }
+        return view.subviews.contains { containsScreenTitle($0, screenTitle: screenTitle) }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
