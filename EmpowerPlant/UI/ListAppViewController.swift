@@ -1,6 +1,24 @@
 import SentrySwift
 import UIKit
 
+/// Handled failure for the DiskWriteException row.
+enum DiskWriteException: Error, LocalizedError {
+    case writeStorm
+
+    var errorDescription: String? {
+        "Disk write storm: repeated 256KB writes for 8 seconds"
+    }
+}
+
+/// Handled failure for the HighCPULoad row.
+enum HighCPULoad: Error, LocalizedError {
+    case computingPi
+
+    var errorDescription: String? {
+        "High CPU load: a background thread is computing pi without stopping"
+    }
+}
+
 /// Other issues list for the Empower TDA error-list test.
 /// Row titles are the accessibility names the test looks up.
 /// The home screen button opens it. No other screen has a bar button for it.
@@ -135,16 +153,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// Background writes so the next TDA tap can still land. The captured error is the issue;
     /// MetricKit disk diagnostics are not delivered on the simulator.
     private func diskWriteException() {
-        let reason = "Disk write storm: repeated 256KB writes for 8 seconds"
-        let error = NSError(
-            domain: "DiskWriteException",
-            code: 1,
-            userInfo: [
-                NSLocalizedDescriptionKey: reason,
-                NSDebugDescriptionErrorKey: reason,
-            ]
-        )
-        SentrySDK.capture(error: error) { [weak self] scope in
+        let reason = DiskWriteException.writeStorm.localizedDescription
+        SentrySDK.capture(error: DiskWriteException.writeStorm) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "DiskWriteException (!)", reason: reason)
         }
         let span: Span
@@ -168,16 +178,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     private func highCPULoad() {
-        let reason = "High CPU load: a background thread is computing pi without stopping"
-        let error = NSError(
-            domain: "HighCPULoad",
-            code: 1,
-            userInfo: [
-                NSLocalizedDescriptionKey: reason,
-                NSDebugDescriptionErrorKey: reason,
-            ]
-        )
-        SentrySDK.capture(error: error) { [weak self] scope in
+        let reason = HighCPULoad.computingPi.localizedDescription
+        SentrySDK.capture(error: HighCPULoad.computingPi) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "HighCPULoad", reason: reason)
         }
         workQueue.async {
