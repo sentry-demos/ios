@@ -13,6 +13,24 @@ class ShoppingCart {
     var total = 0
     var quantities = Quantities()
 
+    // Each read returns a new stream so the plant list and the cart screen can listen together.
+    private static let updateLock = NSLock()
+    private static var updateContinuations: [UUID: AsyncStream<Void>.Continuation] = [:]
+
+    static var updates: AsyncStream<Void> {
+        AsyncStream { continuation in
+            let id = UUID()
+            updateLock.lock()
+            updateContinuations[id] = continuation
+            updateLock.unlock()
+            continuation.onTermination = { _ in
+                updateLock.lock()
+                updateContinuations.removeValue(forKey: id)
+                updateLock.unlock()
+            }
+        }
+    }
+
     // This updates the items, total, and quantities
     static func addProduct(product: Product) {
         let logger = SentrySDK.logger
@@ -58,7 +76,6 @@ class ShoppingCart {
                     "productId": productId,
                     "expectedIds": "3, 4, 5, 6",
                 ])
-            print("product id not found in ShoppingCart switch statement")
         }
 
         logger.info(
@@ -68,7 +85,16 @@ class ShoppingCart {
                 "newTotal": self.instance.total,
                 "cartItemCount": self.instance.items.count,
             ])
-        print("> TOTAL", self.instance.total)
+        Self.publishUpdate()
+    }
+
+    private static func publishUpdate() {
+        updateLock.lock()
+        let continuations = Array(updateContinuations.values)
+        updateLock.unlock()
+        for continuation in continuations {
+            continuation.yield(())
+        }
     }
 
     static func updateTotal(product: Product) {
@@ -77,25 +103,7 @@ class ShoppingCart {
     }
 }
 
-/*
- Cannot dynamically set KeyId's like in javascript, so coding the product names into the Quantities class
-
- The following code fails because you can't add key names on the go
-    self.instance.quantities.setValue(1, forKey: "someProperty")
-    self.instance.quantities.value(forKey: "someProperty"))
- */
 class Quantities: NSObject {
-
-    var _name: Int = 0
-    var name: Int {
-        get {
-            return _name
-        }
-        set(newVal) {
-            _name = newVal
-        }
-    }
-
     var _plantMood: Int = 0
     var plantMood: Int {
         get {

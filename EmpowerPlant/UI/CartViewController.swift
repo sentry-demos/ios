@@ -1,18 +1,16 @@
+import Darwin
 import SentrySwift
 import UIKit
 
-protocol URLSessionProtocol {
-    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
-        -> URLSessionDataTaskProtocol
-}
+enum PurchaseError: Error, LocalizedError {
+    case insufficientInventory
 
-protocol URLSessionDataTaskProtocol {
-    func resume()
+    var errorDescription: String? {
+        "Insufficient inventory available"
+    }
 }
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
-    // private let session: URLSessionProtocol
 
     let tableView: UITableView = {
         let table = UITableView()
@@ -28,6 +26,8 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return v
     }()
 
+    private var cartUpdates: Task<Void, Never>?
+
     private let totalLabel: UILabel = {
         let l = UILabel()
         l.font = .systemFont(ofSize: 20, weight: .bold)
@@ -37,14 +37,11 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         return l
     }()
 
-    // Used for mocking in unit test
-    init(session: URLSessionProtocol = URLSession.shared as! URLSessionProtocol) {
-        // self.session = session
-        super.init(nibName: nil, bundle: nil)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
     required init?(coder: NSCoder) {
-        // fatalError("init(coder:) has not been implemented")
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -88,53 +85,147 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         ])
 
         totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
+        totalLabel.sentryReplayUnmask()
 
         configureNavigationItems()
-        checkRelease()
-
-        print("CartViewController | TOTAL", ShoppingCart.instance.total)
+        observeCartUpdates()
+        checkRelease(screen: "cart")
         SentrySDK.reportFullyDisplayed()
     }
 
     private func configureNavigationItems() {
-        let purchaseButton = UIButton(type: .system)
-        purchaseButton.setTitle("  Purchase  ", for: .normal)
+        let checkoutButton = UIButton(type: .system)
+        checkoutButton.setTitle("  Checkout  ", for: .normal)
         if #unavailable(iOS 26.0) {
-            purchaseButton.setTitleColor(.white, for: .normal)
-            purchaseButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
-            purchaseButton.backgroundColor = EmpowerPlantTheme.buttonBackground
-            purchaseButton.layer.cornerRadius = 4
+            checkoutButton.setTitleColor(.black, for: .normal)
+            checkoutButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            checkoutButton.backgroundColor = EmpowerPlantTheme.buttonBackground
+            checkoutButton.layer.cornerRadius = 4
         }
-        purchaseButton.addTarget(self, action: #selector(purchase), for: .touchUpInside)
-        purchaseButton.accessibilityIdentifier = "Purchase"
+        checkoutButton.addTarget(self, action: #selector(openCheckout), for: .touchUpInside)
+        checkoutButton.accessibilityIdentifier = "Checkout"
+        checkoutButton.sentryReplayUnmask()
 
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: purchaseButton)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: checkoutButton)
+    }
+
+    @objc private func openCheckout() {
+        ShopClick.play()
+        navigationController?.pushViewController(CheckoutViewController(cart: self), animated: true)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshCart()
+    }
+
+    deinit {
+        cartUpdates?.cancel()
+    }
+
+    private func observeCartUpdates() {
+        let updates = ShoppingCart.updates
+        cartUpdates = Task { @MainActor [weak self] in
+            for await _ in updates {
+                self?.refreshCart()
+            }
+        }
+    }
+
+    private func refreshCart() {
+        totalLabel.text = "Total: $\(ShoppingCart.instance.total)"
+        tableView.reloadData()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        unmaskNavigationButtons()
+        totalLabel.sentryReplayUnmask()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        unmaskNavigationButtons()
+        totalLabel.sentryReplayUnmask()
+    }
+
+    /// Checkout and the system back control. The navigation title stays masked.
+    private func unmaskNavigationButtons() {
+        let screenTitle = navigationItem.title ?? title
+        if let navigationBar = navigationController?.navigationBar {
+            unmaskBarControls(in: navigationBar, screenTitle: screenTitle)
+        }
+        let barItems = (navigationItem.leftBarButtonItems ?? []) + (navigationItem.rightBarButtonItems ?? [])
+        for barItem in barItems {
+            barItem.customView?.sentryReplayUnmask()
+        }
+    }
+
+    private func unmaskBarControls(in view: UIView, screenTitle: String?) {
+        if view is UIControl, !containsScreenTitle(view, screenTitle: screenTitle) {
+            view.sentryReplayUnmask()
+        }
+        for subview in view.subviews {
+            unmaskBarControls(in: subview, screenTitle: screenTitle)
+        }
+    }
+
+    /// True for the navigation title control and any ancestor that contains it.
+    private func containsScreenTitle(_ view: UIView, screenTitle: String?) -> Bool {
+        let className = NSStringFromClass(type(of: view))
+        if className.contains("TitleControl") || className.contains("NavigationBarTitle") {
+            return true
+        }
+        guard let screenTitle, !screenTitle.isEmpty else { return false }
+        if let label = view as? UILabel, label.text == screenTitle {
+            return true
+        }
+        return view.subviews.contains { containsScreenTitle($0, screenTitle: screenTitle) }
     }
 
     @objc
-    func purchase() {
+    func purchase(onFailure: (@MainActor () -> Void)? = nil) {
+        let itemCount = ShoppingCart.instance.items.count
+        let total = ShoppingCart.instance.total
+        let checkoutSpan = SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
+        checkoutSpan.setData(value: "checkout", key: "shop.action")
+        checkoutSpan.setData(value: itemCount, key: "cart.item_count")
+        checkoutSpan.setData(value: total, key: "cart.total")
+        checkoutSpan.setData(value: "https://flask.empower-plant.com/checkout", key: "endpoint")
+        checkoutSpan.setTag(value: "checkout", key: "shop.action")
         let logger = SentrySDK.logger
+        let cartItems = ShoppingCart.instance.items
+        let plantTitles = cartItems.compactMap(\.title).joined(separator: ", ")
+        let plantIds = cartItems.compactMap(\.productId).joined(separator: ", ")
+        let crumb = Breadcrumb(level: .info, category: "shop.checkout")
+        crumb.message = "Purchase started"
+        crumb.setData(value: "cart", key: "screen")
+        crumb.setData(value: ShoppingCart.instance.items.count, key: "cart_size")
+        crumb.setData(value: ShoppingCart.instance.total, key: "cart_total")
+        if !plantTitles.isEmpty {
+            crumb.setData(value: plantTitles, key: "plant_title")
+        }
+        if !plantIds.isEmpty {
+            crumb.setData(value: plantIds, key: "plant_id")
+        }
+        if cartItems.count == 1, let price = Int(cartItems[0].price ?? "") {
+            crumb.setData(value: price, key: "plant_price")
+        }
+        SentrySDK.addBreadcrumb(crumb)
         logger.info(
             "Purchase initiated",
             attributes: [
                 "cartTotal": ShoppingCart.instance.total,
                 "itemCount": ShoppingCart.instance.items.count,
             ])
+        recordCheckoutMetrics()
+        processCart(on: checkoutSpan)
 
-        // Simulate potential app hang scenario for AppHang V2 demonstration
-        // This creates a brief delay that could trigger hang detection if it exceeds threshold
-        DispatchQueue.main.async {
-            // Simulate processing delay that might cause UI to appear unresponsive
-            Thread.sleep(forTimeInterval: 0.5)  // 500ms delay - under 2s threshold but shows interaction
-        }
-
-        // use localhost for development against dev-backend
-        // let url = URL(string: "http://127.0.0.1:8080/checkout")!
         let url = URL(string: "https://flask.empower-plant.com/checkout")!
 
         var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
+        ShopSession.applyRequestHeaders(to: &request)
 
         let bodyData = try? JSONSerialization.data(
             withJSONObject: setJson(),
@@ -142,18 +233,12 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         )
         request.httpBody = bodyData
 
-        enum PurchaseError: Error, LocalizedError {
-            case insufficientInventory
-
-            var errorDescription: String? {
-                switch self {
-                case .insufficientInventory:
-                    return "Insufficient inventory available"
-                }
-            }
-        }
-
         let task = URLSession.shared.dataTask(with: request) { _, response, _ in
+            var outcome: SentrySpanStatus = .ok
+            defer {
+                checkoutSpan.finish(status: outcome)
+            }
+
             let logger = SentrySDK.logger
             // Add file I/O operation during checkout for Sentry File I/O Tracking demonstration
             self.performCheckoutFileIO()
@@ -161,18 +246,45 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             // This handler is responsible for Flagship Error
             if let httpResponse = response as? HTTPURLResponse {
                 if (httpResponse.statusCode) == 500 {
-                    let err = PurchaseError.insufficientInventory
+                    outcome = .internalError
+                    let delivery = checkoutSpan.startChild(operation: "delivery.workflow", description: "Start delivery")
+                    delivery.setData(value: 500, key: "http.status_code")
+                    delivery.setData(value: ShoppingCart.instance.total, key: "cart.total")
+                    delivery.setData(value: ShoppingCart.instance.items.count, key: "cart.item_count")
+                    delivery.setData(value: "insufficient_inventory", key: "failure")
+                    delivery.finish(status: .internalError)
                     logger.error(
                         "Purchase failed with server error",
                         attributes: [
                             "statusCode": 500,
                             "errorType": "insufficient_inventory",
+                            "cartTotal": ShoppingCart.instance.total,
+                            "itemCount": ShoppingCart.instance.items.count,
+                            "endpoint": "https://flask.empower-plant.com/checkout",
                         ])
-                    ErrorToastManager.shared.logErrorAndShowToast(  // Flagship!
-                        error: err,
-                        message: "Purchase failed: Insufficient inventory available (HTTP 500)",
-                        showFeedbackOption: true  // Enable User Feedback for checkout errors
-                    )
+                    SentrySDK.capture(error: PurchaseError.insufficientInventory) { scope in
+                        scope.setTag(value: "checkout", key: "shop.action")
+                        scope.setContext(
+                            value: [
+                                "cart_total": ShoppingCart.instance.total,
+                                "item_count": ShoppingCart.instance.items.count,
+                                "status_code": 500,
+                                "endpoint": "https://flask.empower-plant.com/checkout",
+                                "failure": "insufficient_inventory",
+                            ],
+                            key: "checkout"
+                        )
+                    }
+                    Task { @MainActor in
+                        ErrorToastManager.shared.showErrorToastWithFeedback(
+                            message: "Purchase failed: Insufficient inventory available (HTTP 500)"
+                        )
+                    }
+                    if let onFailure {
+                        Task { @MainActor in
+                            onFailure()
+                        }
+                    }
                 } else if (httpResponse.statusCode) == 200 {
                     logger.info(
                         "Purchase completed successfully",
@@ -181,6 +293,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                             "cartTotal": ShoppingCart.instance.total,
                         ])
                 } else {
+                    outcome = .internalError
                     logger.warn(
                         "Purchase completed with unexpected status",
                         attributes: [
@@ -188,20 +301,62 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                         ])
                 }
             }
-
-            // not getting met
-            // if let error = error {
-            //    print("> HTTP Request Failed \(error)")
-            //    SentrySDK.capture(error: error)
-            // }
-
-            // getting met whether it's a 200 or 500 - there's always a 'data' object here
-            // if let data = data {
-            //     print("> no error, do nothing", data)
-            // }
         }
 
         task.resume()
+    }
+
+    /// Slow cart work on the checkout trace. Stays under the 2s hang threshold.
+    private func processCart(on checkoutSpan: Span) {
+        let span = checkoutSpan.startChild(operation: "cart.process", description: "Process cart")
+        let itemCount = ShoppingCart.instance.items.count
+        let total = ShoppingCart.instance.total
+        span.setData(value: itemCount, key: "cart.item_count")
+        span.setData(value: total, key: "cart.total")
+        span.setData(value: 500, key: "duration_ms")
+        Thread.sleep(forTimeInterval: 0.5)
+        SentrySDK.logger.info(
+            "Cart processed for checkout",
+            attributes: [
+                "itemCount": itemCount,
+                "cartTotal": total,
+                "durationMs": 500,
+            ])
+        span.finish()
+    }
+
+    /// Application metrics. CPU, heap, frames, and energy stay on the profiler payload.
+    private func recordCheckoutMetrics() {
+        let itemCount = ShoppingCart.instance.items.count
+        SentrySDK.metrics.count(
+            key: "checkout.attempted",
+            value: 1,
+            attributes: ["item_count": itemCount]
+        )
+        SentrySDK.metrics.gauge(
+            key: "checkout.cart_size",
+            value: Double(itemCount)
+        )
+        if let footprint = Self.memoryFootprintBytes() {
+            SentrySDK.metrics.gauge(
+                key: "memory.usage",
+                value: footprint,
+                unit: .byte
+            )
+        }
+    }
+
+    /// phys_footprint from task_info(TASK_VM_INFO), the same reading the profiler stores as heap.
+    private static func memoryFootprintBytes() -> Double? {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.stride / MemoryLayout<integer_t>.stride)
+        let result = withUnsafeMutablePointer(to: &info) { pointer -> kern_return_t in
+            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { rebound in
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), rebound, &count)
+            }
+        }
+        guard result == KERN_SUCCESS else { return nil }
+        return Double(info.phys_footprint)
     }
 
     // Perform file I/O operations during checkout for Sentry File I/O Tracking demonstration
@@ -231,15 +386,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
 
-    // total, quantities, items
     func setJson() -> [String: Any] {
-
-        // total DONE
-        // quantities DONE below
-        // TODO: items
-
-        let json: [String: Any] = [
-            "form": ["email": "will@example.com"],  // TODO: email update + check if all tx's+errors have email
+        [
+            "form": ["email": "will@example.com"],
             "cart": [
                 "total": ShoppingCart.instance.total,
                 "quantities": [
@@ -250,46 +399,33 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                 ],
                 "items": [
                     ["id": "4", "title": "Plant Nodes"]
-                    // ["id":"5", "title":"Plant Stroller"]
                 ],
             ],
             "validate_inventory": "true",
         ]
-
-        return json
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // TODO: could compute the length based on length of quantities.botanaVoice, plantStroller, nodeVoices, etc.
-        // or continue showing all products, even if quantity is 0. the screen looks more full this way
-        return 4  // products.count
+        cartLines().count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =
             tableView.dequeueReusableCell(withIdentifier: CartItemCell.reuseIdentifier, for: indexPath) as! CartItemCell
 
-        let quantities: [(String, Int)] = [
-            ("Plant Mood", ShoppingCart.instance.quantities.plantMood),
-            ("Botana Voice", ShoppingCart.instance.quantities.botanaVoice),
-            ("Plant Stroller", ShoppingCart.instance.quantities.plantStroller),
-            ("Plant Nodes", ShoppingCart.instance.quantities.plantNodes),
-        ]
-
-        let item = quantities[indexPath.row]
+        let item = cartLines()[indexPath.row]
         cell.configure(name: item.0, quantity: item.1)
 
         return cell
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    /// Plants the shopper added. Zero-quantity catalog rows stay off this list.
+    private func cartLines() -> [(String, Int)] {
+        [
+            ("Plant Mood", ShoppingCart.instance.quantities.plantMood),
+            ("Botana Voice", ShoppingCart.instance.quantities.botanaVoice),
+            ("Plant Stroller", ShoppingCart.instance.quantities.plantStroller),
+            ("Plant Nodes", ShoppingCart.instance.quantities.plantNodes),
+        ].filter { $0.1 > 0 }
     }
-    */
-
 }
