@@ -187,15 +187,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     func purchase(onFailure: (@MainActor () -> Void)? = nil) {
         let itemCount = ShoppingCart.instance.items.count
         let total = ShoppingCart.instance.total
-        let checkoutSpan: Span
-        if let parent = SentrySDK.span {
-            checkoutSpan = parent.startChild(operation: "checkout", description: "checkout")
-            SentrySDK.configureScope { scope in
-                scope.span = checkoutSpan
-            }
-        } else {
-            checkoutSpan = SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
-        }
+        let checkoutSpan = SentrySDK.startTransaction(name: "checkout", operation: "checkout", bindToScope: true)
         checkoutSpan.setData(value: "checkout", key: "shop.action")
         checkoutSpan.setData(value: itemCount, key: "cart.item_count")
         checkoutSpan.setData(value: total, key: "cart.total")
@@ -242,17 +234,9 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.httpBody = bodyData
 
         let task = URLSession.shared.dataTask(with: request) { _, response, _ in
-            SentrySDK.configureScope { scope in
-                scope.span = checkoutSpan
-            }
             var outcome: SentrySpanStatus = .ok
             defer {
                 checkoutSpan.finish(status: outcome)
-                SentrySDK.configureScope { scope in
-                    if scope.span?.spanId.sentrySpanIdString == checkoutSpan.spanId.sentrySpanIdString {
-                        scope.span = nil
-                    }
-                }
             }
 
             let logger = SentrySDK.logger

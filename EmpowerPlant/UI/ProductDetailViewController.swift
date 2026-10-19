@@ -280,9 +280,6 @@ final class ProductDetailViewController: UIViewController {
         let span: Span
         if let parent = SentrySDK.span {
             span = parent.startChild(operation: "watering.schedule", description: "Calculate watering schedule")
-            SentrySDK.configureScope { scope in
-                scope.span = span
-            }
         } else {
             span = SentrySDK.startTransaction(
                 name: "Calculate watering schedule",
@@ -322,9 +319,6 @@ final class ProductDetailViewController: UIViewController {
         let span: Span
         if let parent = SentrySDK.span {
             span = parent.startChild(operation: "nursery.repot", description: "Repot plant")
-            SentrySDK.configureScope { scope in
-                scope.span = span
-            }
         } else {
             span = SentrySDK.startTransaction(name: "Repot plant", operation: "nursery.repot", bindToScope: true)
         }

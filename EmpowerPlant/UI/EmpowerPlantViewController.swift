@@ -125,9 +125,6 @@ class EmpowerPlantViewController: UIViewController {
         let span: Span
         if let parent = SentrySDK.span {
             span = parent.startChild(operation: "catalog.load", description: "Load plant catalog")
-            SentrySDK.configureScope { scope in
-                scope.span = span
-            }
         } else {
             span = SentrySDK.startTransaction(name: "Load plant catalog", operation: "catalog.load", bindToScope: true)
         }
