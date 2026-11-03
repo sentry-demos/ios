@@ -192,9 +192,9 @@ final class ProductDetailViewController: UIViewController {
                 "screen": "product_detail",
             ])
         SentrySDK.metrics.count(
-            key: "product.viewed",
+            "product.viewed",
             value: 1,
-            attributes: ["plant_title": plantTitle, "plant_id": plantId]
+            options: SentryMetricOptions(attributes: ["plant_title": plantTitle, "plant_id": plantId])
         )
         renderPhotoOnMainThread(parent: span)
         span.finish()
@@ -268,8 +268,8 @@ final class ProductDetailViewController: UIViewController {
                 "cartSize": cartSize,
                 "cartTotal": ShoppingCart.instance.total,
             ])
-        SentrySDK.metrics.count(key: "cart.item_added", value: 1, attributes: ["plant_title": plantTitle])
-        SentrySDK.metrics.gauge(key: "cart.size", value: Double(cartSize))
+        SentrySDK.metrics.count("cart.item_added", value: 1, options: SentryMetricOptions(attributes: ["plant_title": plantTitle]))
+        SentrySDK.metrics.gauge("cart.size", value: Double(cartSize))
         span.finish()
         ErrorToastManager.shared.showAddedToCart()
     }
@@ -308,7 +308,7 @@ final class ProductDetailViewController: UIViewController {
                 "durationMs": 3000,
                 "screen": "product_detail",
             ])
-        SentrySDK.metrics.count(key: "plant.watering", value: 1, attributes: ["plant_title": plantTitle])
+        SentrySDK.metrics.count("plant.watering", value: 1, options: SentryMetricOptions(attributes: ["plant_title": plantTitle]))
         Thread.sleep(forTimeInterval: 3)
         span.finish()
     }
@@ -355,7 +355,7 @@ final class ProductDetailViewController: UIViewController {
                 "plantPrice": plantPrice,
                 "screen": "product_detail",
             ])
-        SentrySDK.metrics.count(key: "plant.repot", value: 1, attributes: ["plant_title": plantTitle])
+        SentrySDK.metrics.count("plant.repot", value: 1, options: SentryMetricOptions(attributes: ["plant_title": plantTitle]))
         SentrySDK.crash()
     }
 

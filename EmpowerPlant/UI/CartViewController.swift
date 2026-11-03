@@ -329,19 +329,19 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     private func recordCheckoutMetrics() {
         let itemCount = ShoppingCart.instance.items.count
         SentrySDK.metrics.count(
-            key: "checkout.attempted",
+            "checkout.attempted",
             value: 1,
-            attributes: ["item_count": itemCount]
+            options: SentryMetricOptions(attributes: ["item_count": itemCount])
         )
         SentrySDK.metrics.gauge(
-            key: "checkout.cart_size",
+            "checkout.cart_size",
             value: Double(itemCount)
         )
         if let footprint = Self.memoryFootprintBytes() {
             SentrySDK.metrics.gauge(
-                key: "memory.usage",
+                "memory.usage",
                 value: footprint,
-                unit: .byte
+                options: SentryMetricOptions(unit: .byte)
             )
         }
     }

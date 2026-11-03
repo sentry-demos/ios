@@ -144,7 +144,7 @@ class EmpowerPlantViewController: UIViewController {
                 "screen": "product_list",
                 "endpoint": Self.productsEndpoint,
             ])
-        SentrySDK.metrics.count(key: "catalog.viewed", value: 1)
+        SentrySDK.metrics.count("catalog.viewed", value: 1)
 
         readCatalogFileOnMainThread(parent: span)
         processProducts(parent: span)
@@ -207,9 +207,9 @@ class EmpowerPlantViewController: UIViewController {
                 "screen": "product_list",
             ])
         SentrySDK.metrics.distribution(
-            key: "catalog.process_duration",
+            "catalog.process_duration",
             value: Double(elapsedMs),
-            unit: .millisecond
+            options: SentryMetricOptions(unit: .millisecond)
         )
         span.finish()
     }
@@ -299,11 +299,11 @@ class EmpowerPlantViewController: UIViewController {
                 "durationMs": durationMs,
                 "screen": "product_list",
             ])
-        SentrySDK.metrics.gauge(key: "catalog.product_count", value: Double(productsResponse.count))
+        SentrySDK.metrics.gauge("catalog.product_count", value: Double(productsResponse.count))
         SentrySDK.metrics.distribution(
-            key: "catalog.load_duration",
+            "catalog.load_duration",
             value: Double(durationMs),
-            unit: .millisecond
+            options: SentryMetricOptions(unit: .millisecond)
         )
 
         guard products.isEmpty else {
@@ -457,8 +457,8 @@ extension EmpowerPlantViewController: UITableViewDataSource {
                 "cartTotal": ShoppingCart.instance.total,
                 "screen": "product_list",
             ])
-        SentrySDK.metrics.count(key: "cart.item_added", value: 1, attributes: ["plant_title": title])
-        SentrySDK.metrics.gauge(key: "cart.size", value: Double(cartSize))
+        SentrySDK.metrics.count("cart.item_added", value: 1, options: SentryMetricOptions(attributes: ["plant_title": title]))
+        SentrySDK.metrics.gauge("cart.size", value: Double(cartSize))
         span.finish()
         ErrorToastManager.shared.showAddedToCart()
     }
