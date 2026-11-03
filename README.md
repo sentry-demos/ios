@@ -1,6 +1,6 @@
 ## Overview
 
-Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.30.0** (`SentrySPM`, `import SentrySwift`).
+Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.32.0** (`SentrySPM`, `import SentrySwift`).
 
 The DSN in `EmpowerPlant/Main/AppDelegate.swift` sends events to the demo organization, project **ios**. A commented wassim-test DSN sits above `options.dsn` so that project can be restored. Leave the active DSN on the demo ios project.
 
