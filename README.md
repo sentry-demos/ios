@@ -12,7 +12,7 @@ Sentry's app-hang watcher is off (`enableAppHangTracking = false`). MetricKit is
 - **Homebrew**
 - **Git**
 
-The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`DEVICE_NAME` and `SIMULATOR_OS` override that).
+The app deploys to iOS 15. Build with Xcode 26.3: the app uses iOS 26 SDK calls, and Xcode 16's SwiftPM can reject Sentry Cocoa's KSCrash dependency. `make test` defaults to an iPhone 17 Pro simulator on the latest installed iOS runtime (`DEVICE_NAME` and `SIMULATOR_OS` override that). The `build` check pins `DEVELOPER_DIR=/Applications/Xcode_26.3.app` on `macos-15`, whose iOS 26.2 runtime has that simulator.
 
 ## Setup
 

@@ -10,9 +10,25 @@ on:
 jobs:
   build:
     runs-on: macos-15
+    env:
+      # macos-15 defaults to Xcode 16.4. Its SwiftPM can reject sentry-cocoa's
+      # unstable KSCrash dependency, and its iOS 18.5 SDK lacks the iOS 26 calls
+      # the app makes (hidesSharedBackground). Same pin as deploy_project.sh.
+      # Xcode 26.3's iOS 26.2 runtime has the Makefile's iPhone 17 Pro.
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Check Xcode and simulator
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          if ! xcrun simctl list devices available | grep -q "iPhone 17 Pro ("; then
+            echo "No iPhone 17 Pro simulator for $DEVELOPER_DIR. Pass DEVICE_NAME and SIMULATOR_OS to make test." >&2
+            xcrun simctl list devices available
+            exit 1
+          fi
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
