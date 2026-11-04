@@ -21,7 +21,7 @@ enum HighCPULoad: Error, LocalizedError {
 
 /// Other issues list for the Empower TDA error-list test.
 /// Row titles are the accessibility names the test looks up.
-/// The home screen button opens it. No other screen has a bar button for it.
+/// The product list's leading `more` bar button opens it.
 final class ListAppViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private struct Action {
         let title: String

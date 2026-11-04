@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
             // Automatic app start attaches app_start_cold to the first ui.load
-            // transaction (ShopHomeViewController). Standalone tracing would
+            // transaction (EmpowerPlantViewController). Standalone tracing would
             // send that measurement on its own app.start transaction instead.
             // Cocoa 9.26 moved this off options.experimental.
             options.enableStandaloneAppStartTracing = false

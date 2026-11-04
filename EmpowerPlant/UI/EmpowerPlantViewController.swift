@@ -47,7 +47,6 @@ class EmpowerPlantViewController: UIViewController {
         SentrySDK.configureScope { scope in
             scope.setTag(value: "product_list", key: "screen")
         }
-        SentrySDK.reportFullyDisplayed()
         refreshCartBadge()
     }
 
@@ -56,7 +55,7 @@ class EmpowerPlantViewController: UIViewController {
         unmaskNavigationButtons()
     }
 
-    /// Cart and the system back control. The navigation title stays masked.
+    /// Other issues, Cart, and the system back control. The navigation title stays masked.
     private func unmaskNavigationButtons() {
         cartButton.sentryReplayUnmask()
         let screenTitle = navigationItem.title ?? title
@@ -96,6 +95,17 @@ class EmpowerPlantViewController: UIViewController {
     }
 
     private func configureNavigationItems() {
+        let moreItem = UIBarButtonItem(
+            image: UIImage(systemName: "ellipsis"),
+            style: .plain,
+            target: self,
+            action: #selector(goToListApp)
+        )
+        // Empower's error-list TDA test taps this by accessibility id `more`.
+        moreItem.accessibilityIdentifier = "more"
+        moreItem.accessibilityLabel = "Other issues"
+        navigationItem.leftBarButtonItem = moreItem
+
         cartButton.onTap = { [weak self] in
             ShopClick.play()
             self?.goToCart()
@@ -280,6 +290,7 @@ class EmpowerPlantViewController: UIViewController {
                     } else {
                         ErrorToastManager.shared.showErrorToast(message: failureMessage)
                     }
+                    SentrySDK.reportFullyDisplayed()
                 }
             }
         }
@@ -310,6 +321,7 @@ class EmpowerPlantViewController: UIViewController {
             catalogSpan.setData(value: products.count, key: "product.count")
             catalogSpan.finish()
             self.catalogSpan = nil
+            SentrySDK.reportFullyDisplayed()
             return
         }
 
@@ -325,7 +337,10 @@ class EmpowerPlantViewController: UIViewController {
                 catalogSpan.setData(value: self.products.count, key: "product.count")
                 catalogSpan.finish()
                 self.catalogSpan = nil
-                self.refreshTable()
+                Task { @MainActor in
+                    self.tableView.reloadData()
+                    SentrySDK.reportFullyDisplayed()
+                }
             } catch {
                 persistSpan.setData(value: error.localizedDescription, key: "error")
                 persistSpan.finish(status: .internalError)
@@ -336,6 +351,7 @@ class EmpowerPlantViewController: UIViewController {
                     ErrorToastManager.shared.showErrorToast(
                         message: "Failed to save products from server to database"
                     )
+                    SentrySDK.reportFullyDisplayed()
                 }
             }
         }
@@ -358,6 +374,7 @@ class EmpowerPlantViewController: UIViewController {
             persistSpan.finish()
             catalogSpan.finish()
             self.catalogSpan = nil
+            SentrySDK.reportFullyDisplayed()
         } else {
             operations.append(saveOp)
             OperationQueue.main.addOperations(operations, waitUntilFinished: false)
@@ -380,6 +397,11 @@ class EmpowerPlantViewController: UIViewController {
 
     @objc func goToCart() {
         performSegue(withIdentifier: "goToCart", sender: self)
+    }
+
+    @objc func goToListApp() {
+        ShopClick.play()
+        navigationController?.pushViewController(ListAppViewController(), animated: true)
     }
 
     @objc func refreshTable() {

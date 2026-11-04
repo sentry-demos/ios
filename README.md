@@ -68,14 +68,13 @@ The app deploys to iOS 15. `make test` defaults to an iPhone 17 Pro simulator (`
 
 3. **Walk the shop:**
 
-   - Launch opens the home screen: the succulent photo, the title **Empower Plants**, **Other issues**, and **View products** (`ViewProducts`).
-   - **View products** opens the plant catalog. `GET https://flask.empower-plant.com/products` runs when that screen loads, not at launch.
-   - Each catalog row has **Add to Cart**. Empower’s checkout TDA test still expects that button on launch, because the plant list used to be the first screen. Do not hide it behind product detail. Product detail also has Add to Cart, plus Water and Repot.
+   - Launch opens the plant list (**Empower Plants**). It loads `GET https://flask.empower-plant.com/products` as it opens. Time to full display ends once that request finishes and the table shows the plants, or once it fails.
+   - Each row has **Add to Cart**. Empower’s checkout TDA test taps that button on launch. Do not hide it behind product detail. Product detail also has Add to Cart, plus Water and Repot.
    - The cart icon with the red count badge is on the trailing side of the plant list. The cart lists only plants with a quantity greater than zero. **Checkout** is the trailing button on the cart.
    - Checkout prefills the contact fields. **Apply** fails the promo code. **Place your order** posts to `https://flask.empower-plant.com/checkout` with `validate_inventory` and fails with an inventory error. That error shows a feedback button.
-   - The system back chevron is how you leave a screen. There is no Home bar button and no overflow menu.
+   - The system back chevron is how you leave a screen.
 
-4. **Other issues** is the old Actions menu. The button is on the home screen only, with accessibility id `more`. It is not in the navigation bar. The list rows are:
+4. **Other issues** is the old Actions menu. It opens from the `ellipsis` button on the leading side of the plant list's navigation bar, with accessibility id `more`. The list rows are:
 
    - Error
    - NSException
@@ -127,7 +126,7 @@ xcodebuild -downloadPlatform iOS
 ```
 EmpowerPlant/
 ├── Main/AppDelegate.swift     # Sentry configuration and the demo DSN
-├── UI/                        # Home, catalog, cart, checkout, Other issues
+├── UI/                        # Catalog, cart, checkout, Other issues
 ├── Helpers/                   # Shop telemetry helpers
 ├── Logic/                     # Shopping cart
 ├── Models/                    # Core Data product
@@ -164,8 +163,8 @@ Sauce Labs TDA still downloads `EmpowerPlant_release.zip` (a simulator `.app`). 
 
 ## TDA
 
-The error-list test should use the home-screen **Other issues** button (accessibility id `more`), then the row titles above. That used to be a **more** bar button that opened an Actions menu.
+The error-list test taps the plant list's **more** bar button (accessibility id `more`), then the row titles above.
 
-The checkout test still expects **Add to Cart** on launch. The plant list used to be the first screen, and each row still has that button. Do not hide it behind product detail.
+The checkout test expects **Add to Cart** on launch. The plant list is the first screen, and each row has that button (`AddToCart_<plant title>`). Do not hide it behind product detail.
 
 The command that runs this app in TDA is in [empower `tda/conftest.py`](https://github.com/sentry-demos/empower/blob/a77428aec6cb8e6563caf3d9671419461946db2e/tda/conftest.py#L480-L514).
