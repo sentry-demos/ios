@@ -89,6 +89,18 @@ The app deploys to iOS 15. Build with Xcode 26.3: the app uses iOS 26 SDK calls,
 
    Fatal Error and Async Crash end the process right after `SentrySDK.flush(timeout: 2)`, so buffered logs are sent before the crash. Repot on product detail does the same. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
 
+## Logs
+
+`options.enableLogs = true` sends each `SentrySDK.logger` call to Sentry Logs. **debug** is an internal step, **info** a user action or success, **warn** an expected failure or a deliberate stall, **error** a real failure, and **fatal** comes right before a deliberate crash. Attributes carry the screen, action, plant, cart counts, and HTTP status.
+
+- **Launch.** info when the SDK starts and the Core Data store loads, fatal if the store fails. warn for `--wipe-db` and the database wipe. debug when a scene connects or is discarded. The version check logs info for the 1-second wait and debug when it skips it.
+- **Plant list.** info for the catalog fetch, file read, processing, products loaded, products saved to cache, and Add to Cart. debug for the cache read, the products response, and each Add to Cart tap. warn for a missing catalog file or a plant image that fails to load. error when the fetch, cache read, or cache save fails.
+- **Product detail.** info for the view, photo render, and Add to Cart. warn when Water blocks the main thread. fatal before Repot crashes.
+- **Cart.** debug when it opens, info when Checkout is tapped. Cart updates log debug for a new plant, info for the new total, and warn for an unknown plant id.
+- **Checkout.** info for Apply and for Place your order (purchase start, cart processing, success). error for the expired promo, the HTTP 500 inventory failure, and a missing response. warn for any other status. Opening the feedback form and submitting it log info. A failed submit logs error.
+- **Other issues.** Each row logs once before it fires, with the row title as `action` and the failure text as `reason`. warn for Error, NSException, DiskWriteException, HighCPULoad, Permissions, both ANR rows, and File I/O on Main Thread. fatal for Fatal Error and Async Crash.
+- **Toasts.** debug when an error toast, checkout error toast, or Added to Cart toast shows.
+
 ## Testing
 
 ```bash
