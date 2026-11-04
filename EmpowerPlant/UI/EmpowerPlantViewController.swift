@@ -167,6 +167,12 @@ class EmpowerPlantViewController: UIViewController {
         let span = parent.startChild(operation: "file.read", description: "Read catalog copy")
         span.setData(value: "mobydick.txt", key: "file.name")
         guard let sourceURL = Bundle.main.url(forResource: "mobydick", withExtension: "txt") else {
+            SentrySDK.logger.warn(
+                "Catalog copy file missing from bundle",
+                attributes: [
+                    "fileName": "mobydick.txt",
+                    "screen": "product_list",
+                ])
             span.setData(value: "missing", key: "file.status")
             span.finish(status: .notFound)
             return
@@ -236,11 +242,23 @@ class EmpowerPlantViewController: UIViewController {
             products = try context.fetch(Product.fetchRequest())
             products = products.filter { $0.title != "Plant Mood5" }
             span.setData(value: products.count, key: "product.count")
+            SentrySDK.logger.debug(
+                "Cached products read",
+                attributes: [
+                    "productCount": products.count,
+                    "screen": "product_list",
+                ])
             span.finish()
             refreshTable()
         } catch {
             span.setData(value: error.localizedDescription, key: "error")
             span.finish(status: .internalError)
+            SentrySDK.logger.error(
+                "Failed to read cached products",
+                attributes: [
+                    "error": error.localizedDescription,
+                    "screen": "product_list",
+                ])
             SentrySDK.capture(error: error)
             ErrorToastManager.shared.showErrorToast(message: "Failed to fetch products from database")
         }
@@ -259,6 +277,14 @@ class EmpowerPlantViewController: UIViewController {
             let durationMs = Int(Date().timeIntervalSince(startTime) * 1000)
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
             let decoded = data.flatMap { try? JSONDecoder().decode([CatalogProduct].self, from: $0) }
+            SentrySDK.logger.debug(
+                "Products response received",
+                attributes: [
+                    "endpoint": url.absoluteString,
+                    "statusCode": statusCode,
+                    "responseBytes": data?.count ?? 0,
+                    "decoded": decoded != nil,
+                ])
             let failureMessage = error?.localizedDescription ?? "Invalid response from server when fetching products"
             let fetchError = error
 
@@ -315,6 +341,12 @@ class EmpowerPlantViewController: UIViewController {
         )
 
         guard products.isEmpty else {
+            SentrySDK.logger.debug(
+                "Product cache already filled, skipping save",
+                attributes: [
+                    "cachedProductCount": products.count,
+                    "screen": "product_list",
+                ])
             catalogSpan.setData(value: products.count, key: "product.count")
             catalogSpan.finish()
             self.catalogSpan = nil
@@ -330,6 +362,12 @@ class EmpowerPlantViewController: UIViewController {
                 try self.context.save()
                 self.products = try self.context.fetch(Product.fetchRequest())
                 self.products = self.products.filter { $0.title != "Plant Mood5" }
+                SentrySDK.logger.info(
+                    "Products saved to cache",
+                    attributes: [
+                        "productCount": self.products.count,
+                        "screen": "product_list",
+                    ])
                 persistSpan.finish()
                 catalogSpan.setData(value: self.products.count, key: "product.count")
                 catalogSpan.finish()
@@ -343,6 +381,12 @@ class EmpowerPlantViewController: UIViewController {
                 persistSpan.finish(status: .internalError)
                 catalogSpan.finish(status: .internalError)
                 self.catalogSpan = nil
+                SentrySDK.logger.error(
+                    "Failed to save products to cache",
+                    attributes: [
+                        "error": error.localizedDescription,
+                        "screen": "product_list",
+                    ])
                 SentrySDK.capture(error: error)
                 Task { @MainActor in
                     ErrorToastManager.shared.showErrorToast(

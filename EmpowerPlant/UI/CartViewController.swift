@@ -89,6 +89,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         configureNavigationItems()
         observeCartUpdates()
+        SentrySDK.logger.debug(
+            "Cart opened",
+            attributes: [
+                "screen": "cart",
+                "itemCount": ShoppingCart.instance.items.count,
+                "cartTotal": ShoppingCart.instance.total,
+            ])
         checkRelease(screen: "cart")
         SentrySDK.reportFullyDisplayed()
     }
@@ -111,6 +118,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     @objc private func openCheckout() {
         ShopClick.play()
+        SentrySDK.logger.info(
+            "Checkout opened",
+            attributes: [
+                "screen": "cart",
+                "itemCount": ShoppingCart.instance.items.count,
+                "cartTotal": ShoppingCart.instance.total,
+            ])
         navigationController?.pushViewController(CheckoutViewController(cart: self), animated: true)
     }
 
@@ -231,9 +245,16 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
             withJSONObject: setJson(),
             options: []
         )
+        if bodyData == nil {
+            SentrySDK.logger.warn(
+                "Checkout request body could not be encoded",
+                attributes: [
+                    "endpoint": "https://flask.empower-plant.com/checkout"
+                ])
+        }
         request.httpBody = bodyData
 
-        let task = URLSession.shared.dataTask(with: request) { _, response, _ in
+        let task = URLSession.shared.dataTask(with: request) { _, response, error in
             var outcome: SentrySpanStatus = .ok
             defer {
                 checkoutSpan.finish(status: outcome)
@@ -300,6 +321,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
                             "statusCode": httpResponse.statusCode
                         ])
                 }
+            } else {
+                SentrySDK.logger.error(
+                    "Checkout request got no HTTP response",
+                    attributes: [
+                        "endpoint": "https://flask.empower-plant.com/checkout",
+                        "error": error?.localizedDescription ?? "no response",
+                    ])
             }
         }
 
@@ -377,12 +405,20 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
 
             // Simulate reading the file back (common in checkout processes)
             let readData = try Data(contentsOf: checkoutLogFile)
-            print("Checkout log written and read: \(readData.count) bytes")
+            SentrySDK.logger.debug(
+                "Checkout log file written and read",
+                attributes: [
+                    "bytes": readData.count
+                ])
 
             // Clean up the temporary file
             try FileManager.default.removeItem(at: checkoutLogFile)
         } catch {
-            print("File I/O error during checkout: \(error)")
+            SentrySDK.logger.error(
+                "Checkout log file I/O failed",
+                attributes: [
+                    "error": error.localizedDescription
+                ])
         }
     }
 

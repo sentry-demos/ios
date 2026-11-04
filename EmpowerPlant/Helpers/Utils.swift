@@ -77,5 +77,12 @@ public func checkRelease(screen: String) {
         span.setData(value: versionString, key: "app.version")
         sleep(1)  // sleep takes seconds, not ms
         span.finish()
+    } else {
+        SentrySDK.logger.debug(
+            "version sum is odd, no sleep",
+            attributes: [
+                "version": versionString,
+                "screen": screen,
+            ])
     }
 }

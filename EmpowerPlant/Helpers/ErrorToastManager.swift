@@ -12,6 +12,11 @@ class ErrorToastManager {
     /// - Parameter message: The message to display
     @MainActor
     func showErrorToast(message: String) {
+        SentrySDK.logger.debug(
+            "Error toast shown",
+            attributes: [
+                "message": message
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.error)
         view.configureContent(title: "Error", body: message)
@@ -37,6 +42,12 @@ class ErrorToastManager {
     /// - Parameter message: The message to display
     @MainActor
     func showErrorToastWithFeedback(message: String) {
+        SentrySDK.logger.debug(
+            "Checkout error toast shown",
+            attributes: [
+                "message": message,
+                "screen": "checkout",
+            ])
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.error)
         view.configureContent(title: "Checkout Error", body: message)
@@ -53,6 +64,12 @@ class ErrorToastManager {
         view.buttonTapHandler = { _ in
             SwiftMessages.hide()
             Task { @MainActor in
+                SentrySDK.logger.info(
+                    "Feedback form opened",
+                    attributes: [
+                        "screen": "checkout",
+                        "source": "error_toast",
+                    ])
                 SentrySDK.feedback.show { config in
                     config.configureForm = { form in
                         form.showName = false
@@ -77,6 +94,7 @@ class ErrorToastManager {
     /// Short notice after add-to-cart, matching the React Native toast.
     @MainActor
     func showAddedToCart() {
+        SentrySDK.logger.debug("Added to Cart toast shown")
         let view = MessageView.viewFromNib(layout: .cardView)
         view.configureTheme(.success)
         view.configureContent(title: "Added to Cart", body: " ")

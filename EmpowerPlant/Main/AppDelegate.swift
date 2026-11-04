@@ -86,11 +86,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // button that presents the form with SentrySDK.feedback.show(), with
             // the message prefilled.
             options.configureUserFeedback = { config in
-                config.onSubmitSuccess = { data in
-                    print("Feedback submitted successfully: \(data)")
+                config.onSubmitSuccess = { _ in
+                    SentrySDK.logger.info(
+                        "User feedback submitted",
+                        attributes: [
+                            "screen": "checkout"
+                        ])
                 }
                 config.onSubmitError = { error in
-                    print("Failed to submit feedback: \(error)")
+                    SentrySDK.logger.error(
+                        "User feedback submit failed",
+                        attributes: [
+                            "screen": "checkout",
+                            "errorType": String(describing: type(of: error)),
+                            "error": error.localizedDescription,
+                        ])
                 }
             }
 
@@ -161,6 +171,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
+        SentrySDK.logger.debug(
+            "Scene session connecting",
+            attributes: [
+                "sessionRole": connectingSceneSession.role.rawValue
+            ])
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 
@@ -168,6 +183,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        SentrySDK.logger.debug(
+            "Scene sessions discarded",
+            attributes: [
+                "sessionCount": sceneSessions.count
+            ])
     }
 
     lazy var persistentContainer: NSPersistentContainer = {

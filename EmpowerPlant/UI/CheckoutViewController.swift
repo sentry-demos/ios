@@ -234,6 +234,12 @@ final class CheckoutViewController: UIViewController {
 
     @objc private func showCheckoutFeedback() {
         ShopClick.play()
+        SentrySDK.logger.info(
+            "Feedback form opened",
+            attributes: [
+                "screen": "checkout",
+                "source": "feedback_button",
+            ])
         SentrySDK.feedback.show { config in
             config.configureForm = { form in
                 form.showName = false

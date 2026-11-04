@@ -63,6 +63,12 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        SentrySDK.logger.debug(
+            "Other issues opened",
+            attributes: [
+                "screen": "actions",
+                "rowCount": actions.count,
+            ])
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -133,6 +139,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     private func captureError() {
         let failure = DemoFailure.random()
         let reason = failure.localizedDescription
+        SentrySDK.logger.warn(
+            "Capturing a handled error",
+            attributes: [
+                "screen": "actions",
+                "action": "Error",
+                "reason": reason,
+                "errorType": "\(failure)",
+            ])
         switch failure {
         case .catalogRequestFailed:
             SentrySDK.capture(error: DemoFailure.catalogRequestFailed) { [weak self] scope in
@@ -157,6 +171,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
             reason: reason,
             userInfo: nil
         )
+        SentrySDK.logger.warn(
+            "Capturing an NSException",
+            attributes: [
+                "screen": "actions",
+                "action": "NSException",
+                "reason": reason,
+                "errorType": "CheckoutFlowException",
+            ])
         SentrySDK.capture(exception: exception) { [weak self] scope in
             scope.setLevel(.fatal)
             self?.attachDemoContext(to: scope, action: "NSException", reason: reason)
@@ -168,6 +190,13 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.configureScope { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
         }
+        SentrySDK.logger.fatal(
+            "Triggering a fatal error",
+            attributes: [
+                "screen": "actions",
+                "action": "Fatal Error",
+                "reason": reason,
+            ])
         // Buffered logs live in memory until flushed, so send them before the process dies.
         SentrySDK.flush(timeout: 2)
         fatalError(reason)
@@ -190,6 +219,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// MetricKit disk diagnostics are not delivered on the simulator.
     private func diskWriteException() {
         let reason = DiskWriteException.writeStorm.localizedDescription
+        SentrySDK.logger.warn(
+            "Capturing a disk write error",
+            attributes: [
+                "screen": "actions",
+                "action": "DiskWriteException (!)",
+                "reason": reason,
+                "durationMs": 8000,
+            ])
         SentrySDK.capture(error: DiskWriteException.writeStorm) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "DiskWriteException (!)", reason: reason)
         }
@@ -215,6 +252,13 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     private func highCPULoad() {
         let reason = HighCPULoad.computingPi.localizedDescription
+        SentrySDK.logger.warn(
+            "Capturing a high CPU load error",
+            attributes: [
+                "screen": "actions",
+                "action": "HighCPULoad",
+                "reason": reason,
+            ])
         SentrySDK.capture(error: HighCPULoad.computingPi) { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "HighCPULoad", reason: reason)
         }
@@ -245,12 +289,29 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         do {
             _ = try Data(contentsOf: protected)
         } catch {
+            let nsError = error as NSError
+            SentrySDK.logger.warn(
+                "Capturing a file permission error",
+                attributes: [
+                    "screen": "actions",
+                    "action": "Permissions (!)",
+                    "reason": error.localizedDescription,
+                    "errorDomain": nsError.domain,
+                    "errorCode": nsError.code,
+                ])
             SentrySDK.capture(error: error)
         }
     }
 
     private func asyncCrash() {
         DispatchQueue.main.async {
+            SentrySDK.logger.fatal(
+                "Triggering an async crash",
+                attributes: [
+                    "screen": "actions",
+                    "action": "Async Crash (!)",
+                    "reason": "SentrySDK.crash() from a later main-queue block",
+                ])
             // Buffered logs live in memory until flushed, so send them before the process dies.
             SentrySDK.flush(timeout: 2)
             SentrySDK.crash()
@@ -261,6 +322,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// stall is not reported as an App Hang. MetricKit is the hang reporter.
     /// The span still records the block.
     private func anrFullyBlocking() {
+        SentrySDK.logger.warn(
+            "Blocking the main thread",
+            attributes: [
+                "screen": "actions",
+                "action": "ANR Fully Blocking",
+                "reason": "Main thread busy-waits for 5 seconds",
+                "durationMs": 5000,
+            ])
         let span: Span
         if let parent = SentrySDK.span {
             span = parent.startChild(operation: "app.hang", description: "Block main thread")
@@ -281,6 +350,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// Fills the main run loop with short blocks for 5 seconds.
     /// The span finishes on the main queue after those blocks drain.
     private func anrFillingRunLoop() {
+        SentrySDK.logger.warn(
+            "Filling the main run loop",
+            attributes: [
+                "screen": "actions",
+                "action": "ANR Filling Run Loop",
+                "reason": "Main queue gets short blocks for 5 seconds",
+                "durationMs": 5000,
+            ])
         let span: Span
         if let parent = SentrySDK.span {
             span = parent.startChild(operation: "app.hang", description: "Fill the run loop")
@@ -314,6 +391,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
     /// The Disk write row stays a background handled error.
     private func fileIOOnMainThread() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-main-thread-io.bin")
+        SentrySDK.logger.warn(
+            "Running file I/O on the main thread",
+            attributes: [
+                "screen": "actions",
+                "action": "File I/O on Main Thread",
+                "reason": "Main thread writes then reads a temp file",
+                "fileName": url.lastPathComponent,
+            ])
         let parent: Span
         if let activeSpan = SentrySDK.span {
             parent = activeSpan.startChild(operation: "file.io", description: "File I/O on Main Thread")
