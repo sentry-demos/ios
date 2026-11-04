@@ -47,6 +47,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // These swizzle features default on, except FileManager tracing.
             options.enableNetworkTracking = true
             options.enableNetworkBreadcrumbs = true
+            // Checkout captures its own PurchaseError. The automatic HTTP Client Error
+            // issue duplicated it with no app frames.
+            options.enableCaptureFailedRequests = false
             options.enableUIViewControllerTracing = true
             options.enableUserInteractionTracing = true
             options.enableFileIOTracing = true
