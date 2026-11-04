@@ -2,14 +2,16 @@
 #
 # This repo has no Apple distribution certificate. build_ios_app exports a
 # signed IPA. This lane calls deploy_project.sh, which archives with
-# CODE_SIGNING_ALLOWED=NO and zips Payload/*.app. That script sets
-# DEVELOPER_DIR to Xcode 26.3 and unsets SDK_V10 before xcodebuild.
+# CODE_SIGNING_ALLOWED=NO and zips Payload/*.app, then builds the unsigned
+# Release simulator app and zips it as EmpowerPlant_release.zip for Empower's
+# TDA. That script sets DEVELOPER_DIR to Xcode 26.3 and unsets SDK_V10 before
+# xcodebuild.
 #
 #   bundle exec fastlane ios release \
 #     marketing_version:26.10.7 build_code:261007 release_tag:26.10.7
 #
 # Requires SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN.
-# The workflow publishes the GitHub release with gh release create.
+# The workflow publishes the GitHub release with gh release create, on master only.
 
 opt_out_usage
 skip_docs
@@ -26,7 +28,7 @@ def release_git(repo_root, *args)
 end
 
 platform :ios do
-  desc "Build an unsigned Release IPA and upload symbols, size analysis, and build distribution"
+  desc "Build an unsigned Release IPA and simulator zip, and upload symbols, size analysis, and build distribution"
   lane :release do |options|
     marketing_version = options[:marketing_version].to_s
     build_code = options[:build_code].to_s
@@ -53,8 +55,10 @@ platform :ios do
 
     ipa_path = File.join(repo_root, "build/EmpowerPlant.ipa")
     dsym_path = File.join(repo_root, "build/EmpowerPlant.xcarchive/dSYMs")
+    simulator_zip_path = File.join(repo_root, "EmpowerPlant_release.zip")
     UI.user_error!("Archive did not produce #{ipa_path}") unless File.exist?(ipa_path)
     UI.user_error!("Archive did not produce #{dsym_path}") unless File.directory?(dsym_path)
+    UI.user_error!("Simulator build did not produce #{simulator_zip_path}") unless File.exist?(simulator_zip_path)
 
     sentry_debug_files_upload(
       auth_token: auth_token,
