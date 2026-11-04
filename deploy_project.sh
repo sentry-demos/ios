@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-# Unsigned Release builds for fastlane/Fastfile's release lane.
+# Unsigned Release archive for fastlane/Fastfile's release lane.
 #
 # Usage: ./deploy_project.sh <marketing-version> <build-code> <release-tag>
 # Example: ./deploy_project.sh 26.10.7 261007 26.10.7
@@ -12,14 +12,8 @@ set -eo pipefail
 # release-tag is the GitHub release tag (YY.M.D, or YY.M.D-N if that tag exists).
 #
 # Requires SENTRY_ORG, SENTRY_PROJECT, and SENTRY_AUTH_TOKEN.
-# Builds two unsigned Release products:
-# - build/EmpowerPlant.ipa from a device archive. The lane uploads it and the
-#   archive's dSYMs to Sentry.
-# - EmpowerPlant_release.zip, a simulator EmpowerPlant.app. Empower's TDA
-#   installs that asset from the newest GitHub release on a Sauce Labs
-#   simulator, so the zip keeps the build/Build/Products/Release-iphonesimulator/
-#   layout of 0.0.44's zip.
-# The workflow publishes both on master.
+# Builds one unsigned Release archive and packages EmpowerPlant.ipa from it.
+# The lane uploads that archive's dSYMs and the IPA. The workflow publishes the IPA.
 
 error_exit() {
     echo "$1" >&2
@@ -95,44 +89,4 @@ cp -R "$APP_PATH" "$STAGE/Payload/"
     zip -r -y "../EmpowerPlant.ipa" Payload
 )
 
-echo "Building the Release simulator app..."
-SIM_PRODUCTS="build/Build/Products/Release-iphonesimulator"
-SIM_APP_PATH="$SIM_PRODUCTS/EmpowerPlant.app"
-ZIP_PATH="EmpowerPlant_release.zip"
-rm -rf "$SIM_PRODUCTS" "$ZIP_PATH"
-SENTRY_ORG="$SENTRY_ORG" \
-SENTRY_PROJECT="$SENTRY_PROJECT" \
-SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN" \
-xcodebuild build \
-    -project EmpowerPlant.xcodeproj \
-    -scheme EmpowerPlant \
-    -configuration Release \
-    -sdk iphonesimulator \
-    -destination "generic/platform=iOS Simulator" \
-    -derivedDataPath build \
-    CODE_SIGNING_REQUIRED=NO \
-    CODE_SIGNING_ALLOWED=NO \
-    -quiet
-
-if [ ! -d "$SIM_APP_PATH" ]; then
-    error_exit "Simulator build did not produce $SIM_APP_PATH"
-fi
-
-zip -r -q "$ZIP_PATH" "./$SIM_APP_PATH"
-
-# Check what the TDA will install: the zipped app must be a simulator build.
-ZIP_CHECK="build/zip-check"
-rm -rf "$ZIP_CHECK"
-mkdir -p "$ZIP_CHECK"
-unzip -q "$ZIP_PATH" -d "$ZIP_CHECK"
-ZIPPED_PLIST="$ZIP_CHECK/$SIM_APP_PATH/Info.plist"
-if [ ! -f "$ZIPPED_PLIST" ]; then
-    error_exit "$ZIP_PATH has no $SIM_APP_PATH/Info.plist"
-fi
-PLATFORM=$(/usr/libexec/PlistBuddy -c "Print :DTPlatformName" "$ZIPPED_PLIST")
-if [ "$PLATFORM" != "iphonesimulator" ]; then
-    error_exit "$ZIP_PATH holds a $PLATFORM app, expected iphonesimulator"
-fi
-rm -rf "$ZIP_CHECK"
-
-echo "Archive, ${IPA_PATH}, and ${ZIP_PATH} are ready for ${RELEASE_TAG}."
+echo "Archive and ${IPA_PATH} are ready for ${RELEASE_TAG}."
