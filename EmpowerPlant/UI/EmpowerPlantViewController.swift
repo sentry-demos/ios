@@ -286,9 +286,6 @@ class EmpowerPlantViewController: UIViewController {
                         ])
                     if let fetchError {
                         SentrySDK.capture(error: fetchError)
-                        ErrorToastManager.shared.showErrorToast(message: "Failed to fetch products from server")
-                    } else {
-                        ErrorToastManager.shared.showErrorToast(message: failureMessage)
                     }
                     SentrySDK.reportFullyDisplayed()
                 }
