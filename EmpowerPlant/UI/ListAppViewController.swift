@@ -168,6 +168,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         SentrySDK.configureScope { [weak self] scope in
             self?.attachDemoContext(to: scope, action: "Fatal Error", reason: reason)
         }
+        // Buffered logs live in memory until flushed, so send them before the process dies.
+        SentrySDK.flush(timeout: 2)
         fatalError(reason)
     }
 
@@ -249,6 +251,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
 
     private func asyncCrash() {
         DispatchQueue.main.async {
+            // Buffered logs live in memory until flushed, so send them before the process dies.
+            SentrySDK.flush(timeout: 2)
             SentrySDK.crash()
         }
     }

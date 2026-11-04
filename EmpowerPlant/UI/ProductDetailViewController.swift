@@ -356,6 +356,8 @@ final class ProductDetailViewController: UIViewController {
                 "screen": "product_detail",
             ])
         SentrySDK.metrics.count("plant.repot", value: 1, options: SentryMetricOptions(attributes: ["plant_title": plantTitle]))
+        // Buffered logs live in memory until flushed, so send them before the process dies.
+        SentrySDK.flush(timeout: 2)
         SentrySDK.crash()
     }
 
