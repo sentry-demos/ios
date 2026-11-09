@@ -67,6 +67,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // (MXHangDiagnostic, MXCPUExceptionDiagnostic, MXDiskWriteExceptionDiagnostic).
             options.enableAppHangTracking = false
             options.enableMetricKit = true
+            options.experimental.metrickit.enabledMetricReports = .all
+            // Crash is left out so MetricKit doesn't duplicate Sentry's own crash issues.
+            options.experimental.metrickit.enabledDiagnosticReports = [.hang, .cpuException, .diskWriteException, .appLaunch]
 
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
