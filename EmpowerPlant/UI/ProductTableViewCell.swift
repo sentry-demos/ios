@@ -58,7 +58,7 @@ class ProductTableViewCell: UITableViewCell {
     private let addToCartButton: UIButton = {
         let b = UIButton(type: .system)
         b.setTitle("Add to Cart", for: .normal)
-        b.setTitleColor(.white, for: .normal)
+        b.setTitleColor(.black, for: .normal)
         b.titleLabel?.font = .systemFont(ofSize: 13, weight: .bold)
         b.backgroundColor = EmpowerPlantTheme.buttonBackground
         b.layer.cornerRadius = 4
@@ -70,7 +70,7 @@ class ProductTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .none
+        selectionStyle = .default
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         setupViews()
@@ -90,6 +90,7 @@ class ProductTableViewCell: UITableViewCell {
         cardView.addSubview(addToCartButton)
 
         addToCartButton.addTarget(self, action: #selector(addToCartTapped), for: .touchUpInside)
+        addToCartButton.sentryReplayUnmask()
 
         NSLayoutConstraint.activate([
             // Card inset from cell edges
@@ -153,10 +154,30 @@ class ProductTableViewCell: UITableViewCell {
             return
         }
 
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: urlString) else {
+            SentrySDK.logger.warn(
+                "Product image URL is invalid",
+                attributes: [
+                    "imageURL": urlString,
+                    "screen": "product_list",
+                ])
+            return
+        }
 
-        imageTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
+        imageTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+            guard let data = data, let image = UIImage(data: data) else {
+                // Reused cells cancel their image task, which is not a failure.
+                if (error as? URLError)?.code != .cancelled {
+                    SentrySDK.logger.warn(
+                        "Product image failed to load",
+                        attributes: [
+                            "imageURL": urlString,
+                            "error": error?.localizedDescription ?? "invalid image data",
+                            "screen": "product_list",
+                        ])
+                }
+                return
+            }
             Self.imageCache.setObject(image, forKey: urlString as NSString)
             DispatchQueue.main.async {
                 // Only set if the cell hasn't been reused for a different item
@@ -182,6 +203,12 @@ class ProductTableViewCell: UITableViewCell {
     // MARK: - Actions
 
     @objc private func addToCartTapped() {
+        SentrySDK.logger.debug(
+            "Add to Cart tapped",
+            attributes: [
+                "plantTitle": nameLabel.text ?? "unknown",
+                "screen": "product_list",
+            ])
         onAddToCart?()
 
         // Brief visual feedback

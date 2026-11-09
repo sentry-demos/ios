@@ -14,7 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
 
         SentrySDK.start { options in
-            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@sandbox-mirror.sentry.gg/1"
+            // wassimTestDSN: restore the wassim-test project by assigning this string to options.dsn.
+            // "https://a9e3c927433fc5a2ef7c87bd5938cb72@o4510868817379328.ingest.us.sentry.io/4512181895495680"
+            options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@o87286.ingest.us.sentry.io/4508968167538688"
+
+            // Local runs set SENTRY_ENVIRONMENT so issues are easy to filter in Sentry.
+            if let sentryEnvironment = ProcessInfo.processInfo.environment["SENTRY_ENVIRONMENT"],
+                !sentryEnvironment.isEmpty
+            {
+                options.environment = sentryEnvironment
+            }
 
             // set the SDK debug mode according to defaults and overrides.
             #if DEBUG
@@ -33,16 +42,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.enableSwizzling = enableSwizzling
+            // These swizzle features default on, except FileManager tracing.
+            options.enableNetworkTracking = true
+            options.enableNetworkBreadcrumbs = true
+            // Checkout captures its own PurchaseError. The automatic HTTP Client Error
+            // issue duplicated it with no app frames.
+            options.enableCaptureFailedRequests = false
+            options.enableUIViewControllerTracing = true
+            options.enableUserInteractionTracing = true
+            options.enableFileIOTracing = true
+            options.enableFileManagerSwizzling = true
+            options.enableCoreDataTracing = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
-            options.experimental.enableStandaloneAppStartTracing = true
+            // App Start is sent on its own transaction, and the first ui.load
+            // (EmpowerPlantViewController) reuses its trace ID, so GET /products
+            // and its Flask spans share the trace. Attached app start was lost
+            // whenever another screen's ui.load finished before the plant list's.
+            // Cocoa 9.26 moved this off options.experimental.
+            options.enableStandaloneAppStartTracing = true
 
-            // Enable AppHang configurations
-            options.appHangTimeoutInterval = 2.0
-            options.enableReportNonFullyBlockingAppHangs = true
-
-            // Enable Mobile Session Health configurations
-            options.enableUserInteractionTracing = true
+            // Sentry's app-hang watcher is off. MetricKit is the hang reporter
+            // (MXHangDiagnostic, MXCPUExceptionDiagnostic, MXDiskWriteExceptionDiagnostic).
+            options.enableAppHangTracking = false
+            options.enableMetricKit = true
+            options.experimental.metrickit.enabledMetricReports = .all
+            // Crash is left out so MetricKit doesn't duplicate Sentry's own crash issues.
+            options.experimental.metrickit.enabledDiagnosticReports = [.hang, .cpuException, .diskWriteException, .appLaunch]
 
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
@@ -61,13 +87,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ]
             options.sessionReplay.networkCaptureBodies = true
 
-            // Enable User Feedback Widget
+            // Installs the user-feedback integration. Checkout failure reveals a
+            // button that presents the form with SentrySDK.feedback.show(), with
+            // the message prefilled.
             options.configureUserFeedback = { config in
-                config.onSubmitSuccess = { data in
-                    print("Feedback submitted successfully: \(data)")
+                config.onSubmitSuccess = { _ in
+                    SentrySDK.logger.info(
+                        "User feedback submitted",
+                        attributes: [
+                            "screen": "checkout"
+                        ])
                 }
                 config.onSubmitError = { error in
-                    print("Failed to submit feedback: \(error)")
+                    SentrySDK.logger.error(
+                        "User feedback submit failed",
+                        attributes: [
+                            "screen": "checkout",
+                            "errorType": String(describing: type(of: error)),
+                            "error": error.localizedDescription,
+                        ])
                 }
             }
 
@@ -92,13 +130,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return event
             }
         }
+
+        // Must run before this method returns, or App Start ends at didFinishLaunching.
+        // The plant list ends it from viewDidAppear, like Android's first frame.
+        SentrySDK.extendAppStart()
+        let initSpan = SentrySDK.getExtendedAppStartSpan()?.startChild(
+            operation: "app.init", description: "Post-init setup")
+
+        // Checkout always posts validate_inventory.
+        SentrySDK.addFeatureFlag(name: "inventory-check", result: true)
+        // Product detail includes Water and Repot.
+        SentrySDK.addFeatureFlag(name: "plant-care", result: true)
+        // Session Replay and screenshots unmask the cart, nav buttons, and total.
+        SentrySDK.addFeatureFlag(name: "replay-unmask", result: true)
+
         EmpowerPlantTheme.applyNavBarAppearance()
 
         SentrySDK.configureScope { scope in
             scope.setTag(
                 value: ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown", key: "customer.type")
-            scope.setTag(value: ProcessInfo.processInfo.environment["USER"] ?? "tda", key: "se")
+            scope.setTag(value: ShopSession.se, key: "se")
             scope.setTag(value: "\(enableSwizzling)", key: "enableSwizzling")
+            scope.setTag(value: ShopSession.customerType, key: "customerType")
+            let user = User()
+            user.email = ShopSession.email
+            scope.setUser(user)
         }
 
         let logger = SentrySDK.logger
@@ -106,7 +162,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             "Sentry SDK initialized",
             attributes: [
                 "enableSwizzling": enableSwizzling,
-                "customerType": ["corporate", "enterprise", "self-serve"].randomElement() ?? "unknown",
+                "customerType": ShopSession.customerType,
+                "email": ShopSession.email,
             ])
 
         if ProcessInfo.processInfo.arguments.contains("--wipe-db") {
@@ -114,6 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             wipeDB()
         }
 
+        initSpan?.finish()
         return true
     }
 
@@ -125,6 +183,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
+        SentrySDK.logger.debug(
+            "Scene session connecting",
+            attributes: [
+                "sessionRole": connectingSceneSession.role.rawValue
+            ])
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 
@@ -132,6 +195,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        SentrySDK.logger.debug(
+            "Scene sessions discarded",
+            attributes: [
+                "sessionCount": sceneSessions.count
+            ])
     }
 
     lazy var persistentContainer: NSPersistentContainer = {
@@ -175,29 +243,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         return container
     }()
-
-    // MARK: - Core Data Saving support
-
-    func saveContext() {
-        let logger = SentrySDK.logger
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            logger.debug("Attempting to save Core Data context changes")
-            do {
-                try context.save()
-                logger.info("Core Data context saved successfully")
-            } catch {
-                logger.error(
-                    "Failed to save Core Data context",
-                    attributes: [
-                        "error": error.localizedDescription
-                    ])
-                ErrorToastManager.shared.logErrorAndShowToast(
-                    error: error,
-                    message: "Failed to save context changes"
-                )
-            }
-        }
-    }
-
 }

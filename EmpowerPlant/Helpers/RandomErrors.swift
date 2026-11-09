@@ -1,35 +1,29 @@
 import Foundation
-import SentrySwift
 
-enum SampleError: Error, LocalizedError {
-    case bestDeveloper
-    case happyCustomer
-    case awesomeCentaur
+/// Handled failures for the Other issues Error button.
+/// One case per failure, captured as a Swift error.
+enum DemoFailure: Error, LocalizedError {
+    case catalogRequestFailed
+    case checkoutReservationFailed
+    case paymentAuthorizationFailed
 
     var errorDescription: String? {
         switch self {
-        case .bestDeveloper:
-            return "Best Developer error occurred"
-        case .happyCustomer:
-            return "Happy Customer error occurred"
-        case .awesomeCentaur:
-            return "Awesome Centaur error occurred"
+        case .catalogRequestFailed:
+            return "Catalog request failed: the product service returned no prices"
+        case .checkoutReservationFailed:
+            return "Checkout failed: inventory could not be reserved for this order"
+        case .paymentAuthorizationFailed:
+            return "Payment failed: the card authorization was declined"
         }
     }
-}
 
-class RandomErrorGenerator {
-    static func generate() throws {
-        let random = Int.random(in: 0...2)
-        switch random {
-        case 0:
-            throw SampleError.bestDeveloper
-        case 1:
-            throw SampleError.happyCustomer
-        case 2:
-            throw SampleError.awesomeCentaur
-        default:
-            throw SampleError.bestDeveloper
-        }
+    static func random() -> DemoFailure {
+        let cases: [DemoFailure] = [
+            .catalogRequestFailed,
+            .checkoutReservationFailed,
+            .paymentAuthorizationFailed,
+        ]
+        return cases.randomElement()!
     }
 }
