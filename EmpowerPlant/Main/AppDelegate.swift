@@ -131,6 +131,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
+        // Must run before this method returns, or App Start ends at didFinishLaunching.
+        // The plant list ends it from viewDidAppear, like Android's first frame.
+        SentrySDK.extendAppStart()
+        let initSpan = SentrySDK.getExtendedAppStartSpan()?.startChild(
+            operation: "app.init", description: "Post-init setup")
+
         // Checkout always posts validate_inventory.
         SentrySDK.addFeatureFlag(name: "inventory-check", result: true)
         // Product detail includes Water and Repot.
@@ -165,6 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             wipeDB()
         }
 
+        initSpan?.finish()
         return true
     }
 
