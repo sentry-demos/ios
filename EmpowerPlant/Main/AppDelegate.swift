@@ -38,8 +38,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.configureProfiling = {
                 $0.sessionSampleRate = 1
                 $0.lifecycle = .trace
-                // Profiles the next cold start and attaches that profile to app.launch.
-                $0.profileAppStarts = true
             }
             options.attachScreenshot = true
             options.attachViewHierarchy = true
