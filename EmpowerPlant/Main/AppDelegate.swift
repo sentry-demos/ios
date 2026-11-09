@@ -55,11 +55,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.enableCoreDataTracing = true
             options.enableAutoPerformanceTracing = true
             options.enableTimeToFullDisplayTracing = true
-            // Automatic app start attaches app_start_cold to the first ui.load
-            // transaction (EmpowerPlantViewController). Standalone tracing would
-            // send that measurement on its own app.start transaction instead.
+            // App Start is sent on its own transaction, and the first ui.load
+            // (EmpowerPlantViewController) reuses its trace ID, so GET /products
+            // and its Flask spans share the trace. Attached app start was lost
+            // whenever another screen's ui.load finished before the plant list's.
             // Cocoa 9.26 moved this off options.experimental.
-            options.enableStandaloneAppStartTracing = false
+            options.enableStandaloneAppStartTracing = true
 
             // Sentry's app-hang watcher is off. MetricKit is the hang reporter
             // (MXHangDiagnostic, MXCPUExceptionDiagnostic, MXDiskWriteExceptionDiagnostic).
