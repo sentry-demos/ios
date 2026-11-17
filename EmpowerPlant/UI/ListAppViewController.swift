@@ -241,9 +241,14 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
         workQueue.async {
             let chunk = Data(repeating: 0x41, count: 256 * 1024)
             let url = FileManager.default.temporaryDirectory.appendingPathComponent("sentry-disk-write.bin")
-            let end = Date().addingTimeInterval(8)
-            while Date() < end {
-                try? chunk.write(to: url)
+            FileManager.default.createFile(atPath: url.path, contents: nil)
+            if let handle = try? FileHandle(forWritingTo: url) {
+                let end = Date().addingTimeInterval(8)
+                while Date() < end {
+                    try? handle.seek(toOffset: 0)
+                    try? handle.write(contentsOf: chunk)
+                }
+                try? handle.close()
             }
             try? FileManager.default.removeItem(at: url)
             span.finish()
@@ -416,52 +421,8 @@ final class ListAppViewController: UIViewController, UITableViewDataSource, UITa
             parent.finish()
         }
 
-        let chunk = Data(repeating: 0x42, count: 64 * 1024)
-        let writeSpan = parent.startChild(operation: "file.write", description: "Write file on main thread")
-        writeSpan.setData(value: "actions", key: "screen")
-        writeSpan.setData(value: url.lastPathComponent, key: "file.name")
-        let writeStarted = Date()
-        var bytesWritten = 0
-        FileManager.default.createFile(atPath: url.path, contents: nil)
-        if let handle = try? FileHandle(forWritingTo: url) {
-            let writeEnd = Date().addingTimeInterval(0.3)
-            while Date() < writeEnd {
-                do {
-                    try handle.write(contentsOf: chunk)
-                    bytesWritten += chunk.count
-                } catch {
-                    break
-                }
-            }
-            try? handle.synchronize()
-            try? handle.close()
-        }
-        let writeMs = Int(Date().timeIntervalSince(writeStarted) * 1000)
-        writeSpan.setData(value: writeMs, key: "duration_ms")
-        writeSpan.setData(value: bytesWritten, key: "file.bytes")
-        writeSpan.finish()
-
-        let readSpan = parent.startChild(operation: "file.read", description: "Read file on main thread")
-        readSpan.setData(value: "actions", key: "screen")
-        readSpan.setData(value: url.lastPathComponent, key: "file.name")
-        let readStarted = Date()
-        var bytesRead = 0
-        if let handle = try? FileHandle(forReadingFrom: url) {
-            let readEnd = Date().addingTimeInterval(0.2)
-            while Date() < readEnd {
-                let data = (try? handle.read(upToCount: chunk.count)) ?? Data()
-                if data.isEmpty {
-                    try? handle.seek(toOffset: 0)
-                } else {
-                    bytesRead += data.count
-                }
-            }
-            try? handle.close()
-        }
-        let readMs = Int(Date().timeIntervalSince(readStarted) * 1000)
-        readSpan.setData(value: readMs, key: "duration_ms")
-        readSpan.setData(value: bytesRead, key: "file.bytes")
-        readSpan.finish()
-        parent.setData(value: writeMs + readMs, key: "duration_ms")
+        let data = Data(repeating: 0x42, count: 8 * 1024 * 1024)
+        try? data.write(to: url)
+        _ = try? Data(contentsOf: url)
     }
 }
