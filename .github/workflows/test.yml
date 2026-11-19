@@ -9,11 +9,9 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     env:
-      # macos-15 defaults to Xcode 16.4. Its SwiftPM can reject sentry-cocoa's
-      # unstable KSCrash dependency, and its iOS 18.5 SDK lacks the iOS 26 calls
-      # the app makes (hidesSharedBackground). Same pin as deploy_project.sh.
+      # macos-26 defaults to a newer Xcode. Pin 26.3 to match deploy_project.sh.
       # Xcode 26.3's iOS 26.2 runtime has the Makefile's iPhone 17 Pro.
       DEVELOPER_DIR: /Applications/Xcode_26.3.app
     steps:

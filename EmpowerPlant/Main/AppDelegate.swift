@@ -69,6 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options.experimental.metrickit.enabledMetricReports = .all
             // Crash is left out so MetricKit doesn't duplicate Sentry's own crash issues.
             options.experimental.metrickit.enabledDiagnosticReports = [.hang, .cpuException, .diskWriteException, .appLaunch]
+            options.experimental.metrickit.hangReportingMode = .flamegraphAttachment
 
             // Enable Distributed Tracing
             options.tracePropagationTargets = [
