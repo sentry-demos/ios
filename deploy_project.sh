@@ -55,7 +55,7 @@ INFO_PLIST="EmpowerPlant/Resources/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_CODE" "$INFO_PLIST"
 
 echo "Building one Release archive ($MARKETING_VERSION / $BUILD_CODE)..."
-# macos-15 defaults to Xcode 16.4 (Swift 6.1). That tools version loads
+# Xcode 16.x (Swift 6.1) loads
 # sentry-cocoa 9.32.0's Package@swift-6.1.swift and rejects the KSCrash
 # revision as an unstable dependency of stable 9.32.0. Swift 6.2 (Xcode 26)
 # ignores that revision unless the V10 trait is enabled or SDK_V10=1.
