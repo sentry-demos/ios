@@ -2,7 +2,7 @@
 
 Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.32.0** (`SentrySPM`, `import SentrySwift`).
 
-The DSN in `EmpowerPlant/Main/AppDelegate.swift` sends events to the demo organization, project **ios**. A commented wassim-test DSN sits above `options.dsn` so that project can be restored. Leave the active DSN on the demo ios project.
+The DSN in `EmpowerPlant/Main/AppDelegate.swift` sends events to the demo organization, project **ios**. Leave the active DSN on the demo ios project.
 
 Sentry's app-hang watcher is off (`enableAppHangTracking = false`). MetricKit is the hang reporter (`enableMetricKit = true`). The iOS Simulator does not deliver MetricKit diagnostics.
 

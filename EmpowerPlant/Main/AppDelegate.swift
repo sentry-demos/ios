@@ -14,8 +14,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let enableSwizzling = !ProcessInfo.processInfo.arguments.contains("--disable-swizzling")
 
         SentrySDK.start { options in
-            // wassimTestDSN: restore the wassim-test project by assigning this string to options.dsn.
-            // "https://a9e3c927433fc5a2ef7c87bd5938cb72@o4510868817379328.ingest.us.sentry.io/4512181895495680"
             options.dsn = "https://9b0dbdfd24daad3f475baa5f5adf1302@o87286.ingest.us.sentry.io/4508968167538688"
 
             // Local runs set SENTRY_ENVIRONMENT so issues are easy to filter in Sentry.
