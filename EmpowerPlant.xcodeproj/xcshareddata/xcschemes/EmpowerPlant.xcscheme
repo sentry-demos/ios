@@ -91,6 +91,11 @@
             value = "$(USER)"
             isEnabled = "YES">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "SENTRY_ENVIRONMENT"
+            value = "production"
+            isEnabled = "YES">
+         </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
