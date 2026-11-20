@@ -1,6 +1,6 @@
 ## Overview
 
-Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.32.0** (`SentrySPM`, `import SentrySwift`).
+Empower Plants is an iOS shop that demos Sentry. The app uses the Sentry Cocoa SDK **9.35.0** (`SentrySPM`, `import SentrySwift`).
 
 The DSN in `EmpowerPlant/Main/AppDelegate.swift` sends events to the demo organization, project **ios**. Leave the active DSN on the demo ios project.
 
@@ -88,6 +88,18 @@ The app deploys to iOS 15. Build with Xcode 26.3: the app uses iOS 26 SDK calls,
    - File I/O on Main Thread
 
    Fatal Error and Async Crash end the process right after `SentrySDK.flush(timeout: 2)`, so buffered logs are sent before the crash. Repot on product detail does the same. The two ANR rows still block the main thread and record `app.hang` spans. File I/O on Main Thread keeps the app alive and records main-thread `file.write` and `file.read` spans.
+
+5. **Web store** opens from the `globe` button next to Other issues (accessibility id `web-store`). It loads the Empower Plant React store (`https://empower-plant.com/products`) in a `WKWebView`. `options.webViewTracing` (Cocoa 9.35.0) writes the app's trace into the page as `sentry-trace` and `baggage` `<meta>` tags, so one trace runs from the app through the web page to the backend:
+
+   ```
+   ui.load – WebStoreViewController            (ios)
+   ├─ ui.webview.load – webview/empower-plant
+   └─ pageload – /products                     (Empower React project)
+      └─ http.client – GET flask…/products
+         └─ http.server …                      (Flask)
+   ```
+
+   Time to full display keeps `ui.load` open until the page finishes, so the page loads under that transaction. The option needs swizzling, so `--disable-swizzling` turns it off.
 
 ## Logs
 

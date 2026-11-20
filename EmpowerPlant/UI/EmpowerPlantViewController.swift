@@ -105,7 +105,17 @@ class EmpowerPlantViewController: UIViewController {
         // Empower's error-list TDA test taps this by accessibility id `more`.
         moreItem.accessibilityIdentifier = "more"
         moreItem.accessibilityLabel = "Other issues"
-        navigationItem.leftBarButtonItem = moreItem
+
+        let webStoreItem = UIBarButtonItem(
+            image: UIImage(systemName: "globe"),
+            style: .plain,
+            target: self,
+            action: #selector(goToWebStore)
+        )
+        webStoreItem.accessibilityIdentifier = "web-store"
+        webStoreItem.accessibilityLabel = "Web store"
+        // Added after `more`, which TDA tests find by accessibility id, not position.
+        navigationItem.leftBarButtonItems = [moreItem, webStoreItem]
 
         cartButton.onTap = { [weak self] in
             ShopClick.play()
@@ -444,6 +454,11 @@ class EmpowerPlantViewController: UIViewController {
     @objc func goToListApp() {
         ShopClick.play()
         navigationController?.pushViewController(ListAppViewController(), animated: true)
+    }
+
+    @objc func goToWebStore() {
+        ShopClick.play()
+        navigationController?.pushViewController(WebStoreViewController(), animated: true)
     }
 
     @objc func refreshTable() {
