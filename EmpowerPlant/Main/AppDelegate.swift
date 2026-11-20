@@ -76,6 +76,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ]
             options.enablePropagateTraceparent = true
 
+            // Connect WKWebView traces: the SDK writes the current trace as `sentry-trace` /
+            // `baggage` <meta> tags, and the Empower web store's pageload continues it.
+            // Applies to every WKWebView, so only list hosts we trust. Requires swizzling.
+            options.webViewTracing = SentryWebViewTracingOptions(allowedHosts: [WebStoreViewController.host])
+
             // Enable Mobile Session Replay
             options.sessionReplay.onErrorSampleRate = 1.0
             options.sessionReplay.sessionSampleRate = 1.0
